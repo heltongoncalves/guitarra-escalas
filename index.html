@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo de Escalas de Guitarra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+        }
+        
+        .fret-cell {
+            position: relative;
+        }
+        
+        /* Linha horizontal que representa a corda da guitarra */
+        .string-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #6b7280; /* gray-500 */
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        /* O marcador visual da nota */
+        .note-dot {
+            position: relative;
+            z-index: 20;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Afinadores na lateral esquerda */
+        .tuning-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #111827; /* gray-900 */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        /* Ajuste fino para os selects */
+        select {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right .5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+    </style>
+</head>
+<body class="p-6 max-w-[1400px] mx-auto">
+
+    <h1 class="text-3xl font-normal text-center mb-8">Estudo de Escalas de Guitarra</h1>
+
+    <!-- Controles -->
+    <div class="flex flex-wrap justify-center gap-6 mb-8">
+        <div class="flex items-center gap-2">
+            <label for="tom" class="text-lg">Tom</label>
+            <select id="tom" class="border border-gray-300 rounded px-3 py-1 text-lg w-32 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="C">C</option>
+                <option value="C#">C#</option>
+                <option value="D">D</option>
+                <option value="D#">D#</option>
+                <option value="E">E</option>
+                <option value="F" selected>F</option>
+                <option value="F#">F#</option>
+                <option value="G">G</option>
+                <option value="G#">G#</option>
+                <option value="A">A</option>
+                <option value="A#">A#</option>
+                <option value="B">B</option>
+            </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <label for="escala" class="text-lg">Escala</label>
+            <select id="escala" class="border border-gray-300 rounded px-3 py-1 text-lg w-64 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- Preenchido dinamicamente -->
+            </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <label for="modo" class="text-lg">Variação / Modo</label>
+            <select id="modo" class="border border-gray-300 rounded px-3 py-1 text-lg w-64 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- Preenchido dinamicamente -->
+            </select>
+        </div>
+    </div>
+
+    <!-- Braço Principal -->
+    <div class="mb-10 overflow-x-auto pb-4">
+        <div id="main-fretboard" class="min-w-[900px]"></div>
+    </div>
+
+    <!-- Posições (Sistema CAGED) -->
+    <div id="positions-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <!-- Renderizados dinamicamente -->
+    </div>
+
+    <script>
+        const notasCromaticas = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        // Afinação padrão: E4, B3, G3, D3, A2, E2 (do agudo para o grave)
+        const afinacaoIndices = [4, 11, 7, 2, 9, 4]; 
+
+        // Banco de Escalas e Modos com intervalos e deslocamento do sistema CAGED
+        const bancoDeEscalas = {
+            'Pentatônica': {
+                'Maior': { i: [0, 2, 4, 7, 9], c: 0 },
+                'Menor': { i: [0, 3, 5, 7, 10], c: 3 }
+            },
+            'Diatônica (Modos Gregos)': {
+                'Jônio (Maior)': { i: [0, 2, 4, 5, 7, 9, 11], c: 0 },
+                'Dórico': { i: [0, 2, 3, 5, 7, 9, 10], c: -2 },
+                'Frígio': { i: [0, 1, 3, 5, 7, 8, 10], c: -4 },
+                'Lídio': { i: [0, 2, 4, 6, 7, 9, 11], c: -5 },
+                'Mixolídio': { i: [0, 2, 4, 5, 7, 9, 10], c: -7 },
+                'Eólio (Menor)': { i: [0, 2, 3, 5, 7, 8, 10], c: 3 },
+                'Lócrio': { i: [0, 1, 3, 5, 6, 8, 10], c: 1 }
+            },
+            'Escala Blues': {
+                'Maior': { i: [0, 2, 3, 4, 7, 9], c: 0 },
+                'Menor': { i: [0, 3, 5, 6, 7, 10], c: 3 }
+            },
+            'Menor Harmônica': {
+                'Padrão': { i: [0, 2, 3, 5, 7, 8, 11], c: 3 }
+            },
+            'Menor Melódica': {
+                'Padrão': { i: [0, 2, 3, 5, 7, 9, 11], c: 3 }
+            },
+            'Escalas Simétricas': {
+                'Diminuta (Tom-Semitom)': { i: [0, 2, 3, 5, 6, 8, 9, 11], c: 0 },
+                'Dom Diminuta (Semitom-Tom)': { i: [0, 1, 3, 4, 6, 7, 9, 10], c: 0 },
+                'Hexafônica (Tons Inteiros)': { i: [0, 2, 4, 6, 8, 10], c: 0 }
+            }
+        };
+
+        function inicializarDropdowns() {
+            const selectCategoria = document.getElementById('escala');
+            selectCategoria.innerHTML = '';
+            for (const cat in bancoDeEscalas) {
+                selectCategoria.add(new Option(cat, cat));
+            }
+            selectCategoria.value = 'Pentatônica'; // Valor padrão inicial
+            atualizarModos();
+        }
+
+        function atualizarModos() {
+            const selectCategoria = document.getElementById('escala');
+            const selectModo = document.getElementById('modo');
+            const cat = selectCategoria.value;
+            const modos = bancoDeEscalas[cat];
+            
+            selectModo.innerHTML = '';
+            for (const modo in modos) {
+                selectModo.add(new Option(modo, modo));
+            }
+            updateUI();
+        }
+
+        function getScaleData() {
+            const tom = document.getElementById('tom').value;
+            const categoria = document.getElementById('escala').value;
+            const modo = document.getElementById('modo').value;
+
+            const rootIdx = notasCromaticas.indexOf(tom);
+            
+            // Fallback para evitar erro de corrida durante a atualização do UI
+            if (!bancoDeEscalas[categoria] || !bancoDeEscalas[categoria][modo]) return null;
+
+            const dadosModo = bancoDeEscalas[categoria][modo];
+            const notasDaEscala = new Set(dadosModo.i.map(i => notasCromaticas[(rootIdx + i) % 12]));
+
+            return {
+                root: tom,
+                rootIdx: rootIdx,
+                notes: notasDaEscala,
+                cagedOffset: dadosModo.c
+            };
+        }
+
+        // Determina as "caixas" de digitação utilizando offset da escala maior relativa
+        function getPositionWindows(rootIdx, cagedOffset) {
+            let relMajorIdx = (rootIdx + cagedOffset + 12) % 12;
+            let r = (relMajorIdx - 4 + 12) % 12; // Encontra a tônica maior na corda Mizona
+            
+            let rawWindows = [
+                [r - 1, r + 3],  // Pos 1 (Formato E)
+                [r + 3, r + 6],  // Pos 2 (Formato D)
+                [r + 6, r + 9],  // Pos 3 (Formato C)
+                [r + 9, r + 12], // Pos 4 (Formato A)
+                [r + 12, r + 14] // Pos 5 (Formato G)
+            ];
+
+            let normalized = rawWindows.map(w => {
+                let [s, e] = w;
+                // Ajustes de oitava para posições perto da pestana
+                if (s < 0) {
+                    if (e >= 2) s = 0;
+                    else { s += 12; e += 12; }
+                }
+                // Manter foco nos 15 primeiros trastes
+                while (s >= 12 && e > 15) {
+                    s -= 12;
+                    e -= 12;
+                }
+                if (s < 0) s = 0;
+                if (e > 15) e = 15;
+                return [s, e];
+            });
+
+            // Evitar formas duplicadas após recálculo de oitava
+            let uniqueMap = new Map();
+            normalized.forEach(w => uniqueMap.set(`${w[0]}-${w[1]}`, w));
+            
+            let finalWindows = Array.from(uniqueMap.values()).sort((a, b) => a[0] - b[0]);
+            
+            // Fallback emergencial caso perca alguma posição na normalização
+            if (finalWindows.length < 5) finalWindows = [ [0,3], [3,6], [5,9], [8,12], [10,15] ];
+            return finalWindows.slice(0, 5);
+        }
+
+        function renderGuitarFretboard(startFret, endFret, scaleData, showTuningLabels, numberPos) {
+            let html = `<div class="flex flex-col">`;
+
+            // Numeração Superior
+            if (numberPos === 'top') {
+                html += `<div class="flex mb-1">`;
+                if (showTuningLabels) html += `<div class="w-[35px] flex-shrink-0"></div>`;
+                for (let f = startFret; f <= endFret; f++) {
+                    let isTarget = f === 5 || f === 12;
+                    let widthCls = f === 0 ? 'w-[40px] flex-shrink-0' : 'flex-1';
+                    let textCls = isTarget ? 'font-bold text-[1.1rem] text-black' : 'text-sm text-gray-500';
+                    html += `<div class="text-center ${widthCls} ${textCls}">${f}</div>`;
+                }
+                html += `</div>`;
+            }
+
+            // Corpo do Braço da Guitarra
+            html += `<div class="flex">`;
+
+            // Coluna Externa Esquerda (Afinadores)
+            if (showTuningLabels) {
+                html += `<div class="w-[35px] flex-shrink-0 flex flex-col justify-around py-[10px]">`;
+                for (let s = 0; s < 6; s++) {
+                    let openNote = notasCromaticas[afinacaoIndices[s]];
+                    html += `<div class="flex items-center justify-center">`;
+                    html += `<div class="tuning-dot">${openNote}</div>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            }
+
+            // Container do Grid Trastes
+            let gridCols = startFret === 0 ? '40px ' : '';
+            for(let f = (startFret === 0 ? 1 : startFret); f <= endFret; f++){
+                gridCols += 'minmax(0, 1fr) ';
+            }
+
+            html += `<div class="flex-1 grid border-t border-b border-gray-600 bg-white shadow-sm" style="grid-template-columns: ${gridCols}; grid-template-rows: repeat(6, 1fr);">`;
+
+            for (let s = 0; s < 6; s++) {
+                for (let f = startFret; f <= endFret; f++) {
+                    let noteIdx = (afinacaoIndices[s] + f) % 12;
+                    let note = notasCromaticas[noteIdx];
+                    let isScale = scaleData.notes.has(note);
+                    let isRoot = note === scaleData.root;
+
+                    // Estilo da Célula (Fundo e Traste)
+                    let bgCls = (f === 0 || f === 12) ? 'bg-gray-200' : '';
+                    let borderCls = 'border-l border-gray-400';
+                    if (f === 0) borderCls = 'border-l-8 border-gray-500'; // O Nut realçado
+                    if (f === startFret && f !== 0) borderCls = 'border-l-2 border-gray-500'; 
+                    if (f === endFret) borderCls += ' border-r border-gray-600'; // Fechar a grade
+                    
+                    html += `<div class="fret-cell ${bgCls} ${borderCls} flex items-center justify-center min-h-[38px]">`;
+                    html += `<div class="string-line"></div>`;
+
+                    // Renderizar a nota se pertencer à escala
+                    if (isScale) {
+                        let bgDot = isRoot ? 'bg-red-600' : 'bg-black';
+                        html += `<div class="note-dot ${bgDot}">${note}</div>`;
+                    }
+                    html += `</div>`;
+                }
+            }
+            html += `</div>`; // Fim Grid
+            html += `</div>`; // Fim Corpo
+
+            // Numeração Inferior
+            if (numberPos === 'bottom') {
+                html += `<div class="flex mt-1">`;
+                if (showTuningLabels) html += `<div class="w-[35px] flex-shrink-0"></div>`;
+                for (let f = startFret; f <= endFret; f++) {
+                    let isTarget = f === 5 || f === 12;
+                    let widthCls = f === 0 ? 'w-[40px] flex-shrink-0' : 'flex-1';
+                    let textCls = isTarget ? 'font-bold text-sm text-black' : 'text-xs text-gray-500';
+                    html += `<div class="text-center ${widthCls} ${textCls}">${f}</div>`;
+                }
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function updateUI() {
+            const scaleData = getScaleData();
+            if (!scaleData) return;
+
+            // Renderizar Diagrama Principal (Trastes 0 a 15) com numeração abaixo
+            const mainFretboard = document.getElementById('main-fretboard');
+            mainFretboard.innerHTML = renderGuitarFretboard(0, 15, scaleData, true, 'bottom');
+
+            // Calcular e Renderizar as 5 posições usando o Offset do Modo
+            const windows = getPositionWindows(scaleData.rootIdx, scaleData.cagedOffset);
+            const positionsContainer = document.getElementById('positions-container');
+            positionsContainer.innerHTML = '';
+
+            windows.forEach((win, index) => {
+                let [start, end] = win;
+                
+                let positionWrapper = document.createElement('div');
+                positionWrapper.className = 'flex flex-col';
+                
+                let title = document.createElement('div');
+                title.className = 'text-center text-sm mb-2 text-gray-700';
+                title.innerText = `Posição ${index + 1} (Trastes ${start}-${end})`;
+                
+                let fretboardDiv = document.createElement('div');
+                fretboardDiv.innerHTML = renderGuitarFretboard(start, end, scaleData, true, 'bottom');
+
+                positionWrapper.appendChild(title);
+                positionWrapper.appendChild(fretboardDiv);
+                positionsContainer.appendChild(positionWrapper);
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('tom').addEventListener('change', updateUI);
+        document.getElementById('escala').addEventListener('change', atualizarModos);
+        document.getElementById('modo').addEventListener('change', updateUI);
+
+        // Inicialização Inicial
+        inicializarDropdowns();
+
+    </script>
+</body>
+</html>
