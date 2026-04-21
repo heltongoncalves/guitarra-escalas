@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estudo de Escalas de Guitarra</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Adicionando biblioteca de bandeiras para visualização perfeita (como na imagem) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -78,17 +80,73 @@
         input[type="number"] {
             background-image: none;
         }
+        
+        /* Ajustes para modo RTL (Árabe, Urdu) */
+        [dir="rtl"] select {
+            background-position: left .5rem center;
+        }
+
+        /* Ocultar a seta padrão do summary no acordeão */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
     </style>
 </head>
-<body class="p-6 max-w-[1400px] mx-auto">
+<body class="p-6 max-w-[1400px] mx-auto relative">
 
-    <h1 class="text-3xl font-normal text-center mb-8">Estudo de Escalas de Guitarra</h1>
+    <!-- Cabeçalho: Título e Menu de Idioma na mesma linha -->
+    <div class="relative flex flex-col md:flex-row items-center justify-between mb-8 z-[100] gap-4">
+        
+        <!-- Bloco invisível (apenas para manter o título perfeitamente centralizado no Flexbox no Desktop) -->
+        <div class="hidden md:block w-[180px]"></div>
+        
+        <!-- Título -->
+        <h1 class="text-3xl font-normal text-center flex justify-center items-center gap-3">
+            <span class="text-4xl">🎸</span>
+            <span data-i18n="title">Estudo de Escalas de Guitarra</span>
+            <!-- Usando a mesma guitarra, mas invertida horizontalmente (espelhada) para dar simetria, já que não há emoji de violão oficial -->
+            <span class="text-4xl" style="transform: scaleX(-1);">🎸</span>
+        </h1>
+
+        <!-- Seletor de Idioma Customizado com Bandeiras alinhado à direita -->
+        <div class="w-full md:w-[180px] flex justify-end">
+            <div class="relative inline-block text-left w-full md:w-auto">
+                <div>
+                    <button type="button" id="lang-menu-btn" class="inline-flex justify-center items-center gap-2 w-full rounded-md border border-gray-300 shadow-sm px-3 py-1.5 bg-gray-50 text-sm font-medium text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" aria-expanded="true" aria-haspopup="true">
+                        <span id="current-flag" class="fi fi-br text-base rounded-sm shadow-sm"></span>
+                        <span id="current-lang-name">Português</span>
+                        <svg class="-mr-1 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="lang-menu-dropdown" class="origin-top-right absolute right-0 md:right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-[100]" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                    <div class="py-1" role="none">
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('pt', 'fi-br', 'Português')"><span class="fi fi-br text-base rounded-sm shadow-sm"></span> Português</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('ru', 'fi-ru', 'Русский')"><span class="fi fi-ru text-base rounded-sm shadow-sm"></span> Русский</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('hi', 'fi-in', 'हिन्दी')"><span class="fi fi-in text-base rounded-sm shadow-sm"></span> हिन्दी</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('zh', 'fi-cn', '中文')"><span class="fi fi-cn text-base rounded-sm shadow-sm"></span> 中文</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('en', 'fi-us', 'English')"><span class="fi fi-us text-base rounded-sm shadow-sm"></span> English</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('es', 'fi-es', 'Español')"><span class="fi fi-es text-base rounded-sm shadow-sm"></span> Español</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('fr', 'fi-fr', 'Français')"><span class="fi fi-fr text-base rounded-sm shadow-sm"></span> Français</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('ar', 'fi-sa', 'العربية')"><span class="fi fi-sa text-base rounded-sm shadow-sm"></span> العربية</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('bn', 'fi-bd', 'বাংলা')"><span class="fi fi-bd text-base rounded-sm shadow-sm"></span> বাংলা</a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('ur', 'fi-pk', 'اردو')"><span class="fi fi-pk text-base rounded-sm shadow-sm"></span> اردو</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Controles -->
-    <div class="flex flex-wrap justify-center items-end gap-6 mb-8">
+    <div class="flex flex-wrap justify-center items-end gap-3 mb-8">
         <div class="flex flex-col gap-1">
-            <label for="tom" class="text-sm font-semibold text-gray-600 uppercase">Tom</label>
-            <select id="tom" class="border border-gray-300 rounded px-3 py-2 text-lg w-28 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label for="tom" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_root">Tom</label>
+            <select id="tom" class="border border-gray-300 rounded px-2 py-1 text-sm w-20 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="C" selected>C</option>
                 <option value="C#">C#</option>
                 <option value="D">D</option>
@@ -105,23 +163,32 @@
         </div>
 
         <div class="flex flex-col gap-1">
-            <label for="escala" class="text-sm font-semibold text-gray-600 uppercase">Escala</label>
-            <select id="escala" class="border border-gray-300 rounded px-3 py-2 text-lg w-64 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label for="escala" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_scale">Escala</label>
+            <select id="escala" class="border border-gray-300 rounded px-2 py-1 text-sm w-44 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <!-- Preenchido dinamicamente -->
             </select>
         </div>
 
         <div class="flex flex-col gap-1">
-            <label for="modo" class="text-sm font-semibold text-gray-600 uppercase">Variação / Modo</label>
-            <select id="modo" class="border border-gray-300 rounded px-3 py-2 text-lg w-64 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label for="modo" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_mode">Variação / Modo</label>
+            <select id="modo" class="border border-gray-300 rounded px-2 py-1 text-sm w-48 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <!-- Preenchido dinamicamente -->
             </select>
         </div>
 
         <div class="flex flex-col gap-1">
-            <label for="bpm" class="text-sm font-semibold text-gray-600 uppercase">Velocidade (BPM)</label>
-            <div class="flex items-center">
-                <input type="number" id="bpm" value="160" min="40" max="300" class="border border-gray-300 rounded px-3 py-2 text-lg w-24 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label for="exercicio" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_ex">Exercício</label>
+            <select id="exercicio" class="border border-gray-300 rounded px-2 py-1 text-sm w-64 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-ellipsis">
+                <!-- Preenchido dinamicamente via JS (I18n) -->
+            </select>
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <label for="bpm" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_bpm">BPM</label>
+            <div class="flex items-center gap-1">
+                <button id="btn-bpm-minus" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-700 font-bold transition-colors text-sm" dir="ltr">-10</button>
+                <input type="number" id="bpm" value="160" min="40" max="300" class="border border-gray-300 rounded px-1 py-1 text-sm w-16 text-center bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" dir="ltr">
+                <button id="btn-bpm-plus" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-700 font-bold transition-colors text-sm" dir="ltr">+10</button>
             </div>
         </div>
     </div>
@@ -129,23 +196,145 @@
     <!-- Braço Principal -->
     <div class="mb-10 overflow-x-auto pb-4">
         <div id="main-fretboard-container" class="min-w-[900px] flex flex-col">
-            <div id="main-fretboard"></div>
+            <div id="main-fretboard" dir="ltr"></div>
             <div class="flex justify-center mt-3">
                 <button id="btn-play-main" onclick="togglePlay('main', 0, 15)" class="flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors text-sm font-medium">
                     <svg class="w-4 h-4 icon-play" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
                     <svg class="w-4 h-4 icon-stop hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5h10v10H5z"></path></svg>
-                    <span class="btn-text">Tocar Escala Completa</span>
+                    <span class="btn-text" data-i18n="btn_play_full">Tocar Escala Completa</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Posições (Sistema CAGED) -->
-    <div id="positions-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <div id="positions-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6" dir="ltr">
         <!-- Renderizados dinamicamente -->
     </div>
 
+    <!-- Sobre o autor -->
+    <div class="mt-12 bg-white border border-gray-200 rounded-lg shadow-sm mb-8" dir="ltr">
+        <details class="group" open>
+            <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5 text-xl text-gray-800">
+                <span data-i18n="about_author">Sobre o autor</span>
+                <span class="transition group-open:rotate-180 text-gray-500">
+                    <!-- Ícone de seta apontando para baixo (gira para cima quando aberto) -->
+                    <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M19 9l-7 7-7-7"></path></svg>
+                </span>
+            </summary>
+            <div class="text-gray-700 border-t border-gray-100 p-5">
+                <div class="flex items-center gap-3 mb-4" dir="ltr">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <span><strong>E-mail:</strong> <a href="mailto:heltongoncalves@gmail.com" class="text-blue-600 hover:underline">heltongoncalves@gmail.com</a></span>
+                </div>
+                <div class="flex items-center gap-3" dir="ltr">
+                    <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>
+                    <span><strong>GitHub:</strong> <a href="https://heltongoncalves.github.io/guitarra-escalas/" target="_blank" class="text-blue-600 hover:underline">heltongoncalves/guitarra-escalas</a></span>
+                </div>
+            </div>
+        </details>
+    </div>
+
     <script>
+        // Dicionário de Internacionalização (I18N)
+        const i18n = {
+            'pt': {
+                'about_author': 'Sobre o autor',
+                'title': 'Estudo de Escalas de Guitarra', 'lbl_root': 'Tom', 'lbl_scale': 'Escala', 'lbl_mode': 'Variação / Modo', 'lbl_ex': 'Exercício', 'lbl_bpm': 'BPM',
+                'btn_play_full': 'Tocar Escala Completa', 'btn_play': 'Tocar', 'btn_stop': 'Parar', 'position': 'Posição', 'frets': 'Trastes',
+                'ex_1': '1. Subir e descer a escala toda', 'ex_2': '2. Cordas graves (6ª a 3ª)', 'ex_3': '3. Cordas agudas (4ª a 1ª)', 'ex_4': '4. Grupos de 3 (1-2-3, 2-3-4...)',
+                'ex_5': '5. Grupos de 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Saltos de Terças (1-3, 2-4, 3-5...)', 'ex_7': '7. Arpejos Tríades', 'ex_8': '8. Arpejos Tétrades', 'ex_9': '9. Salto de Cordas (6-4, 5-3, 4-2...)',
+                'Pentatônica': 'Pentatônica', 'Maior': 'Maior', 'Menor': 'Menor', 'Diatônica (Modos Gregos)': 'Diatônica (Modos Gregos)', 'Jônio (Maior)': 'Jônio (Maior)',
+                'Dórico': 'Dórico', 'Frígio': 'Frígio', 'Lídio': 'Lídio', 'Mixolídio': 'Mixolídio', 'Eólio (Menor)': 'Eólio (Menor)', 'Lócrio': 'Lócrio',
+                'Escala Blues': 'Escala Blues', 'Menor Harmônica': 'Menor Harmônica', 'Padrão': 'Padrão', 'Menor Melódica': 'Menor Melódica', 'Escalas Simétricas': 'Escalas Simétricas',
+                'Diminuta (Tom-Semitom)': 'Diminuta (Tom-Semitom)', 'Dom Diminuta (Semitom-Tom)': 'Dom Diminuta (Semitom-Tom)', 'Hexafônica (Tons Inteiros)': 'Hexafônica (Tons Inteiros)'
+            },
+            'en': {
+                'about_author': 'About the author',
+                'title': 'Guitar Scale Study', 'lbl_root': 'Root', 'lbl_scale': 'Scale', 'lbl_mode': 'Variation / Mode', 'lbl_ex': 'Exercise', 'lbl_bpm': 'BPM',
+                'btn_play_full': 'Play Full Scale', 'btn_play': 'Play', 'btn_stop': 'Stop', 'position': 'Position', 'frets': 'Frets',
+                'ex_1': '1. Up and down the whole scale', 'ex_2': '2. Low strings (6th to 3rd)', 'ex_3': '3. High strings (4th to 1st)', 'ex_4': '4. Groups of 3 (1-2-3, 2-3-4...)',
+                'ex_5': '5. Groups of 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Third leaps (1-3, 2-4, 3-5...)', 'ex_7': '7. Triad Arpeggios', 'ex_8': '8. Tetrad Arpeggios', 'ex_9': '9. String skipping (6-4, 5-3, 4-2...)',
+                'Pentatônica': 'Pentatonic', 'Maior': 'Major', 'Menor': 'Minor', 'Diatônica (Modos Gregos)': 'Diatonic (Greek Modes)', 'Jônio (Maior)': 'Ionian (Major)',
+                'Dórico': 'Dorian', 'Frígio': 'Phrygian', 'Lídio': 'Lydian', 'Mixolídio': 'Mixolydian', 'Eólio (Menor)': 'Aeolian (Minor)', 'Lócrio': 'Locrian',
+                'Escala Blues': 'Blues Scale', 'Menor Harmônica': 'Harmonic Minor', 'Padrão': 'Standard', 'Menor Melódica': 'Melodic Minor', 'Escalas Simétricas': 'Symmetrical Scales',
+                'Diminuta (Tom-Semitom)': 'Diminished (W-H)', 'Dom Diminuta (Semitom-Tom)': 'Dom Diminished (H-W)', 'Hexafônica (Tons Inteiros)': 'Whole Tone'
+            },
+            'es': {
+                'about_author': 'Sobre el autor',
+                'title': 'Estudio de Escalas de Guitarra', 'lbl_root': 'Tono', 'lbl_scale': 'Escala', 'lbl_mode': 'Variación / Modo', 'lbl_ex': 'Ejercicio', 'lbl_bpm': 'BPM',
+                'btn_play_full': 'Tocar Escala Completa', 'btn_play': 'Tocar', 'btn_stop': 'Detener', 'position': 'Posición', 'frets': 'Trastes',
+                'ex_1': '1. Subir y bajar toda la escala', 'ex_2': '2. Cuerdas graves (6ª a 3ª)', 'ex_3': '3. Cuerdas agudas (4ª a 1ª)', 'ex_4': '4. Grupos de 3 (1-2-3, 2-3-4...)',
+                'ex_5': '5. Grupos de 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Saltos de Terceras (1-3, 2-4, 3-5...)', 'ex_7': '7. Arpegios Tríadas', 'ex_8': '8. Arpegios Tétradas', 'ex_9': '9. Salto de Cuerdas (6-4, 5-3, 4-2...)',
+                'Pentatônica': 'Pentatónica', 'Maior': 'Mayor', 'Menor': 'Menor', 'Diatônica (Modos Gregos)': 'Diatónica (Modos Griegos)', 'Jônio (Maior)': 'Jónico (Mayor)',
+                'Dórico': 'Dórico', 'Frígio': 'Frigio', 'Lídio': 'Lidio', 'Mixolídio': 'Mixolidio', 'Eólio (Menor)': 'Eólico (Menor)', 'Lócrio': 'Locrio',
+                'Escala Blues': 'Escala Blues', 'Menor Harmônica': 'Menor Armónica', 'Padrão': 'Estándar', 'Menor Melódica': 'Menor Melódica', 'Escalas Simétricas': 'Escalas Simétricas',
+                'Diminuta (Tom-Semitom)': 'Disminuida (T-S)', 'Dom Diminuta (Semitom-Tom)': 'Dom Disminuida (S-T)', 'Hexafônica (Tons Inteiros)': 'Hexáfona (Tonos Enteros)'
+            },
+            'fr': {
+                'about_author': 'À propos de l\'auteur',
+                'title': 'Étude des Gammes de Guitare', 'lbl_root': 'Tonalité', 'lbl_scale': 'Gamme', 'lbl_mode': 'Variation / Mode', 'lbl_ex': 'Exercice', 'lbl_bpm': 'BPM',
+                'btn_play_full': 'Jouer la Gamme Complète', 'btn_play': 'Jouer', 'btn_stop': 'Arrêter', 'position': 'Position', 'frets': 'Frettes',
+                'ex_1': '1. Monter et descendre toute la gamme', 'ex_2': '2. Cordes graves (6ème à 3ème)', 'ex_3': '3. Cordes aiguës (4ème à 1ère)', 'ex_4': '4. Groupes de 3 (1-2-3, 2-3-4...)',
+                'ex_5': '5. Groupes de 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Sauts de Tierces (1-3, 2-4, 3-5...)', 'ex_7': '7. Arpèges Triades', 'ex_8': '8. Arpèges Tétrades', 'ex_9': '9. Saut de Cordes (6-4, 5-3...)',
+                'Pentatônica': 'Pentatonique', 'Maior': 'Majeure', 'Menor': 'Mineure', 'Diatônica (Modos Gregos)': 'Diatonique (Modes Grecs)', 'Jônio (Maior)': 'Ionien (Majeur)',
+                'Dórico': 'Dorien', 'Frígio': 'Phrygien', 'Lídio': 'Lydien', 'Mixolídio': 'Mixolydien', 'Eólio (Menor)': 'Éolien (Mineur)', 'Lócrio': 'Locrien',
+                'Escala Blues': 'Gamme Blues', 'Menor Harmônica': 'Mineure Harmonique', 'Padrão': 'Standard', 'Menor Melódica': 'Mineure Mélodique', 'Escalas Simétricas': 'Gammes Symétriques',
+                'Diminuta (Tom-Semitom)': 'Diminuée (Ton-Demi-ton)', 'Dom Diminuta (Semitom-Tom)': 'Dom Diminuée (Demi-ton-Ton)', 'Hexafônica (Tons Inteiros)': 'Par Tons (Hexatonique)'
+            },
+            'ru': {
+                'about_author': 'Об авторе',
+                'title': 'Изучение Гитарных Гамм', 'lbl_root': 'Тоника', 'lbl_scale': 'Гамма', 'lbl_mode': 'Вариация / Лад', 'lbl_ex': 'Упражнение', 'lbl_bpm': 'Удары/мин',
+                'btn_play_full': 'Играть Всю Гамму', 'btn_play': 'Играть', 'btn_stop': 'Стоп', 'position': 'Позиция', 'frets': 'Лады',
+                'ex_1': '1. Вверх и вниз по всей гамме', 'ex_2': '2. Басовые струны (с 6 по 3)', 'ex_3': '3. Верхние струны (с 4 по 1)', 'ex_4': '4. Группы по 3 (1-2-3, 2-3-4...)',
+                'ex_5': '5. Группы по 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Скачки на терцию (1-3, 2-4, 3-5...)', 'ex_7': '7. Арпеджио Трезвучий', 'ex_8': '8. Арпеджио Септаккордов', 'ex_9': '9. Пропуск струн (6-4, 5-3, 4-2...)'
+            },
+            'zh': {
+                'about_author': '关于作者',
+                'title': '吉他音阶学习', 'lbl_root': '主音', 'lbl_scale': '音阶', 'lbl_mode': '变奏 / 调式', 'lbl_ex': '练习', 'lbl_bpm': '拍/分钟',
+                'btn_play_full': '弹奏全音阶', 'btn_play': '弹奏', 'btn_stop': '停止', 'position': '位置', 'frets': '品格',
+                'ex_1': '1. 上下全音阶', 'ex_2': '2. 低音弦 (6到3弦)', 'ex_3': '3. 高音弦 (4到1弦)', 'ex_4': '4. 三音组 (1-2-3, 2-3-4...)',
+                'ex_5': '5. 四音组 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. 三度跳跃 (1-3, 2-4, 3-5...)', 'ex_7': '7. 三和弦琶音', 'ex_8': '8. 七和弦琶音', 'ex_9': '9. 跳弦 (6-4, 5-3, 4-2...)'
+            },
+            'hi': {
+                'about_author': 'लेखक के बारे में',
+                'title': 'गिटार स्केल का अध्ययन', 'lbl_root': 'मूल स्वर', 'lbl_scale': 'स्केल', 'lbl_mode': 'मोड', 'lbl_ex': 'व्यायाम', 'lbl_bpm': 'बीपीएम',
+                'btn_play_full': 'पूरा स्केल बजाएं', 'btn_play': 'बजाएं', 'btn_stop': 'रुकें', 'position': 'स्थिति', 'frets': 'फ्रेट्स',
+                'ex_1': '1. पूरा स्केल ऊपर-नीचे', 'ex_2': '2. निचली स्ट्रिंग्स (6 से 3)', 'ex_3': '3. ऊपरी स्ट्रिंग्स (4 से 1)', 'ex_4': '4. 3 के समूह (1-2-3, 2-3-4...)',
+                'ex_5': '5. 4 के समूह (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. थर्ड्स जंप (1-3, 2-4, 3-5...)', 'ex_7': '7. ट्रायड आर्पेजियोस', 'ex_8': '8. टेट्राड आर्पेजियोस', 'ex_9': '9. स्ट्रिंग जंपिंग (6-4, 5-3, 4-2...)'
+            },
+            'ar': {
+                'about_author': 'عن المؤلف',
+                'title': 'دراسة سلالم الجيتار', 'lbl_root': 'الجذر', 'lbl_scale': 'السلم', 'lbl_mode': 'الوضع', 'lbl_ex': 'تمرين', 'lbl_bpm': 'نبضة/دقيقة',
+                'btn_play_full': 'عزف السلم كاملاً', 'btn_play': 'عزف', 'btn_stop': 'إيقاف', 'position': 'موضع', 'frets': 'دساتين',
+                'ex_1': '1. صعود وهبوط السلم', 'ex_2': '2. الأوتار الغليظة (6 إلى 3)', 'ex_3': '3. الأوتار الرفيعة (4 إلى 1)', 'ex_4': '4. مجموعات ثلاثية (1-2-3, 2-3-4...)',
+                'ex_5': '5. مجموعات رباعية (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. قفزات ثلثية (1-3, 2-4, 3-5...)', 'ex_7': '7. تتابعات ثلاثية', 'ex_8': '8. تتابعات رباعية', 'ex_9': '9. قفز الأوتار (6-4, 5-3, 4-2...)'
+            },
+            'bn': {
+                'about_author': 'লেখকের সম্পর্কে',
+                'title': 'গিটার স্কেল অধ্যয়ন', 'lbl_root': 'রুট (Root)', 'lbl_scale': 'স্কেল', 'lbl_mode': 'মোড', 'lbl_ex': 'ব্যায়াম', 'lbl_bpm': 'বিপিএম',
+                'btn_play_full': 'সম্পূর্ণ স্কেল বাজান', 'btn_play': 'বাজান', 'btn_stop': 'থামুন', 'position': 'অবস্থান', 'frets': 'ফ্রেট',
+                'ex_1': '১. সম্পূর্ণ স্কেল উপরে-নিচে', 'ex_2': '২. নিচের স্ট্রিং (৬ থেকে ৩)', 'ex_3': '৩. উপরের স্ট্রিং (৪ থেকে ১)', 'ex_4': '৪. ৩ এর গ্রুপ (১-২-৩, ২-৩-৪...)',
+                'ex_5': '৫. ৪ এর গ্রুপ (১-২-৩-৪, ২-৩-৪-৫...)', 'ex_6': '৬. থার্ডস জাম্প (১-৩, ২-৪, ৩-৫...)', 'ex_7': '৭. ট্রায়াড আর্পেজিওস', 'ex_8': '৮. টেট্রাড আর্পেজিওস', 'ex_9': '৯. স্ট্রিং স্কিপিং (৬-৪, ৫-৩, ৪-২...)'
+            },
+            'ur': {
+                'about_author': 'مصنف کے بارے میں',
+                'title': 'گٹار سکیل کا مطالعہ', 'lbl_root': 'روٹ', 'lbl_scale': 'سکیل', 'lbl_mode': 'موڈ', 'lbl_ex': 'مشق', 'lbl_bpm': 'بی پی ایم',
+                'btn_play_full': 'پورا سکیل بجائیں', 'btn_play': 'بجائیں', 'btn_stop': 'روکیں', 'position': 'پوزیشن', 'frets': 'فریٹس',
+                'ex_1': '1. پورا سکیل اوپر نیچے', 'ex_2': '2. نچلی تاریں (6 سے 3)', 'ex_3': '3. اوپری تاریں (4 سے 1)', 'ex_4': '4. 3 کے گروپس (1-2-3, 2-3-4...)',
+                'ex_5': '5. 4 کے گروپس (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. تھرڈز جمپ (1-3, 2-4, 3-5...)', 'ex_7': '7. ٹرائڈ آرپیجیوس', 'ex_8': '8. ٹیٹراڈ آرپیجیوس', 'ex_9': '9. سٹرنگ سکپنگ (6-4, 5-3, 4-2...)'
+            }
+        };
+
+        let currentLang = 'pt';
+
+        function t(key) {
+            if (i18n[currentLang] && i18n[currentLang][key]) return i18n[currentLang][key];
+            if (i18n['en'] && i18n['en'][key]) return i18n['en'][key];
+            if (i18n['pt'] && i18n['pt'][key]) return i18n['pt'][key];
+            return key;
+        }
+
         const notasCromaticas = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
         // Afinação padrão: E4, B3, G3, D3, A2, E2 (do agudo para o grave)
         const afinacaoIndices = [4, 11, 7, 2, 9, 4]; 
@@ -162,6 +351,7 @@
             timeoutId: null,
             currentIndex: 0,
             sequence: [],
+            sequences: {}, // Armazena as sequências pré-calculadas
             playing: false,
             lastHighlightedNote: null
         };
@@ -179,20 +369,16 @@
         // Sintetizador básico de guitarra (Pluck)
         function playPluck(stringIdx, fret) {
             initAudio();
-            
-            // Calcula a frequência exata da nota baseada no traste
             const freq = openStringFreqs[stringIdx] * Math.pow(2, fret / 12);
             
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             const filter = audioCtx.createBiquadFilter();
 
-            // Uma mistura de dente de serra com filtro passa-baixa simula bem a corda
             osc.type = 'sawtooth';
             osc.frequency.value = freq;
-
             filter.type = 'lowpass';
-            filter.frequency.value = 1500 + (fret * 100); // Filtro abre um pouco mais em trastes agudos
+            filter.frequency.value = 1500 + (fret * 100);
 
             osc.connect(filter);
             filter.connect(gainNode);
@@ -200,8 +386,8 @@
 
             const now = audioCtx.currentTime;
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(0.8, now + 0.02); // Ataque rápido da palheta
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5); // Sustain / Release longo
+            gainNode.gain.linearRampToValueAtTime(0.8, now + 0.02); 
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
 
             osc.start(now);
             osc.stop(now + 2.5);
@@ -239,27 +425,91 @@
             }
         };
 
-        function inicializarDropdowns() {
-            const selectCategoria = document.getElementById('escala');
-            selectCategoria.innerHTML = '';
-            for (const cat in bancoDeEscalas) {
-                selectCategoria.add(new Option(cat, cat));
+        // Lógica do Menu Dropdown Customizado
+        const langMenuBtn = document.getElementById('lang-menu-btn');
+        const langMenuDropdown = document.getElementById('lang-menu-dropdown');
+
+        langMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langMenuDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!langMenuBtn.contains(e.target) && !langMenuDropdown.contains(e.target)) {
+                langMenuDropdown.classList.add('hidden');
             }
-            selectCategoria.value = 'Pentatônica'; // Valor padrão inicial
-            atualizarModos();
+        });
+
+        function setLang(code, flagClass, langName) {
+            // Atualizar UI do botão
+            document.getElementById('current-flag').className = `fi ${flagClass} text-base rounded-sm shadow-sm`;
+            document.getElementById('current-lang-name').innerText = langName;
+            langMenuDropdown.classList.add('hidden');
+            
+            // Alterar Idioma
+            currentLang = code;
+            applyLanguage();
         }
 
-        function atualizarModos() {
-            const selectCategoria = document.getElementById('escala');
-            const selectModo = document.getElementById('modo');
-            const cat = selectCategoria.value;
+        function applyLanguage() {
+            // Salvar estado atual de forma segura
+            const selCat = document.getElementById('escala').value || 'Pentatônica';
+            const selModo = document.getElementById('modo').value || 'Maior';
+            const selEx = document.getElementById('exercicio').value || '1';
+
+            document.documentElement.lang = currentLang;
+            
+            // Suporte RTL (Arabe, Urdu)
+            if (currentLang === 'ar' || currentLang === 'ur') {
+                document.body.dir = 'rtl';
+            } else {
+                document.body.dir = 'ltr';
+            }
+
+            // Traduzir textos fixos no HTML
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.innerText = t(key);
+            });
+
+            // Recarregar Menu de Exercícios
+            const exSelect = document.getElementById('exercicio');
+            exSelect.innerHTML = '';
+            for (let i = 1; i <= 9; i++) {
+                exSelect.add(new Option(t(`ex_${i}`), i.toString()));
+            }
+            exSelect.value = selEx;
+
+            // Recarregar Categorias de Escalas (Mantendo a Chave em Português como ID do Sistema)
+            const catSelect = document.getElementById('escala');
+            catSelect.innerHTML = '';
+            for (const cat in bancoDeEscalas) {
+                catSelect.add(new Option(t(cat), cat));
+            }
+            catSelect.value = bancoDeEscalas[selCat] ? selCat : 'Pentatônica';
+
+            // Atualizar os modos silenciosamente
+            atualizarModos(false);
+
+            const modoSelect = document.getElementById('modo');
+            if ([...modoSelect.options].some(o => o.value === selModo)) {
+                modoSelect.value = selModo;
+            }
+
+            // Atualizar os gráficos
+            updateUI();
+        }
+
+        function atualizarModos(triggerUpdateUI = true) {
+            const cat = document.getElementById('escala').value;
             const modos = bancoDeEscalas[cat];
+            const selectModo = document.getElementById('modo');
             
             selectModo.innerHTML = '';
             for (const modo in modos) {
-                selectModo.add(new Option(modo, modo));
+                selectModo.add(new Option(t(modo), modo));
             }
-            updateUI();
+            if (triggerUpdateUI) updateUI();
         }
 
         function getScaleData() {
@@ -268,7 +518,6 @@
             const modo = document.getElementById('modo').value;
 
             const rootIdx = notasCromaticas.indexOf(tom);
-            
             if (!bancoDeEscalas[categoria] || !bancoDeEscalas[categoria][modo]) return null;
 
             const dadosModo = bancoDeEscalas[categoria][modo];
@@ -318,7 +567,98 @@
             return finalWindows.slice(0, 5);
         }
 
-        function renderGuitarFretboard(diagramId, startFret, endFret, scaleData, showTuningLabels, numberPos) {
+        // Lógica de Geração de Sequência com base no Exercício Escolhido
+        function generateExerciseData(diagramId, startFret, endFret, scaleData, exercicio) {
+            let baseNotes = [];
+            for (let s = 5; s >= 0; s--) {
+                for (let f = startFret; f <= endFret; f++) {
+                    let noteIdx = (afinacaoIndices[s] + f) % 12;
+                    let note = notasCromaticas[noteIdx];
+                    if (scaleData.notes.has(note)) {
+                        let pitch = openStringFreqs[s] * Math.pow(2, f / 12);
+                        baseNotes.push({ string: s, fret: f, id: `note-${diagramId}-${s}-${f}`, noteIdx: noteIdx, pitch: pitch });
+                    }
+                }
+            }
+            
+            baseNotes.sort((a, b) => a.pitch - b.pitch);
+
+            let exSeq = [];
+            
+            if (exercicio === "1") {
+                exSeq = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
+            } 
+            else if (exercicio === "2") {
+                let filtered = baseNotes.filter(n => n.string >= 2); 
+                exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
+            }
+            else if (exercicio === "3") {
+                let filtered = baseNotes.filter(n => n.string <= 3); 
+                exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
+            }
+            else if (exercicio === "4") {
+                for (let i = 0; i < baseNotes.length - 2; i++) {
+                    exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2]);
+                }
+                let rev = [...baseNotes].reverse();
+                for (let i = 0; i < rev.length - 2; i++) {
+                    exSeq.push(rev[i], rev[i+1], rev[i+2]);
+                }
+            }
+            else if (exercicio === "5") {
+                for (let i = 0; i < baseNotes.length - 3; i++) {
+                    exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2], baseNotes[i+3]);
+                }
+                let rev = [...baseNotes].reverse();
+                for (let i = 0; i < rev.length - 3; i++) {
+                    exSeq.push(rev[i], rev[i+1], rev[i+2], rev[i+3]);
+                }
+            }
+            else if (exercicio === "6") {
+                for (let i = 0; i < baseNotes.length - 2; i++) {
+                    exSeq.push(baseNotes[i], baseNotes[i+2]);
+                }
+                let rev = [...baseNotes].reverse();
+                for (let i = 0; i < rev.length - 2; i++) {
+                    exSeq.push(rev[i], rev[i+2]);
+                }
+            }
+            else if (exercicio === "7") {
+                let filtered = baseNotes.filter(n => {
+                    let dist = (n.noteIdx - scaleData.rootIdx + 12) % 12;
+                    return [0, 3, 4, 6, 7, 8].includes(dist);
+                });
+                exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
+            }
+            else if (exercicio === "8") {
+                let filtered = baseNotes.filter(n => {
+                    let dist = (n.noteIdx - scaleData.rootIdx + 12) % 12;
+                    return [0, 3, 4, 6, 7, 8, 9, 10, 11].includes(dist);
+                });
+                exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
+            }
+            else if (exercicio === "9") {
+                let stringPattern = [5, 3, 4, 2, 3, 1, 2, 0];
+                stringPattern.forEach(sIndex => {
+                    let notes = baseNotes.filter(n => n.string === sIndex);
+                    exSeq.push(...notes);
+                });
+                let revPattern = [0, 2, 1, 3, 2, 4, 3, 5];
+                revPattern.forEach(sIndex => {
+                    let notes = baseNotes.filter(n => n.string === sIndex);
+                    exSeq.push(...notes.reverse());
+                });
+            }
+
+            if (exSeq.length === 0) {
+                 exSeq = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
+            }
+
+            let activeNoteIds = new Set(exSeq.map(n => n.id));
+            return { sequence: exSeq, activeNoteIds: activeNoteIds };
+        }
+
+        function renderGuitarFretboard(diagramId, startFret, endFret, scaleData, showTuningLabels, numberPos, activeNoteIds) {
             let html = `<div class="flex flex-col">`;
 
             if (numberPos === 'top') {
@@ -336,7 +676,7 @@
             html += `<div class="flex">`;
 
             if (showTuningLabels) {
-                html += `<div class="w-[35px] flex-shrink-0 flex flex-col justify-around py-[10px]">`;
+                html += `<div class="w-[35px] flex-shrink-0 flex flex-col justify-around py-[10px]" dir="ltr">`;
                 for (let s = 0; s < 6; s++) {
                     let openNote = notasCromaticas[afinacaoIndices[s]];
                     html += `<div class="flex items-center justify-center">`;
@@ -351,7 +691,7 @@
                 gridCols += 'minmax(0, 1fr) ';
             }
 
-            html += `<div class="flex-1 grid border-t border-b border-gray-600 bg-white shadow-sm" style="grid-template-columns: ${gridCols}; grid-template-rows: repeat(6, 1fr);">`;
+            html += `<div class="flex-1 grid border-t border-b border-gray-600 bg-white shadow-sm" style="grid-template-columns: ${gridCols}; grid-template-rows: repeat(6, 1fr);" dir="ltr">`;
 
             for (let s = 0; s < 6; s++) {
                 for (let f = startFret; f <= endFret; f++) {
@@ -370,8 +710,14 @@
                     html += `<div class="string-line"></div>`;
 
                     if (isScale) {
-                        let bgDot = isRoot ? 'bg-red-600' : 'bg-black';
                         let noteId = `note-${diagramId}-${s}-${f}`;
+                        let isActive = activeNoteIds && activeNoteIds.has(noteId);
+                        
+                        let bgDot = 'bg-gray-300 text-gray-500 border border-gray-400';
+                        if (isActive) {
+                            bgDot = isRoot ? 'bg-red-600' : 'bg-black';
+                        }
+                        
                         html += `<div id="${noteId}" class="note-dot ${bgDot}">${note}</div>`;
                     }
                     html += `</div>`;
@@ -397,28 +743,6 @@
         }
 
         // LÓGICA DE REPRODUÇÃO DA ESCALA (PLAY/STOP)
-        function getScaleSequence(diagramId, startFret, endFret, scaleData) {
-            let sequence = [];
-            // Itera da 6ª corda (índice 5, Low E) até a 1ª corda (índice 0, High E)
-            for (let s = 5; s >= 0; s--) {
-                let stringNotes = [];
-                for (let f = startFret; f <= endFret; f++) {
-                    let noteIdx = (afinacaoIndices[s] + f) % 12;
-                    let note = notasCromaticas[noteIdx];
-                    if (scaleData.notes.has(note)) {
-                        stringNotes.push({ string: s, fret: f, id: `note-${diagramId}-${s}-${f}` });
-                    }
-                }
-                // Ordena por traste (mais grave para mais agudo na mesma corda)
-                stringNotes.sort((a, b) => a.fret - b.fret);
-                sequence.push(...stringNotes);
-            }
-            
-            // Adiciona a descida (reverso, omitindo a nota de pico repetida)
-            let descendSequence = [...sequence].reverse().slice(1);
-            return sequence.concat(descendSequence);
-        }
-
         function clearPlaybackHighlight() {
             if (playbackState.lastHighlightedNote) {
                 let el = document.getElementById(playbackState.lastHighlightedNote);
@@ -433,12 +757,16 @@
             }
             clearPlaybackHighlight();
             
-            // Reset de todos os botões para estado Play
+            // Reset de todos os botões para estado Play com texto Traduzido
             document.querySelectorAll('[id^="btn-play-"]').forEach(btn => {
                 btn.querySelector('.icon-play').classList.remove('hidden');
                 btn.querySelector('.icon-stop').classList.add('hidden');
                 let textEl = btn.querySelector('.btn-text');
-                if (textEl) textEl.innerText = textEl.dataset.originalText || "Tocar Escala";
+                if (textEl) {
+                    let isMain = btn.id === 'btn-play-main';
+                    textEl.innerText = isMain ? t('btn_play_full') : t('btn_play');
+                    textEl.dataset.originalText = textEl.innerText;
+                }
                 btn.classList.replace('bg-red-50', 'bg-blue-50');
                 btn.classList.replace('text-red-700', 'text-blue-700');
                 btn.classList.replace('border-red-200', 'border-blue-200');
@@ -453,7 +781,6 @@
 
             let seq = playbackState.sequence;
             if (playbackState.currentIndex >= seq.length) {
-                // Loop infinito: retorna ao início da sequência ao invés de parar
                 playbackState.currentIndex = 0;
             }
 
@@ -466,12 +793,10 @@
                 playbackState.lastHighlightedNote = currentNote.id;
             }
 
-            // Tocar som
             playPluck(currentNote.string, currentNote.fret);
 
             playbackState.currentIndex++;
 
-            // Calcular intervalo via BPM (Milissegundos por batida)
             let bpm = parseInt(document.getElementById('bpm').value) || 120;
             let msPerBeat = 60000 / bpm;
 
@@ -485,25 +810,10 @@
             if (playbackState.playing && playbackState.diagramId === diagramId) {
                 stopPlayback();
             } else {
-                stopPlayback(); // Parar se outra coisa estiver tocando
+                stopPlayback();
 
-                // Iniciar nova reprodução
                 playbackState.diagramId = diagramId;
-                
-                if (diagramId === 'main') {
-                    // Tocar a escala principal mapeando pelas 5 posições sequencialmente
-                    let windows = getPositionWindows(scaleData.rootIdx, scaleData.cagedOffset);
-                    let fullSequence = [];
-                    windows.forEach(win => {
-                        let posSeq = getScaleSequence('main', win[0], win[1], scaleData);
-                        fullSequence = fullSequence.concat(posSeq);
-                    });
-                    playbackState.sequence = fullSequence;
-                } else {
-                    // Tocar apenas a posição selecionada
-                    playbackState.sequence = getScaleSequence(diagramId, startFret, endFret, scaleData);
-                }
-                
+                playbackState.sequence = playbackState.sequences[diagramId] || [];
                 playbackState.currentIndex = 0;
                 playbackState.playing = true;
 
@@ -514,31 +824,41 @@
                 let textEl = btn.querySelector('.btn-text');
                 if (textEl) {
                     textEl.dataset.originalText = textEl.innerText;
-                    textEl.innerText = "Parar";
+                    textEl.innerText = t('btn_stop');
                 }
                 btn.classList.replace('bg-blue-50', 'bg-red-50');
                 btn.classList.replace('text-blue-700', 'text-red-700');
                 btn.classList.replace('border-blue-200', 'border-red-200');
 
-                // Garante a ativação do AudioContext no click
                 initAudio();
-                
                 playNextNote();
             }
         }
 
         function updateUI() {
-            stopPlayback(); // Parar o som se mudar de escala
+            stopPlayback(); 
 
             const scaleData = getScaleData();
             if (!scaleData) return;
+            
+            const exercicioId = document.getElementById('exercicio').value;
+            playbackState.sequences = {}; 
 
-            // Renderizar Diagrama Principal (Trastes 0 a 15)
-            const mainFretboard = document.getElementById('main-fretboard');
-            mainFretboard.innerHTML = renderGuitarFretboard('main', 0, 15, scaleData, true, 'bottom');
-
-            // Calcular e Renderizar as 5 posições
             const windows = getPositionWindows(scaleData.rootIdx, scaleData.cagedOffset);
+
+            let mainFullSequence = [];
+            let mainActiveIds = new Set();
+            windows.forEach((win, index) => {
+                let data = generateExerciseData('main', win[0], win[1], scaleData, exercicioId);
+                mainFullSequence = mainFullSequence.concat(data.sequence);
+                data.activeNoteIds.forEach(id => mainActiveIds.add(id));
+            });
+            
+            playbackState.sequences['main'] = mainFullSequence;
+            
+            const mainFretboard = document.getElementById('main-fretboard');
+            mainFretboard.innerHTML = renderGuitarFretboard('main', 0, 15, scaleData, true, 'bottom', mainActiveIds);
+
             const positionsContainer = document.getElementById('positions-container');
             positionsContainer.innerHTML = '';
 
@@ -546,15 +866,18 @@
                 let [start, end] = win;
                 let diagId = `pos-${index}`;
                 
+                let data = generateExerciseData(diagId, start, end, scaleData, exercicioId);
+                playbackState.sequences[diagId] = data.sequence;
+                
                 let positionWrapper = document.createElement('div');
                 positionWrapper.className = 'flex flex-col';
                 
                 let title = document.createElement('div');
                 title.className = 'text-center text-sm font-semibold mb-2 text-gray-700';
-                title.innerText = `Posição ${index + 1} (Trastes ${start}-${end})`;
+                title.innerText = `${t('position')} ${index + 1} (${t('frets')} ${start}-${end})`;
                 
                 let fretboardDiv = document.createElement('div');
-                fretboardDiv.innerHTML = renderGuitarFretboard(diagId, start, end, scaleData, true, 'bottom');
+                fretboardDiv.innerHTML = renderGuitarFretboard(diagId, start, end, scaleData, false, 'bottom', data.activeNoteIds);
 
                 let playBtnDiv = document.createElement('div');
                 playBtnDiv.className = 'flex justify-center mt-3';
@@ -562,7 +885,7 @@
                     <button id="btn-play-${diagId}" onclick="togglePlay('${diagId}', ${start}, ${end})" class="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors text-xs font-medium">
                         <svg class="w-3.5 h-3.5 icon-play" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
                         <svg class="w-3.5 h-3.5 icon-stop hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5h10v10H5z"></path></svg>
-                        <span class="btn-text">Tocar</span>
+                        <span class="btn-text" data-i18n="btn_play">${t('btn_play')}</span>
                     </button>
                 `;
 
@@ -575,17 +898,34 @@
 
         // Event Listeners
         document.getElementById('tom').addEventListener('change', updateUI);
-        document.getElementById('escala').addEventListener('change', atualizarModos);
+        document.getElementById('escala').addEventListener('change', () => atualizarModos(true));
         document.getElementById('modo').addEventListener('change', updateUI);
+        document.getElementById('exercicio').addEventListener('change', updateUI);
         
-        // Impede que a troca de BPM pare o som, só altera a velocidade da próxima batida
         document.getElementById('bpm').addEventListener('input', function() {
             if (this.value < 40) this.value = 40;
             if (this.value > 300) this.value = 300;
         });
 
+        function changeBPM(amount) {
+            const bpmInput = document.getElementById('bpm');
+            let currentVal = parseInt(bpmInput.value) || 120;
+            let newVal = currentVal + amount;
+            
+            if (newVal < 40) newVal = 40;
+            if (newVal > 300) newVal = 300;
+            
+            bpmInput.value = newVal;
+        }
+        document.getElementById('btn-bpm-minus').addEventListener('click', () => changeBPM(-10));
+        document.getElementById('btn-bpm-plus').addEventListener('click', () => changeBPM(10));
+
         // Inicialização Inicial
-        inicializarDropdowns();
+        function initApp() {
+            applyLanguage(); // Popula listas traduzidas e renderiza na linguagem padrão ('pt')
+        }
+        
+        initApp();
 
     </script>
 </body>
