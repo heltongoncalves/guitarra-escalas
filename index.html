@@ -672,37 +672,50 @@
 
         function getPositionWindows(rootIdx, cagedOffset) {
             let relMajorIdx = (rootIdx + cagedOffset + 12) % 12;
-            let r = (relMajorIdx - 4 + 12) % 12; 
+            let r = (relMajorIdx - 4 + 12) % 12; // Encontra o traste da tônica maior na corda 6 (E)
             
+            // Posições baseadas ESTRITAMENTE nas 5 formas do sistema CAGED
             let rawWindows = [
-                [r - 1, r + 3],  
-                [r + 3, r + 6],  
-                [r + 6, r + 9],  
-                [r + 9, r + 12], 
-                [r + 12, r + 14] 
+                [r - 1, r + 2],  // Forma E (Posição 1 Maior)
+                [r + 1, r + 5],  // Forma D (Posição 2 Maior)
+                [r + 4, r + 7],  // Forma C (Posição 3 Maior)
+                [r + 6, r + 9],  // Forma A (Posição 4 Maior)
+                [r + 9, r + 12]  // Forma G (Posição 5 Maior)
             ];
 
             let normalized = rawWindows.map(w => {
                 let [s, e] = w;
-                if (s < 0) {
-                    if (e >= 2) s = 0;
-                    else { s += 12; e += 12; }
-                }
-                while (s >= 12 && e > 15) {
+                
+                // Se a forma inteira passar do traste 11, transpomos para a região aberta (oitava abaixo)
+                if (s >= 12) {
                     s -= 12;
                     e -= 12;
                 }
+                
+                // Tratar wrap around do braço (nut/pestana)
+                if (s < 0) {
+                    // Se a caixa cobre o traste 1 ou mais, a base será as cordas soltas (0)
+                    if (e >= 1) { 
+                        s = 0; 
+                    } else {
+                        // Caso a tônica gere uma caixa negativa (ex: E Maior)
+                        s += 12; e += 12; 
+                    }
+                }
+                
                 if (s < 0) s = 0;
-                if (e > 15) e = 15;
                 return [s, e];
             });
 
+            // Remove duplicadas exatas de oitava
             let uniqueMap = new Map();
             normalized.forEach(w => uniqueMap.set(`${w[0]}-${w[1]}`, w));
             
+            // Ordena pela casa inicial para mostrar da esquerda pra direita
             let finalWindows = Array.from(uniqueMap.values()).sort((a, b) => a[0] - b[0]);
             
-            if (finalWindows.length < 5) finalWindows = [ [0,3], [3,6], [5,9], [8,12], [10,15] ];
+            // Fallback de segurança 
+            if (finalWindows.length < 5) finalWindows = [ [0,3], [2,5], [5,8], [7,10], [9,12] ];
             return finalWindows.slice(0, 5);
         }
 
