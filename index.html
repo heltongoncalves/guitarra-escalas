@@ -3,34 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estudo de Escalas de Guitarra</title>
+    <title>Tutor de Escalas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Adicionando biblioteca de bandeiras para visualização perfeita (como na imagem) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            color: #333;
+            transition: background-color 0.3s, color 0.3s;
         }
         
-        .fret-cell {
-            position: relative;
-        }
+        .fret-cell { position: relative; }
         
-        /* Linha horizontal que representa a corda da guitarra */
         .string-line {
             position: absolute;
             top: 50%;
             left: 0;
             right: 0;
             height: 2px;
-            background-color: #6b7280; /* gray-500 */
+            background-color: #6b7280;
             transform: translateY(-50%);
             z-index: 10;
         }
 
-        /* O marcador visual da nota */
         .note-dot {
             position: relative;
             z-index: 20;
@@ -47,7 +41,6 @@
             transition: all 0.1s ease-in-out;
         }
 
-        /* Destaque quando a nota está sendo tocada */
         .playing-note {
             box-shadow: 0 0 15px 6px rgba(250, 204, 21, 0.8);
             transform: scale(1.4);
@@ -55,12 +48,11 @@
             border: 2px solid white;
         }
 
-        /* Afinadores na lateral esquerda */
         .tuning-dot {
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background-color: #111827; /* gray-900 */
+            background-color: #111827;
             color: white;
             display: flex;
             align-items: center;
@@ -69,7 +61,6 @@
             font-weight: bold;
         }
         
-        /* Ajuste fino para os selects */
         select, input[type="number"] {
             background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
             background-position: right .5rem center;
@@ -77,35 +68,19 @@
             background-size: 1.5em 1.5em;
         }
         
-        input[type="number"] {
-            background-image: none;
-        }
+        input[type="number"] { background-image: none; }
         
-        /* Ajustes para modo RTL (Árabe, Urdu) */
-        [dir="rtl"] select {
-            background-position: left .5rem center;
-        }
+        [dir="rtl"] select { background-position: left .5rem center; }
 
-        /* Ocultar a seta padrão do summary no acordeão */
-        details > summary {
-            list-style: none;
-        }
-        details > summary::-webkit-details-marker {
-            display: none;
-        }
-
-        /* Icones de Título Dinâmicos por Tema */
-        .icon-light, .icon-dark, .icon-vintage { display: none; }
-        body[data-skin="light"] .icon-light { display: flex; }
-        body[data-skin="dark"] .icon-dark { display: flex; }
-        body[data-skin="vintage"] .icon-vintage { display: flex; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
 
         /* Custom Skins (Temas) */
         
-        /* Skin: Light (Azul bem clarinho) */
+        /* Skin: Light */
         body[data-skin="light"] { background-color: #f0f8ff; color: #333; }
         
-        /* Skin: Dark (Estúdio) */
+        /* Skin: Dark */
         body[data-skin="dark"] { background-color: #121212; color: #e0e0e0; }
         body[data-skin="dark"] .bg-white, body[data-skin="dark"] .bg-gray-50 { background-color: #1e1e1e !important; color: #e0e0e0 !important; border-color: #333 !important; }
         body[data-skin="dark"] select, body[data-skin="dark"] input { background-color: #2c2c2c !important; color: #ffffff !important; border-color: #444 !important; }
@@ -119,7 +94,7 @@
         body[data-skin="dark"] .bg-red-50 { background-color: #5f1e1e !important; color: #fca5a5 !important; border-color: #dc2626 !important; }
         body[data-skin="dark"] .text-blue-600 { color: #60a5fa !important; }
 
-        /* Skin: Vintage (Acústico) */
+        /* Skin: Vintage */
         body[data-skin="vintage"] { background-color: #f4ecd8; color: #4a3b2c; }
         body[data-skin="vintage"] .bg-white, body[data-skin="vintage"] .bg-gray-50 { background-color: #fdfbf7 !important; color: #4a3b2c !important; border-color: #d8c8b8 !important; }
         body[data-skin="vintage"] select, body[data-skin="vintage"] input { background-color: #f9f4e8 !important; color: #3d2b1f !important; border-color: #d8c8b8 !important; }
@@ -134,17 +109,23 @@
         body[data-skin="vintage"] .bg-blue-50 { background-color: #e6e1c5 !important; color: #5c4b37 !important; border-color: #d8c8b8 !important; }
         body[data-skin="vintage"] .bg-red-50 { background-color: #e6c5c5 !important; color: #7a3b3b !important; border-color: #d8b8b8 !important; }
         body[data-skin="vintage"] .text-blue-600 { color: #8b5a2b !important; }
+
+        /* Regras do Modo Desafio (Esconder Notas) */
+        .challenge-hide-notes .note-dot {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
     </style>
 </head>
-<body class="p-6 max-w-[1400px] mx-auto relative min-h-screen transition-colors duration-300" data-skin="dark">
+<body class="p-6 max-w-[1400px] mx-auto relative min-h-screen" data-skin="dark">
 
-    <!-- Cabeçalho: Tema (Esq), Título (Centro) e Idioma (Dir) na mesma linha horizontal -->
+    <!-- Cabeçalho -->
     <div class="relative flex flex-col lg:flex-row items-center justify-between mb-8 z-[100] gap-4 w-full">
         
-        <!-- Esquerda: Seletor de Tema (Skin) -->
+        <!-- Esquerda: Seletor de Tema -->
         <div class="w-full lg:w-[260px] flex justify-center lg:justify-start">
             <div class="relative inline-block text-left w-full lg:w-auto">
-                <select id="skin-selector" onchange="changeSkin(this.value)" class="inline-flex justify-center items-center gap-2 w-full rounded-md border border-gray-300 shadow-sm px-3 py-1.5 bg-gray-50 text-sm font-medium text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors cursor-pointer appearance-none pr-8 bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.5em_1.5em]" style="background-image: url(&quot;data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E&quot;);">
+                <select id="skin-selector" onchange="changeSkin(this.value)" class="inline-flex justify-center items-center gap-2 w-full rounded-md border border-gray-300 shadow-sm px-3 py-1.5 bg-gray-50 text-sm font-medium text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors cursor-pointer appearance-none pr-8 bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.5em_1.5em]">
                     <option value="light" data-i18n="skin_light">☀️ Claro</option>
                     <option value="dark" data-i18n="skin_dark" selected>🌙 Escuro</option>
                     <option value="vintage" data-i18n="skin_vintage">🎸 Vintage</option>
@@ -152,87 +133,9 @@
             </div>
         </div>
         
-        <!-- Centro: Título com Ícones Dinâmicos (em linha única) -->
-        <h1 class="text-2xl md:text-3xl font-normal text-center flex justify-center items-center gap-2 flex-1 whitespace-nowrap">
-            <!-- Ícones Esquerda -->
-            <span class="icon-light text-3xl md:text-4xl">🎸</span>
-            <!-- Flying V SVG (Tema Escuro) -->
-            <span class="icon-dark w-10 h-10 md:w-12 md:h-12 items-center justify-center">
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
-                    <g transform="translate(50, 50) rotate(-45) translate(-50, -50)">
-                        <!-- Braço -->
-                        <rect x="50" y="46" width="35" height="8" fill="#3f3f46"/>
-                        <!-- Mão (Headstock) -->
-                        <polygon points="85,44 98,47 98,53 85,56" fill="#ea580c"/>
-                        <circle cx="89" cy="43" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="44" r="1.5" fill="#d4d4d8"/>
-                        <circle cx="89" cy="57" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="56" r="1.5" fill="#d4d4d8"/>
-                        <!-- Corpo (Flying V) -->
-                        <path d="M 50,40 L 50,60 L 5,95 L 25,50 L 5,5 Z" fill="#dc2626" stroke="#991b1b" stroke-width="1.5" stroke-linejoin="round"/>
-                        <!-- Escudo (Pickguard) -->
-                        <path d="M 45,43 L 45,57 L 15,80 L 28,50 L 15,20 Z" fill="#f4f4f5"/>
-                        <!-- Captadores -->
-                        <rect x="40" y="47" width="4" height="6" rx="1" fill="#18181b"/>
-                        <rect x="32" y="47" width="4" height="6" rx="1" fill="#18181b"/>
-                        <!-- Ponte -->
-                        <rect x="23" y="46" width="3" height="8" fill="#d4d4d8"/>
-                    </g>
-                </svg>
-            </span>
-            <!-- Violão Acústico SVG (Tema Vintage) -->
-            <span class="icon-vintage w-10 h-10 md:w-12 md:h-12 items-center justify-center">
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
-                    <g transform="translate(50, 50) rotate(-45) translate(-50, -50)">
-                        <!-- Braço -->
-                        <rect x="55" y="46" width="30" height="8" fill="#451a03"/>
-                        <!-- Mão (Headstock) -->
-                        <rect x="85" y="44" width="12" height="12" rx="2" fill="#27272a"/>
-                        <circle cx="88" cy="42" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="42" r="1.5" fill="#d4d4d8"/>
-                        <circle cx="88" cy="58" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="58" r="1.5" fill="#d4d4d8"/>
-                        <!-- Corpo Folk com Cutaway -->
-                        <path d="M 55,42 C 55,25 35,18 15,28 C -2,38 -2,62 15,72 C 35,82 55,75 55,60 C 55,54 48,54 48,50 C 48,46 55,46 55,42 Z" fill="#d97706" stroke="#78350f" stroke-width="1.5" stroke-linejoin="round"/>
-                        <!-- Escudo (Pickguard) -->
-                        <path d="M 38,59 C 45,59 50,65 50,70 C 40,75 30,68 30,59 Z" fill="#78350f"/>
-                        <!-- Boca (Soundhole) -->
-                        <circle cx="38" cy="50" r="9" fill="#18181b" stroke="#fde047" stroke-width="1"/>
-                        <!-- Ponte -->
-                        <rect x="18" y="43" width="5" height="14" rx="2" fill="#451a03"/>
-                    </g>
-                </svg>
-            </span>
-
-            <span data-i18n="title" class="px-1 text-ellipsis overflow-hidden">Estudo de Escalas de Guitarra</span>
-            
-            <!-- Ícones Direita (Invertidos Horizontalmente para Simetria) -->
-            <span class="icon-light text-3xl md:text-4xl" style="transform: scaleX(-1);">🎸</span>
-            <span class="icon-dark w-10 h-10 md:w-12 md:h-12 items-center justify-center" style="transform: scaleX(-1);">
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
-                    <g transform="translate(50, 50) rotate(-45) translate(-50, -50)">
-                        <rect x="50" y="46" width="35" height="8" fill="#3f3f46"/>
-                        <polygon points="85,44 98,47 98,53 85,56" fill="#ea580c"/>
-                        <circle cx="89" cy="43" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="44" r="1.5" fill="#d4d4d8"/>
-                        <circle cx="89" cy="57" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="56" r="1.5" fill="#d4d4d8"/>
-                        <path d="M 50,40 L 50,60 L 5,95 L 25,50 L 5,5 Z" fill="#dc2626" stroke="#991b1b" stroke-width="1.5" stroke-linejoin="round"/>
-                        <path d="M 45,43 L 45,57 L 15,80 L 28,50 L 15,20 Z" fill="#f4f4f5"/>
-                        <rect x="40" y="47" width="4" height="6" rx="1" fill="#18181b"/>
-                        <rect x="32" y="47" width="4" height="6" rx="1" fill="#18181b"/>
-                        <rect x="23" y="46" width="3" height="8" fill="#d4d4d8"/>
-                    </g>
-                </svg>
-            </span>
-            <span class="icon-vintage w-10 h-10 md:w-12 md:h-12 items-center justify-center" style="transform: scaleX(-1);">
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
-                    <g transform="translate(50, 50) rotate(-45) translate(-50, -50)">
-                        <rect x="55" y="46" width="30" height="8" fill="#451a03"/>
-                        <rect x="85" y="44" width="12" height="12" rx="2" fill="#27272a"/>
-                        <circle cx="88" cy="42" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="42" r="1.5" fill="#d4d4d8"/>
-                        <circle cx="88" cy="58" r="1.5" fill="#d4d4d8"/><circle cx="93" cy="58" r="1.5" fill="#d4d4d8"/>
-                        <path d="M 55,42 C 55,25 35,18 15,28 C -2,38 -2,62 15,72 C 35,82 55,75 55,60 C 55,54 48,54 48,50 C 48,46 55,46 55,42 Z" fill="#d97706" stroke="#78350f" stroke-width="1.5" stroke-linejoin="round"/>
-                        <path d="M 38,59 C 45,59 50,65 50,70 C 40,75 30,68 30,59 Z" fill="#78350f"/>
-                        <circle cx="38" cy="50" r="9" fill="#18181b" stroke="#fde047" stroke-width="1"/>
-                        <rect x="18" y="43" width="5" height="14" rx="2" fill="#451a03"/>
-                    </g>
-                </svg>
-            </span>
+        <!-- Centro: Título Limpo -->
+        <h1 class="text-2xl md:text-3xl font-semibold text-center flex justify-center items-center gap-2 flex-1 whitespace-nowrap">
+            <span data-i18n="title" class="px-1 text-ellipsis overflow-hidden tracking-wide">Tutor de Escalas</span>
         </h1>
 
         <!-- Direita: Seletor de Idioma -->
@@ -266,53 +169,51 @@
         </div>
     </div>
 
-    <!-- Controles -->
+    <!-- Controles Centrais -->
     <div class="flex flex-wrap justify-center items-end gap-3 mb-8">
         <div class="flex flex-col gap-1">
             <label for="tom" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_root">Tom</label>
             <select id="tom" class="border border-gray-300 rounded px-2 py-1 text-sm w-20 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="C" selected>C</option>
-                <option value="C#">C#</option>
-                <option value="D">D</option>
-                <option value="D#">D#</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="F#">F#</option>
-                <option value="G">G</option>
-                <option value="G#">G#</option>
-                <option value="A">A</option>
-                <option value="A#">A#</option>
-                <option value="B">B</option>
+                <option value="C" selected>C</option><option value="C#">C#</option><option value="D">D</option><option value="D#">D#</option>
+                <option value="E">E</option><option value="F">F</option><option value="F#">F#</option><option value="G">G</option>
+                <option value="G#">G#</option><option value="A">A</option><option value="A#">A#</option><option value="B">B</option>
             </select>
         </div>
 
         <div class="flex flex-col gap-1">
             <label for="escala" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_scale">Escala</label>
             <select id="escala" class="border border-gray-300 rounded px-2 py-1 text-sm w-44 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <!-- Preenchido dinamicamente -->
             </select>
         </div>
 
         <div class="flex flex-col gap-1">
             <label for="modo" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_mode">Variação / Modo</label>
             <select id="modo" class="border border-gray-300 rounded px-2 py-1 text-sm w-48 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <!-- Preenchido dinamicamente -->
             </select>
         </div>
 
         <div class="flex flex-col gap-1">
             <label for="exercicio" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_ex">Exercício</label>
             <select id="exercicio" class="border border-gray-300 rounded px-2 py-1 text-sm w-64 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-ellipsis">
-                <!-- Preenchido dinamicamente via JS (I18n) -->
             </select>
         </div>
 
         <div class="flex flex-col gap-1">
-            <label for="bpm" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_bpm">BPM</label>
+            <label for="bpm" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_bpm">Velocidade</label>
             <div class="flex items-center gap-1">
                 <button id="btn-bpm-minus" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-700 font-bold transition-colors text-sm" dir="ltr">-10</button>
                 <input type="number" id="bpm" value="160" min="40" max="300" class="border border-gray-300 rounded px-1 py-1 text-sm w-16 text-center bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" dir="ltr">
                 <button id="btn-bpm-plus" class="px-2 py-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-700 font-bold transition-colors text-sm" dir="ltr">+10</button>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1 items-center ml-2">
+            <label for="desafio" class="text-xs font-semibold text-gray-600 uppercase" data-i18n="lbl_challenge">Desafio</label>
+            <div class="flex items-center justify-center h-[30px] w-full">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="desafio" class="sr-only peer">
+                  <div class="w-10 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
             </div>
         </div>
     </div>
@@ -333,7 +234,6 @@
 
     <!-- Posições (Sistema CAGED) -->
     <div id="positions-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6" dir="ltr">
-        <!-- Renderizados dinamicamente -->
     </div>
 
     <!-- Sobre o autor -->
@@ -342,7 +242,6 @@
             <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-5 text-xl text-gray-800">
                 <span data-i18n="about_author">Sobre o autor</span>
                 <span class="transition group-open:rotate-180 text-gray-500">
-                    <!-- Ícone de seta apontando para baixo (gira para cima quando aberto) -->
                     <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24"><path d="M19 9l-7 7-7-7"></path></svg>
                 </span>
             </summary>
@@ -360,12 +259,11 @@
     </div>
 
     <script>
-        // Dicionário de Internacionalização (I18N)
         const i18n = {
             'pt': {
                 'skin_light': '☀️ Claro', 'skin_dark': '🌙 Escuro', 'skin_vintage': '🎸 Vintage',
                 'about_author': 'Sobre o autor',
-                'title': 'Estudo de Escalas de Guitarra', 'lbl_root': 'Tom', 'lbl_scale': 'Escala', 'lbl_mode': 'Variação / Modo', 'lbl_ex': 'Exercício', 'lbl_bpm': 'BPM',
+                'title': 'Tutor de Escalas', 'lbl_root': 'Tom', 'lbl_scale': 'Escala', 'lbl_mode': 'Variação / Modo', 'lbl_ex': 'Exercício', 'lbl_bpm': 'Velocidade', 'lbl_challenge': 'Desafio',
                 'btn_play_full': 'Tocar Escala Completa', 'btn_play': 'Tocar', 'btn_stop': 'Parar', 'position': 'Posição', 'frets': 'Trastes',
                 'ex_1': '1. Subir e descer a escala toda', 'ex_2': '2. 2 vezes cada nota', 'ex_3': '3. 3 vezes cada nota', 'ex_4': '4. Cordas graves (6ª a 3ª)', 'ex_5': '5. Cordas agudas (4ª a 1ª)', 'ex_6': '6. Grupos de 3 (1-2-3, 2-3-4...)',
                 'ex_7': '7. Grupos de 4 (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. Saltos de Terças (1-3, 2-4, 3-5...)', 'ex_9': '9. Arpejos Tríades', 'ex_10': '10. Arpejos Tétrades', 'ex_11': '11. Salto de Cordas (6-4, 5-3, 4-2...)',
@@ -377,7 +275,7 @@
             'en': {
                 'skin_light': '☀️ Light', 'skin_dark': '🌙 Dark', 'skin_vintage': '🎸 Vintage',
                 'about_author': 'About the author',
-                'title': 'Guitar Scale Study', 'lbl_root': 'Root', 'lbl_scale': 'Scale', 'lbl_mode': 'Variation / Mode', 'lbl_ex': 'Exercise', 'lbl_bpm': 'BPM',
+                'title': 'Scale Tutor', 'lbl_root': 'Root', 'lbl_scale': 'Scale', 'lbl_mode': 'Variation / Mode', 'lbl_ex': 'Exercise', 'lbl_bpm': 'Speed', 'lbl_challenge': 'Challenge',
                 'btn_play_full': 'Play Full Scale', 'btn_play': 'Play', 'btn_stop': 'Stop', 'position': 'Position', 'frets': 'Frets',
                 'ex_1': '1. Up and down the whole scale', 'ex_2': '2. 2 times each note', 'ex_3': '3. 3 times each note', 'ex_4': '4. Low strings (6th to 3rd)', 'ex_5': '5. High strings (4th to 1st)', 'ex_6': '6. Groups of 3 (1-2-3, 2-3-4...)',
                 'ex_7': '7. Groups of 4 (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. Third leaps (1-3, 2-4, 3-5...)', 'ex_9': '9. Triad Arpeggios', 'ex_10': '10. Tetrad Arpeggios', 'ex_11': '11. String skipping (6-4, 5-3, 4-2...)',
@@ -389,7 +287,7 @@
             'es': {
                 'skin_light': '☀️ Claro', 'skin_dark': '🌙 Oscuro', 'skin_vintage': '🎸 Vintage',
                 'about_author': 'Sobre el autor',
-                'title': 'Estudio de Escalas de Guitarra', 'lbl_root': 'Tono', 'lbl_scale': 'Escala', 'lbl_mode': 'Variación / Modo', 'lbl_ex': 'Ejercicio', 'lbl_bpm': 'BPM',
+                'title': 'Tutor de Escalas', 'lbl_root': 'Tono', 'lbl_scale': 'Escala', 'lbl_mode': 'Variación / Modo', 'lbl_ex': 'Ejercicio', 'lbl_bpm': 'Velocidad', 'lbl_challenge': 'Desafío',
                 'btn_play_full': 'Tocar Escala Completa', 'btn_play': 'Tocar', 'btn_stop': 'Detener', 'position': 'Posición', 'frets': 'Trastes',
                 'ex_1': '1. Subir y bajar toda la escala', 'ex_2': '2. 2 veces cada nota', 'ex_3': '3. 3 veces cada nota', 'ex_4': '4. Cuerdas graves (6ª a 3ª)', 'ex_5': '5. Cuerdas agudas (4ª a 1ª)', 'ex_6': '6. Grupos de 3 (1-2-3, 2-3-4...)',
                 'ex_7': '7. Grupos de 4 (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. Saltos de Terceras (1-3, 2-4, 3-5...)', 'ex_9': '9. Arpegios Tríadas', 'ex_10': '10. Arpegios Tétradas', 'ex_11': '11. Salto de Cuerdas (6-4, 5-3, 4-2...)',
@@ -401,7 +299,7 @@
             'fr': {
                 'skin_light': '☀️ Clair', 'skin_dark': '🌙 Sombre', 'skin_vintage': '🎸 Vintage',
                 'about_author': 'À propos de l\'auteur',
-                'title': 'Étude des Gammes de Guitare', 'lbl_root': 'Tonalité', 'lbl_scale': 'Gamme', 'lbl_mode': 'Variation / Mode', 'lbl_ex': 'Exercice', 'lbl_bpm': 'BPM',
+                'title': 'Tuteur de Gammes', 'lbl_root': 'Tonalité', 'lbl_scale': 'Gamme', 'lbl_mode': 'Variation / Mode', 'lbl_ex': 'Exercice', 'lbl_bpm': 'Vitesse', 'lbl_challenge': 'Défi',
                 'btn_play_full': 'Jouer la Gamme Complète', 'btn_play': 'Jouer', 'btn_stop': 'Arrêter', 'position': 'Position', 'frets': 'Frettes',
                 'ex_1': '1. Monter et descendre toute la gamme', 'ex_2': '2. 2 fois chaque note', 'ex_3': '3. 3 fois chaque note', 'ex_4': '4. Cordes graves (6ème à 3ème)', 'ex_5': '5. Cordes aiguës (4ème à 1ère)', 'ex_6': '6. Groupes de 3 (1-2-3, 2-3-4...)',
                 'ex_7': '7. Groupes de 4 (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. Sauts de Tierces (1-3, 2-4, 3-5...)', 'ex_9': '9. Arpèges Triades', 'ex_10': '10. Arpèges Tétrades', 'ex_11': '11. Saut de Cordes (6-4, 5-3...)',
@@ -413,7 +311,7 @@
             'ru': {
                 'skin_light': '☀️ Светлая', 'skin_dark': '🌙 Темная', 'skin_vintage': '🎸 Винтаж',
                 'about_author': 'Об авторе',
-                'title': 'Изучение Гитарных Гамм', 'lbl_root': 'Тоника', 'lbl_scale': 'Гамма', 'lbl_mode': 'Вариация / Лад', 'lbl_ex': 'Упражнение', 'lbl_bpm': 'Удары/мин',
+                'title': 'Репетитор по Гаммам', 'lbl_root': 'Тоника', 'lbl_scale': 'Гамма', 'lbl_mode': 'Вариация / Лад', 'lbl_ex': 'Упражнение', 'lbl_bpm': 'Скорость', 'lbl_challenge': 'Вызов',
                 'btn_play_full': 'Играть Всю Гамму', 'btn_play': 'Играть', 'btn_stop': 'Стоп', 'position': 'Позиция', 'frets': 'Лады',
                 'ex_1': '1. Вверх и вниз по всей гамме', 'ex_2': '2. По 2 раза каждую ноту', 'ex_3': '3. По 3 раза каждую ноту', 'ex_4': '4. Басовые струны (с 6 по 3)', 'ex_5': '5. Верхние струны (с 4 по 1)', 'ex_6': '6. Группы по 3 (1-2-3, 2-3-4...)',
                 'ex_7': '7. Группы по 4 (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. Скачки на терцию (1-3, 2-4, 3-5...)', 'ex_9': '9. Арпеджио Трезвучий', 'ex_10': '10. Арпеджио Септаккордов', 'ex_11': '11. Пропуск струн (6-4, 5-3, 4-2...)'
@@ -421,7 +319,7 @@
             'zh': {
                 'skin_light': '☀️ 浅色', 'skin_dark': '🌙 深色', 'skin_vintage': '🎸 复古',
                 'about_author': '关于作者',
-                'title': '吉他音阶学习', 'lbl_root': '主音', 'lbl_scale': '音阶', 'lbl_mode': '变奏 / 调式', 'lbl_ex': '练习', 'lbl_bpm': '拍/分钟',
+                'title': '音阶导师', 'lbl_root': '主音', 'lbl_scale': '音阶', 'lbl_mode': '变奏 / 调式', 'lbl_ex': '练习', 'lbl_bpm': '速度', 'lbl_challenge': '挑战',
                 'btn_play_full': '弹奏全音阶', 'btn_play': '弹奏', 'btn_stop': '停止', 'position': '位置', 'frets': '品格',
                 'ex_1': '1. 上下全音阶', 'ex_2': '2. 每个音符弹2次', 'ex_3': '3. 每个音符弹3次', 'ex_4': '4. 低音弦 (6到3弦)', 'ex_5': '5. 高音弦 (4到1弦)', 'ex_6': '6. 三音组 (1-2-3, 2-3-4...)',
                 'ex_7': '7. 四音组 (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. 三度跳跃 (1-3, 2-4, 3-5...)', 'ex_9': '9. 三和弦琶音', 'ex_10': '10. 七和弦琶音', 'ex_11': '11. 跳弦 (6-4, 5-3, 4-2...)'
@@ -429,7 +327,7 @@
             'hi': {
                 'skin_light': '☀️ हल्का', 'skin_dark': '🌙 गहरा', 'skin_vintage': '🎸 विंटेज',
                 'about_author': 'लेखक के बारे में',
-                'title': 'गिटार स्केल का अध्ययन', 'lbl_root': 'मूल स्वर', 'lbl_scale': 'स्केल', 'lbl_mode': 'मोड', 'lbl_ex': 'व्यायाम', 'lbl_bpm': 'बीपीएम',
+                'title': 'स्केल ट्यूटर', 'lbl_root': 'मूल स्वर', 'lbl_scale': 'स्केल', 'lbl_mode': 'मोड', 'lbl_ex': 'व्यायाम', 'lbl_bpm': 'गति', 'lbl_challenge': 'चुनौती',
                 'btn_play_full': 'पूरा स्केल बजाएं', 'btn_play': 'बजाएं', 'btn_stop': 'रुकें', 'position': 'स्थिति', 'frets': 'फ्रेट्स',
                 'ex_1': '1. पूरा स्केल ऊपर-नीचे', 'ex_2': '2. 2 बार प्रत्येक स्वर', 'ex_3': '3. 3 बार प्रत्येक स्वर', 'ex_4': '4. निचली स्ट्रिंग्स (6 से 3)', 'ex_5': '5. ऊपरी स्ट्रिंग्स (4 से 1)', 'ex_6': '6. 3 के समूह (1-2-3, 2-3-4...)',
                 'ex_7': '7. 4 के समूह (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. थर्ड्स जंप (1-3, 2-4, 3-5...)', 'ex_9': '9. ट्रायड आर्पेजियोस', 'ex_10': '10. टेट्राड आर्पेजियोस', 'ex_11': '11. स्ट्रिंग जंपिंग (6-4, 5-3, 4-2...)'
@@ -437,7 +335,7 @@
             'ar': {
                 'skin_light': '☀️ فاتح', 'skin_dark': '🌙 داكن', 'skin_vintage': '🎸 كلاسيكي',
                 'about_author': 'عن المؤلف',
-                'title': 'دراسة سلالم الجيتار', 'lbl_root': 'الجذر', 'lbl_scale': 'السلم', 'lbl_mode': 'الوضع', 'lbl_ex': 'تمرين', 'lbl_bpm': 'نبضة/دقيقة',
+                'title': 'معلم السلالم', 'lbl_root': 'الجذر', 'lbl_scale': 'السلم', 'lbl_mode': 'الوضع', 'lbl_ex': 'تمرين', 'lbl_bpm': 'السرعة', 'lbl_challenge': 'تحدي',
                 'btn_play_full': 'عزف السلم كاملاً', 'btn_play': 'عزف', 'btn_stop': 'إيقاف', 'position': 'موضع', 'frets': 'دساتين',
                 'ex_1': '1. صعود وهبوط السلم', 'ex_2': '2. مرتان لكل نغمة', 'ex_3': '3. 3 مرات لكل نغمة', 'ex_4': '4. الأوتار الغليظة (6 إلى 3)', 'ex_5': '5. الأوتار الرفيعة (4 إلى 1)', 'ex_6': '6. مجموعات ثلاثية (1-2-3, 2-3-4...)',
                 'ex_7': '7. مجموعات رباعية (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. قفزات ثلثية (1-3, 2-4, 3-5...)', 'ex_9': '9. تتابعات ثلاثية', 'ex_10': '10. تتابعات رباعية', 'ex_11': '11. قفز الأوتار (6-4, 5-3, 4-2...)'
@@ -445,7 +343,7 @@
             'bn': {
                 'skin_light': '☀️ হালকা', 'skin_dark': '🌙 গাঢ়', 'skin_vintage': '🎸 ভিন্টেজ',
                 'about_author': 'লেখকের সম্পর্কে',
-                'title': 'গিটার স্কেল অধ্যয়ন', 'lbl_root': 'রুট (Root)', 'lbl_scale': 'স্কেল', 'lbl_mode': 'মোড', 'lbl_ex': 'ব্যায়াম', 'lbl_bpm': 'বিপিএম',
+                'title': 'স্কেল টিউটর', 'lbl_root': 'রুট (Root)', 'lbl_scale': 'স্কেল', 'lbl_mode': 'মোড', 'lbl_ex': 'ব্যায়াম', 'lbl_bpm': 'গতি', 'lbl_challenge': 'চ্যালেঞ্জ',
                 'btn_play_full': 'সম্পূর্ণ স্কেল বাজান', 'btn_play': 'বাজান', 'btn_stop': 'থামুন', 'position': 'অবস্থান', 'frets': 'ফ্রেট',
                 'ex_1': '১. সম্পূর্ণ স্কেল উপরে-নিচে', 'ex_2': '২. প্রতিটি নোট ২ বার', 'ex_3': '৩. প্রতিটি নোট ৩ বার', 'ex_4': '৪. নিচের স্ট্রিং (৬ থেকে ৩)', 'ex_5': '৫. উপরের স্ট্রিং (৪ থেকে ১)', 'ex_6': '৬. ৩ এর গ্রুপ (১-২-৩, ২-৩-৪...)',
                 'ex_7': '৭. ৪ এর গ্রুপ (১-২-৩-৪, ২-৩-৪-৫...)', 'ex_8': '৮. থার্ডস জাম্প (১-৩, ২-৪, ৩-৫...)', 'ex_9': '৯. ট্রায়াড আর্পেজিওস', 'ex_10': '১০. টেট্রাড আর্পেজিওস', 'ex_11': '১১. স্ট্রিং স্কিপিং (৬-৪, ৫-৩, ৪-২...)'
@@ -453,7 +351,7 @@
             'ur': {
                 'skin_light': '☀️ ہلکا', 'skin_dark': '🌙 گہرا', 'skin_vintage': '🎸 ونٹیج',
                 'about_author': 'مصنف کے بارے میں',
-                'title': 'گٹار سکیل کا مطالعہ', 'lbl_root': 'روٹ', 'lbl_scale': 'سکیل', 'lbl_mode': 'موڈ', 'lbl_ex': 'مشق', 'lbl_bpm': 'بی پی ایم',
+                'title': 'سکیل ٹیوٹر', 'lbl_root': 'روٹ', 'lbl_scale': 'سکیل', 'lbl_mode': 'موڈ', 'lbl_ex': 'مشق', 'lbl_bpm': 'رفتار', 'lbl_challenge': 'چیلنج',
                 'btn_play_full': 'پورا سکیل بجائیں', 'btn_play': 'بجائیں', 'btn_stop': 'روکیں', 'position': 'پوزیشن', 'frets': 'فریٹس',
                 'ex_1': '1. پورا سکیل اوپر نیچے', 'ex_2': '2. 2 بار ہر نوٹ', 'ex_3': '3. 3 بار ہر نوٹ', 'ex_4': '4. نچلی تاریں (6 سے 3)', 'ex_5': '5. اوپری تاریں (4 سے 1)', 'ex_6': '6. 3 کے گروپس (1-2-3, 2-3-4...)',
                 'ex_7': '7. 4 کے گروپس (1-2-3-4, 2-3-4-5...)', 'ex_8': '8. تھرڈز جمپ (1-3, 2-4, 3-5...)', 'ex_9': '9. ٹرائڈ آرپیجیوس', 'ex_10': '10. ٹیٹراڈ آرپیجیوس', 'ex_11': '11. سٹرنگ سکپنگ (6-4, 5-3, 4-2...)'
@@ -470,41 +368,22 @@
         }
 
         const notasCromaticas = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        // Afinação padrão: E4, B3, G3, D3, A2, E2 (do agudo para o grave)
         const afinacaoIndices = [4, 11, 7, 2, 9, 4]; 
-
-        // Frequências das cordas soltas (High E até Low E)
         const openStringFreqs = [329.63, 246.94, 196.00, 146.83, 110.00, 82.41]; 
 
-        // Configuração de Áudio
         let audioCtx;
-        
-        // Estado de Reprodução
         let playbackState = {
-            diagramId: null,
-            timeoutId: null,
-            currentIndex: 0,
-            sequence: [],
-            sequences: {}, // Armazena as sequências pré-calculadas
-            playing: false,
-            lastHighlightedNote: null
+            diagramId: null, timeoutId: null, currentIndex: 0, cycleCount: 0, sequence: [], sequences: {}, playing: false, lastHighlightedNote: null
         };
 
-        // Inicializa o Áudio Context apenas com interação do usuário (Regra dos navegadores)
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // Sintetizador básico de guitarra (Pluck)
         function playPluck(stringIdx, fret) {
             initAudio();
             const freq = openStringFreqs[stringIdx] * Math.pow(2, fret / 12);
-            
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             const filter = audioCtx.createBiquadFilter();
@@ -527,39 +406,15 @@
             osc.stop(now + 2.5);
         }
 
-        // Banco de Escalas e Modos com intervalos e deslocamento do sistema CAGED
         const bancoDeEscalas = {
-            'Pentatônica': {
-                'Maior': { i: [0, 2, 4, 7, 9], c: 0 },
-                'Menor': { i: [0, 3, 5, 7, 10], c: 3 }
-            },
-            'Diatônica (Modos Gregos)': {
-                'Jônio (Maior)': { i: [0, 2, 4, 5, 7, 9, 11], c: 0 },
-                'Dórico': { i: [0, 2, 3, 5, 7, 9, 10], c: -2 },
-                'Frígio': { i: [0, 1, 3, 5, 7, 8, 10], c: -4 },
-                'Lídio': { i: [0, 2, 4, 6, 7, 9, 11], c: -5 },
-                'Mixolídio': { i: [0, 2, 4, 5, 7, 9, 10], c: -7 },
-                'Eólio (Menor)': { i: [0, 2, 3, 5, 7, 8, 10], c: 3 },
-                'Lócrio': { i: [0, 1, 3, 5, 6, 8, 10], c: 1 }
-            },
-            'Escala Blues': {
-                'Maior': { i: [0, 2, 3, 4, 7, 9], c: 0 },
-                'Menor': { i: [0, 3, 5, 6, 7, 10], c: 3 }
-            },
-            'Menor Harmônica': {
-                'Padrão': { i: [0, 2, 3, 5, 7, 8, 11], c: 3 }
-            },
-            'Menor Melódica': {
-                'Padrão': { i: [0, 2, 3, 5, 7, 9, 11], c: 3 }
-            },
-            'Escalas Simétricas': {
-                'Diminuta (Tom-Semitom)': { i: [0, 2, 3, 5, 6, 8, 9, 11], c: 0 },
-                'Dom Diminuta (Semitom-Tom)': { i: [0, 1, 3, 4, 6, 7, 9, 10], c: 0 },
-                'Hexafônica (Tons Inteiros)': { i: [0, 2, 4, 6, 8, 10], c: 0 }
-            }
+            'Pentatônica': { 'Maior': { i: [0, 2, 4, 7, 9], c: 0 }, 'Menor': { i: [0, 3, 5, 7, 10], c: 3 } },
+            'Diatônica (Modos Gregos)': { 'Jônio (Maior)': { i: [0, 2, 4, 5, 7, 9, 11], c: 0 }, 'Dórico': { i: [0, 2, 3, 5, 7, 9, 10], c: -2 }, 'Frígio': { i: [0, 1, 3, 5, 7, 8, 10], c: -4 }, 'Lídio': { i: [0, 2, 4, 6, 7, 9, 11], c: -5 }, 'Mixolídio': { i: [0, 2, 4, 5, 7, 9, 10], c: -7 }, 'Eólio (Menor)': { i: [0, 2, 3, 5, 7, 8, 10], c: 3 }, 'Lócrio': { i: [0, 1, 3, 5, 6, 8, 10], c: 1 } },
+            'Escala Blues': { 'Maior': { i: [0, 2, 3, 4, 7, 9], c: 0 }, 'Menor': { i: [0, 3, 5, 6, 7, 10], c: 3 } },
+            'Menor Harmônica': { 'Padrão': { i: [0, 2, 3, 5, 7, 8, 11], c: 3 } },
+            'Menor Melódica': { 'Padrão': { i: [0, 2, 3, 5, 7, 9, 11], c: 3 } },
+            'Escalas Simétricas': { 'Diminuta (Tom-Semitom)': { i: [0, 2, 3, 5, 6, 8, 9, 11], c: 0 }, 'Dom Diminuta (Semitom-Tom)': { i: [0, 1, 3, 4, 6, 7, 9, 10], c: 0 }, 'Hexafônica (Tons Inteiros)': { i: [0, 2, 4, 6, 8, 10], c: 0 } }
         };
 
-        // Lógica do Menu Dropdown Customizado
         const langMenuBtn = document.getElementById('lang-menu-btn');
         const langMenuDropdown = document.getElementById('lang-menu-dropdown');
 
@@ -575,43 +430,34 @@
         });
 
         function setLang(code, flagClass, langName) {
-            // Atualizar UI do botão
             document.getElementById('current-flag').className = `fi ${flagClass} text-base rounded-sm shadow-sm`;
             document.getElementById('current-lang-name').innerText = langName;
             langMenuDropdown.classList.add('hidden');
-            
-            // Alterar Idioma
             currentLang = code;
             applyLanguage();
         }
 
-        // Função para alterar o tema visual
         function changeSkin(skinName) {
             document.body.setAttribute('data-skin', skinName);
         }
 
         function applyLanguage() {
-            // Salvar estado atual de forma segura
             const selCat = document.getElementById('escala').value || 'Pentatônica';
             const selModo = document.getElementById('modo').value || 'Maior';
             const selEx = document.getElementById('exercicio').value || '1';
 
             document.documentElement.lang = currentLang;
-            
-            // Suporte RTL (Arabe, Urdu)
             if (currentLang === 'ar' || currentLang === 'ur') {
                 document.body.dir = 'rtl';
             } else {
                 document.body.dir = 'ltr';
             }
 
-            // Traduzir textos fixos no HTML
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 el.innerText = t(key);
             });
 
-            // Recarregar Menu de Exercícios (1 a 11)
             const exSelect = document.getElementById('exercicio');
             exSelect.innerHTML = '';
             for (let i = 1; i <= 11; i++) {
@@ -619,7 +465,6 @@
             }
             exSelect.value = selEx;
 
-            // Recarregar Categorias de Escalas (Mantendo a Chave em Português como ID do Sistema)
             const catSelect = document.getElementById('escala');
             catSelect.innerHTML = '';
             for (const cat in bancoDeEscalas) {
@@ -627,15 +472,11 @@
             }
             catSelect.value = bancoDeEscalas[selCat] ? selCat : 'Pentatônica';
 
-            // Atualizar os modos silenciosamente
             atualizarModos(false);
-
             const modoSelect = document.getElementById('modo');
             if ([...modoSelect.options].some(o => o.value === selModo)) {
                 modoSelect.value = selModo;
             }
-
-            // Atualizar os gráficos
             updateUI();
         }
 
@@ -662,64 +503,39 @@
             const dadosModo = bancoDeEscalas[categoria][modo];
             const notasDaEscala = new Set(dadosModo.i.map(i => notasCromaticas[(rootIdx + i) % 12]));
 
-            return {
-                root: tom,
-                rootIdx: rootIdx,
-                notes: notasDaEscala,
-                cagedOffset: dadosModo.c
-            };
+            return { root: tom, rootIdx: rootIdx, notes: notasDaEscala, cagedOffset: dadosModo.c };
         }
 
         function getPositionWindows(rootIdx, cagedOffset) {
             let relMajorIdx = (rootIdx + cagedOffset + 12) % 12;
-            let r = (relMajorIdx - 4 + 12) % 12; // Encontra o traste da tônica maior na corda 6 (E)
+            let r = (relMajorIdx - 4 + 12) % 12; 
             
-            // Posições baseadas ESTRITAMENTE nas 5 formas do sistema CAGED
             let rawWindows = [
-                [r - 1, r + 2],  // Forma E (Posição 1 Maior)
-                [r + 1, r + 5],  // Forma D (Posição 2 Maior)
-                [r + 4, r + 7],  // Forma C (Posição 3 Maior)
-                [r + 6, r + 9],  // Forma A (Posição 4 Maior)
-                [r + 9, r + 12]  // Forma G (Posição 5 Maior)
+                [r - 1, r + 2],  
+                [r + 1, r + 5],  
+                [r + 4, r + 7],  
+                [r + 6, r + 9],  
+                [r + 9, r + 12]  
             ];
 
             let normalized = rawWindows.map(w => {
                 let [s, e] = w;
-                
-                // Se a forma inteira passar do traste 11, transpomos para a região aberta (oitava abaixo)
-                if (s >= 12) {
-                    s -= 12;
-                    e -= 12;
-                }
-                
-                // Tratar wrap around do braço (nut/pestana)
+                if (s >= 12) { s -= 12; e -= 12; }
                 if (s < 0) {
-                    // Se a caixa cobre o traste 1 ou mais, a base será as cordas soltas (0)
-                    if (e >= 1) { 
-                        s = 0; 
-                    } else {
-                        // Caso a tônica gere uma caixa negativa (ex: E Maior)
-                        s += 12; e += 12; 
-                    }
+                    if (e >= 1) s = 0; 
+                    else { s += 12; e += 12; }
                 }
-                
                 if (s < 0) s = 0;
                 return [s, e];
             });
 
-            // Remove duplicadas exatas de oitava
             let uniqueMap = new Map();
             normalized.forEach(w => uniqueMap.set(`${w[0]}-${w[1]}`, w));
-            
-            // Ordena pela casa inicial para mostrar da esquerda pra direita
             let finalWindows = Array.from(uniqueMap.values()).sort((a, b) => a[0] - b[0]);
-            
-            // Fallback de segurança 
             if (finalWindows.length < 5) finalWindows = [ [0,3], [2,5], [5,8], [7,10], [9,12] ];
             return finalWindows.slice(0, 5);
         }
 
-        // Lógica de Geração de Sequência com base no Exercício Escolhido
         function generateExerciseData(diagramId, startFret, endFret, scaleData, exercicio) {
             let baseNotes = [];
             for (let s = 5; s >= 0; s--) {
@@ -734,19 +550,16 @@
             }
             
             baseNotes.sort((a, b) => a.pitch - b.pitch);
-
             let exSeq = [];
             
             if (exercicio === "1") {
                 exSeq = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
             } 
             else if (exercicio === "2") {
-                // Tocar 2 vezes cada nota
                 let upDown = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
                 upDown.forEach(n => { exSeq.push(n, n); });
             }
             else if (exercicio === "3") {
-                // Tocar 3 vezes cada nota
                 let upDown = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
                 upDown.forEach(n => { exSeq.push(n, n, n); });
             }
@@ -759,69 +572,43 @@
                 exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
             }
             else if (exercicio === "6") {
-                for (let i = 0; i < baseNotes.length - 2; i++) {
-                    exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2]);
-                }
+                for (let i = 0; i < baseNotes.length - 2; i++) exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2]);
                 let rev = [...baseNotes].reverse();
-                for (let i = 0; i < rev.length - 2; i++) {
-                    exSeq.push(rev[i], rev[i+1], rev[i+2]);
-                }
+                for (let i = 0; i < rev.length - 2; i++) exSeq.push(rev[i], rev[i+1], rev[i+2]);
             }
             else if (exercicio === "7") {
-                for (let i = 0; i < baseNotes.length - 3; i++) {
-                    exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2], baseNotes[i+3]);
-                }
+                for (let i = 0; i < baseNotes.length - 3; i++) exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2], baseNotes[i+3]);
                 let rev = [...baseNotes].reverse();
-                for (let i = 0; i < rev.length - 3; i++) {
-                    exSeq.push(rev[i], rev[i+1], rev[i+2], rev[i+3]);
-                }
+                for (let i = 0; i < rev.length - 3; i++) exSeq.push(rev[i], rev[i+1], rev[i+2], rev[i+3]);
             }
             else if (exercicio === "8") {
-                for (let i = 0; i < baseNotes.length - 2; i++) {
-                    exSeq.push(baseNotes[i], baseNotes[i+2]);
-                }
+                for (let i = 0; i < baseNotes.length - 2; i++) exSeq.push(baseNotes[i], baseNotes[i+2]);
                 let rev = [...baseNotes].reverse();
-                for (let i = 0; i < rev.length - 2; i++) {
-                    exSeq.push(rev[i], rev[i+2]);
-                }
+                for (let i = 0; i < rev.length - 2; i++) exSeq.push(rev[i], rev[i+2]);
             }
             else if (exercicio === "9") {
-                let filtered = baseNotes.filter(n => {
-                    let dist = (n.noteIdx - scaleData.rootIdx + 12) % 12;
-                    return [0, 3, 4, 6, 7, 8].includes(dist);
-                });
+                let filtered = baseNotes.filter(n => { return [0, 3, 4, 6, 7, 8].includes((n.noteIdx - scaleData.rootIdx + 12) % 12); });
                 exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
             }
             else if (exercicio === "10") {
-                let filtered = baseNotes.filter(n => {
-                    let dist = (n.noteIdx - scaleData.rootIdx + 12) % 12;
-                    return [0, 3, 4, 6, 7, 8, 9, 10, 11].includes(dist);
-                });
+                let filtered = baseNotes.filter(n => { return [0, 3, 4, 6, 7, 8, 9, 10, 11].includes((n.noteIdx - scaleData.rootIdx + 12) % 12); });
                 exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
             }
             else if (exercicio === "11") {
                 let stringPattern = [5, 3, 4, 2, 3, 1, 2, 0];
-                stringPattern.forEach(sIndex => {
-                    let notes = baseNotes.filter(n => n.string === sIndex);
-                    exSeq.push(...notes);
-                });
+                stringPattern.forEach(sIndex => { exSeq.push(...baseNotes.filter(n => n.string === sIndex)); });
                 let revPattern = [0, 2, 1, 3, 2, 4, 3, 5];
-                revPattern.forEach(sIndex => {
-                    let notes = baseNotes.filter(n => n.string === sIndex);
-                    exSeq.push(...notes.reverse());
-                });
+                revPattern.forEach(sIndex => { exSeq.push(...baseNotes.filter(n => n.string === sIndex).reverse()); });
             }
 
-            if (exSeq.length === 0) {
-                 exSeq = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
-            }
+            if (exSeq.length === 0) exSeq = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
 
             let activeNoteIds = new Set(exSeq.map(n => n.id));
             return { sequence: exSeq, activeNoteIds: activeNoteIds };
         }
 
         function renderGuitarFretboard(diagramId, startFret, endFret, scaleData, showTuningLabels, numberPos, activeNoteIds) {
-            let html = `<div class="flex flex-col">`;
+            let html = `<div id="diagram-${diagramId}" class="flex flex-col transition-opacity duration-300">`;
 
             if (numberPos === 'top') {
                 html += `<div class="flex mb-1">`;
@@ -841,17 +628,13 @@
                 html += `<div class="w-[35px] flex-shrink-0 flex flex-col justify-around py-[10px]" dir="ltr">`;
                 for (let s = 0; s < 6; s++) {
                     let openNote = notasCromaticas[afinacaoIndices[s]];
-                    html += `<div class="flex items-center justify-center">`;
-                    html += `<div class="tuning-dot">${openNote}</div>`;
-                    html += `</div>`;
+                    html += `<div class="flex items-center justify-center"><div class="tuning-dot">${openNote}</div></div>`;
                 }
                 html += `</div>`;
             }
 
             let gridCols = startFret === 0 ? '40px ' : '';
-            for(let f = (startFret === 0 ? 1 : startFret); f <= endFret; f++){
-                gridCols += 'minmax(0, 1fr) ';
-            }
+            for(let f = (startFret === 0 ? 1 : startFret); f <= endFret; f++) gridCols += 'minmax(0, 1fr) ';
 
             html += `<div class="flex-1 grid border-t border-b border-gray-600 bg-white shadow-sm" style="grid-template-columns: ${gridCols}; grid-template-rows: repeat(6, 1fr);" dir="ltr">`;
 
@@ -868,25 +651,19 @@
                     if (f === startFret && f !== 0) borderCls = 'border-l-2 border-gray-500'; 
                     if (f === endFret) borderCls += ' border-r border-gray-600'; 
                     
-                    html += `<div class="fret-cell ${bgCls} ${borderCls} flex items-center justify-center min-h-[38px]">`;
-                    html += `<div class="string-line"></div>`;
+                    html += `<div class="fret-cell ${bgCls} ${borderCls} flex items-center justify-center min-h-[38px]"><div class="string-line"></div>`;
 
                     if (isScale) {
                         let noteId = `note-${diagramId}-${s}-${f}`;
                         let isActive = activeNoteIds && activeNoteIds.has(noteId);
-                        
                         let bgDot = 'bg-gray-300 text-gray-500 border border-gray-400';
-                        if (isActive) {
-                            bgDot = isRoot ? 'bg-red-600' : 'bg-black';
-                        }
-                        
+                        if (isActive) bgDot = isRoot ? 'bg-red-600' : 'bg-black';
                         html += `<div id="${noteId}" class="note-dot ${bgDot}">${note}</div>`;
                     }
                     html += `</div>`;
                 }
             }
-            html += `</div>`; 
-            html += `</div>`; 
+            html += `</div></div>`; 
 
             if (numberPos === 'bottom') {
                 html += `<div class="flex mt-1">`;
@@ -904,7 +681,6 @@
             return html;
         }
 
-        // LÓGICA DE REPRODUÇÃO DA ESCALA (PLAY/STOP)
         function clearPlaybackHighlight() {
             if (playbackState.lastHighlightedNote) {
                 let el = document.getElementById(playbackState.lastHighlightedNote);
@@ -914,12 +690,12 @@
         }
 
         function stopPlayback() {
-            if (playbackState.timeoutId) {
-                clearTimeout(playbackState.timeoutId);
-            }
+            if (playbackState.timeoutId) clearTimeout(playbackState.timeoutId);
             clearPlaybackHighlight();
             
-            // Reset de todos os botões para estado Play com texto Traduzido
+            // Remove as regras de desafio ativas de todos os diagramas
+            document.querySelectorAll('[id^="diagram-"]').forEach(el => el.classList.remove('challenge-hide-notes'));
+            
             document.querySelectorAll('[id^="btn-play-"]').forEach(btn => {
                 btn.querySelector('.icon-play').classList.remove('hidden');
                 btn.querySelector('.icon-stop').classList.add('hidden');
@@ -944,19 +720,36 @@
             let seq = playbackState.sequence;
             if (playbackState.currentIndex >= seq.length) {
                 playbackState.currentIndex = 0;
+                playbackState.cycleCount++; // Conta um ciclo de exercício completado
             }
 
             clearPlaybackHighlight();
 
+            // Lógica do Modo Desafio (Somente nas escalas menores, e se ativado)
+            let isChallengeOn = document.getElementById('desafio').checked;
+            let isPositionDiagram = playbackState.diagramId && playbackState.diagramId.startsWith('pos-');
+
+            let cyclePhase = isChallengeOn && isPositionDiagram ? (playbackState.cycleCount % 12) : 0;
+            let hideHighlight = cyclePhase >= 8; // 9 e 10 Repetição: Não mostra a luz da nota
+            let hideNotes = cyclePhase >= 10;    // 11 e 12 Repetição: Apaga a escala toda
+
+            // Aplica ou remove classe para esconder as bolinhas
+            let diagramEl = document.getElementById(`diagram-${playbackState.diagramId}`);
+            if (diagramEl) {
+                if (hideNotes) diagramEl.classList.add('challenge-hide-notes');
+                else diagramEl.classList.remove('challenge-hide-notes');
+            }
+
             let currentNote = seq[playbackState.currentIndex];
             let noteEl = document.getElementById(currentNote.id);
-            if (noteEl) {
+            
+            // Somente destaca a nota se a luz e a bolinha forem permitidas no desafio
+            if (noteEl && !hideHighlight && !hideNotes) {
                 noteEl.classList.add('playing-note');
                 playbackState.lastHighlightedNote = currentNote.id;
             }
 
             playPluck(currentNote.string, currentNote.fret);
-
             playbackState.currentIndex++;
 
             let bpm = parseInt(document.getElementById('bpm').value) || 120;
@@ -973,13 +766,16 @@
                 stopPlayback();
             } else {
                 stopPlayback();
-
                 playbackState.diagramId = diagramId;
                 playbackState.sequence = playbackState.sequences[diagramId] || [];
                 playbackState.currentIndex = 0;
+                playbackState.cycleCount = 0; // Reinicia a contagem dos ciclos de desafio
                 playbackState.playing = true;
 
-                // Atualizar UI do Botão clicado
+                // Restaura o braço da guitarra caso estivesse escondido por um desafio interrompido
+                let diagramEl = document.getElementById(`diagram-${diagramId}`);
+                if (diagramEl) diagramEl.classList.remove('challenge-hide-notes');
+
                 let btn = document.getElementById(`btn-play-${diagramId}`);
                 btn.querySelector('.icon-play').classList.add('hidden');
                 btn.querySelector('.icon-stop').classList.remove('hidden');
@@ -1058,7 +854,6 @@
             });
         }
 
-        // Event Listeners
         document.getElementById('tom').addEventListener('change', updateUI);
         document.getElementById('escala').addEventListener('change', () => atualizarModos(true));
         document.getElementById('modo').addEventListener('change', updateUI);
@@ -1073,22 +868,15 @@
             const bpmInput = document.getElementById('bpm');
             let currentVal = parseInt(bpmInput.value) || 120;
             let newVal = currentVal + amount;
-            
             if (newVal < 40) newVal = 40;
             if (newVal > 300) newVal = 300;
-            
             bpmInput.value = newVal;
         }
         document.getElementById('btn-bpm-minus').addEventListener('click', () => changeBPM(-10));
         document.getElementById('btn-bpm-plus').addEventListener('click', () => changeBPM(10));
 
-        // Inicialização Inicial
-        function initApp() {
-            applyLanguage(); // Popula listas traduzidas e renderiza na linguagem padrão ('pt')
-        }
-        
+        function initApp() { applyLanguage(); }
         initApp();
-
     </script>
 </body>
 </html>
