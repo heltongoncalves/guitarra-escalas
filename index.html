@@ -328,8 +328,8 @@
         <div class="relative inline-block text-left">
             <div>
                 <button type="button" id="lang-menu-btn" class="inline-flex justify-between items-center gap-1 md:gap-2 rounded-md border border-gray-300 shadow-sm px-2 py-1 md:px-3 md:py-1.5 bg-gray-50 text-xs md:text-sm font-medium text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" aria-expanded="true" aria-haspopup="true">
-                    <!-- O botão exibe apenas a Bandeira para poupar espaço -->
-                    <span id="current-flag" class="text-sm md:text-base">🇧🇷</span>
+                    <!-- O botão exibe apenas a Bandeira SVG (injetada via JS) para poupar espaço -->
+                    <span id="current-flag" class="flex items-center justify-center"></span>
                     <!-- A tag com o nome do idioma possui a classe hidden (oculta) -->
                     <span id="current-lang-name" class="hidden">Português</span>
                     <svg class="h-3 w-3 md:h-4 md:w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -338,21 +338,10 @@
                 </button>
             </div>
 
-            <!-- Listagem de idiomas suportados -->
+            <!-- Listagem de idiomas suportados (Injetada via JS com bandeiras SVG) -->
             <div id="lang-menu-dropdown" class="origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white border border-gray-200 focus:outline-none hidden z-[100]" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                <div class="py-1" role="none">
-                    <!-- Cada link dispara a função JS setLang(código, emoji, nome) -->
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('pt', '🇧🇷', 'Português')"><span class="text-base">🇧🇷</span> Português</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('ru', '🇷🇺', 'Русский')"><span class="text-base">🇷🇺</span> Русский</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('hi', '🇮🇳', 'हिन्दी')"><span class="text-base">🇮🇳</span> हिन्दी</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('zh', '🇨🇳', '中文')"><span class="text-base">🇨🇳</span> 中文</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('de', '🇩🇪', 'Deutsch')"><span class="text-base">🇩🇪</span> Deutsch</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('en', '🇺🇸', 'English')"><span class="text-base">🇺🇸</span> English</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('es', '🇪🇸', 'Español')"><span class="text-base">🇪🇸</span> Español</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('fr', '🇫🇷', 'Français')"><span class="text-base">🇫🇷</span> Français</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('ar', '🇸🇦', 'العربية')"><span class="text-base">🇸🇦</span> العربية</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('bn', '🇧🇩', 'বাংলা')"><span class="text-base">🇧🇩</span> বাংলা</a>
-                    <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors" role="menuitem" onclick="event.preventDefault(); setLang('ur', '🇵🇰', 'اردو')"><span class="text-base">🇵🇰</span> اردو</a>
+                <div class="py-1" id="lang-menu-list" role="none">
+                    <!-- Links injetados dinamicamente via JS -->
                 </div>
             </div>
         </div>
@@ -496,19 +485,20 @@
         'ur': { 'str_all': '6 تار', 'lbl_auto': 'auto', 'starting_in': 'شروع ہو رہا ہے', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ ہلکا', 'skin_dark': '🌙 گہرا', 'skin_vintage': '🎸 ونٹیج', 'title': 'سکیل ٹیوٹر', 'lbl_root': 'روٹ', 'lbl_scale': 'سکیل', 'lbl_mode': 'تغیر', 'lbl_ex': 'مشق', 'lbl_bpm': 'رفتار', 'lbl_challenge': 'چیلنج', 'btn_play_full': 'پورا سکیل بجائیں', 'btn_play': 'بجائیں', 'btn_stop': 'روکیں', 'position': 'پوزیشن', 'frets': 'فریٹس', 'ex_1': '1. پورا سکیل اوپر نیچے', 'ex_2': '2. 2 بار ہر نوٹ', 'ex_3': '3. 3 بار ہر نوٹ', 'ex_4': '4. 3 کے گروپس (1-2-3, 2-3-4...)', 'ex_5': '5. 4 کے گروپس (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. تھرڈز جمپ (1-3, 2-4, 3-5...)', 'ex_7': '7. ٹرائڈ آرپیجیوس', 'ex_8': '8. ٹیٹراڈ آرپیجیوس', 'ex_9': '9. سٹرنگ سکپنگ (6-4, 5-3, 4-2...)' }
     };
 
-    // Metadados visuais das linguagens para a Auto-Detecção
+    // Metadados visuais das linguagens com SVGs desenhados em vetor para contornar a falta de emojis no Windows!
+    const baseSvg = '<svg class="w-5 h-3.5 rounded-[2px] shadow-[0_0_1px_rgba(0,0,0,0.5)] flex-shrink-0" preserveAspectRatio="none" viewBox="0 0 64 48">';
     const langMetadata = {
-        'pt': { flag: '🇧🇷', name: 'Português' },
-        'ru': { flag: '🇷🇺', name: 'Русский' },
-        'hi': { flag: '🇮🇳', name: 'हिन्दी' },
-        'zh': { flag: '🇨🇳', name: '中文' },
-        'de': { flag: '🇩🇪', name: 'Deutsch' },
-        'en': { flag: '🇺🇸', name: 'English' },
-        'es': { flag: '🇪🇸', name: 'Español' },
-        'fr': { flag: '🇫🇷', name: 'Français' },
-        'ar': { flag: '🇸🇦', name: 'العربية' },
-        'bn': { flag: '🇧🇩', name: 'বাংলা' },
-        'ur': { flag: '🇵🇰', name: 'اردو' }
+        'pt': { name: 'Português', svg: `${baseSvg}<rect width="64" height="48" fill="#009b3a"/><polygon points="32,4 60,24 32,44 4,24" fill="#fedf00"/><circle cx="32" cy="24" r="10" fill="#002776"/></svg>` },
+        'ru': { name: 'Русский',   svg: `${baseSvg}<rect width="64" height="16" fill="#fff"/><rect y="16" width="64" height="16" fill="#0039a6"/><rect y="32" width="64" height="16" fill="#d52b1e"/></svg>` },
+        'hi': { name: 'हिन्दी',     svg: `${baseSvg}<rect width="64" height="16" fill="#f93"/><rect y="16" width="64" height="16" fill="#fff"/><rect y="32" width="64" height="16" fill="#138808"/><circle cx="32" cy="24" r="6" fill="#000080"/></svg>` },
+        'zh': { name: '中文',      svg: `${baseSvg}<rect width="64" height="48" fill="#ee1c25"/><polygon points="12,8 14,14 20,14 15,18 17,24 12,20 7,24 9,18 4,14 10,14" fill="#ff0"/></svg>` },
+        'de': { name: 'Deutsch',   svg: `${baseSvg}<rect width="64" height="16" fill="#000"/><rect y="16" width="64" height="16" fill="#d00"/><rect y="32" width="64" height="16" fill="#ffce00"/></svg>` },
+        'en': { name: 'English',   svg: `${baseSvg}<rect width="64" height="48" fill="#bf0a30"/><rect y="6.8" width="64" height="6.8" fill="#fff"/><rect y="20.4" width="64" height="6.8" fill="#fff"/><rect y="34" width="64" height="6.8" fill="#fff"/><rect width="26" height="26" fill="#002868"/></svg>` },
+        'es': { name: 'Español',   svg: `${baseSvg}<rect width="64" height="12" fill="#aa151b"/><rect y="12" width="64" height="24" fill="#f1bf00"/><rect y="36" width="64" height="12" fill="#aa151b"/></svg>` },
+        'fr': { name: 'Français',  svg: `${baseSvg}<rect width="21.3" height="48" fill="#002395"/><rect x="21.3" width="21.3" height="48" fill="#fff"/><rect x="42.6" width="21.3" height="48" fill="#ed2939"/></svg>` },
+        'ar': { name: 'العربية',  svg: `${baseSvg}<rect width="64" height="48" fill="#006c35"/><rect x="16" y="22" width="32" height="4" fill="#fff"/></svg>` },
+        'bn': { name: 'বাংলা',     svg: `${baseSvg}<rect width="64" height="48" fill="#006a4e"/><circle cx="28" cy="24" r="14" fill="#f42a41"/></svg>` },
+        'ur': { name: 'اردو',      svg: `${baseSvg}<rect width="64" height="48" fill="#115740"/><rect width="16" height="48" fill="#fff"/><circle cx="40" cy="24" r="12" fill="#fff"/><circle cx="44" cy="20" r="10" fill="#115740"/></svg>` }
     };
 
     // Variável de estado global que armazena a Linguagem Padrão do Sistema
@@ -738,8 +728,8 @@
      * Ação disparada quando um Idioma é clicado na listagem.
      * Altera a variável global currentLang e ordena a recompilação da tela toda via applyLanguage()
      */
-    function setLang(code, flagEmoji, langName) {
-        document.getElementById('current-flag').innerText = flagEmoji;
+    function setLang(code, langName) {
+        document.getElementById('current-flag').innerHTML = langMetadata[code].svg;
         document.getElementById('current-lang-name').innerText = langName;
         langMenuDropdown.classList.add('hidden');
         currentLang = code;
@@ -1544,9 +1534,23 @@
         // Se a linguagem do utilizador existir no nosso dicionário restrito, alteramos o estado global ANTES de pintar o ecrã!
         if (i18n[userLang] && langMetadata[userLang]) {
             currentLang = userLang;
-            document.getElementById('current-flag').innerText = langMetadata[userLang].flag;
-            document.getElementById('current-lang-name').innerText = langMetadata[userLang].name;
         }
+
+        // Constrói o menu dinâmico de linguagens para injetar matematicamente os SVGs
+        const langListEl = document.getElementById('lang-menu-list');
+        langListEl.innerHTML = '';
+        Object.keys(langMetadata).forEach(code => {
+            const btn = document.createElement('a');
+            btn.href = '#';
+            btn.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors';
+            btn.innerHTML = `${langMetadata[code].svg} <span>${langMetadata[code].name}</span>`;
+            btn.onclick = (e) => { e.preventDefault(); setLang(code, langMetadata[code].name); };
+            langListEl.appendChild(btn);
+        });
+
+        // Configura o botão superior imediatamente com a bandeira carregada
+        document.getElementById('current-flag').innerHTML = langMetadata[currentLang].svg;
+        document.getElementById('current-lang-name').innerText = langMetadata[currentLang].name;
 
         // 2. O primeiro boot precisa que a arquitetura leia a língua que está escrita, monte os Selects e finalmente pinte as guitarras
         applyLanguage(); 
