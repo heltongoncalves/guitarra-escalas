@@ -1,0 +1,37 @@
+<div id="help-modal" class="hidden transition-opacity duration-300" style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); z-index: 1000;" dir="ltr">
+    <div class="bg-white rounded-lg shadow-xl max-w-[90%] md:max-w-md w-full max-h-[85vh] overflow-y-auto relative p-6 border border-gray-200">
+        <button type="button" id="close-help-btn" class="absolute text-gray-500 hover:text-gray-800 focus:outline-none transition-colors cursor-pointer" style="top: 1rem; right: 1rem; width: 24px; height: 24px;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <h2 class="text-xl font-bold text-blue-700 mb-2 border-b border-gray-200 pb-2" data-i18n="help_title">Ajuda & Funcionalidades</h2>
+
+        <!-- Aviso sobre Nível Intermediário -->
+        <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs p-3 rounded-md mb-4 mt-3">
+            <span data-i18n="help_level_notice">⚠️ Este software é recomendado para estudantes de nível intermediário na guitarra ou violão.</span>
+        </div>
+
+        <!-- NOVO: Guia Rápido (Como Iniciar) -->
+        <div class="mb-5 bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r-md">
+            <h3 class="text-sm font-bold text-blue-800 mb-1" data-i18n="help_how_to_start_title">Como Iniciar?</h3>
+            <p class="text-xs text-blue-700 leading-relaxed" data-i18n="help_how_to_start_text">Afine o seu instrumento na afinação padrão (EADGBE). Clique no botão "Tocar" da primeira posição e acompanhe as notas piscando na tela. Aumente a velocidade ou avance para a próxima posição quando se sentir confiante!</p>
+        </div>
+
+        <p class="text-gray-800 text-sm mb-3 font-bold" data-i18n="help_intro">Entenda os controles:</p>
+
+        <ul class="space-y-3 text-sm text-gray-700 mb-4 border-b border-gray-200 pb-4">
+            <li><strong class="text-blue-600" data-i18n="lbl_root">Tom</strong>: <span data-i18n="help_root">Define a nota fundamental (raiz) do exercício.</span></li>
+            <li><strong class="text-blue-600" data-i18n="lbl_scale">Escala</strong>: <span data-i18n="help_scale">Escolhe a família da escala (Pentatônica, Diatônica, etc).</span></li>
+            <li><strong class="text-blue-600" data-i18n="lbl_mode">Variação</strong>: <span data-i18n="help_mode">Altera o modo ou variação dentro da família selecionada.</span></li>
+            <li><strong class="text-blue-600" data-i18n="lbl_ex">Exercício</strong>: <span data-i18n="help_ex">Muda o padrão de movimento sonoro (subir/descer, saltos, arpejos).</span></li>
+            <li><strong class="text-blue-600" data-i18n="lbl_strings">Cordas</strong>: <span data-i18n="help_strings">Isole a prática em grupos específicos de cordas no braço.</span></li>
+            <li><strong class="text-blue-600" data-i18n="lbl_bpm">Velocidade</strong>: <span data-i18n="help_speed">Ajusta as batidas por minuto. O modo "auto" aumenta 10 BPM a cada X repetições.</span></li>
+            <li><strong class="text-blue-600" data-i18n="lbl_challenge">Desafio</strong>: <span data-i18n="help_challenge">Invisibiliza os marcadores progressivamente para treinar a sua memória visual!</span></li>
+        </ul>
+
+        <!-- Lógica do CAGED e Escala Completa -->
+        <div class="space-y-3 text-sm text-gray-700">
+            <p><strong class="text-blue-600" data-i18n="help_lbl_pos">Posições 1-5</strong>: <span data-i18n="help_positions">Representam os formatos do sistema CAGED, fatiando a escala em blocos fáceis de memorizar.</span></p>
+            <p><strong class="text-blue-600" data-i18n="help_lbl_full">Escala Completa</strong>: <span data-i18n="help_full_scale">Exibe todo o braço do instrumento, dando uma visão panorâmica de como as posições se conectam.</span></p>
+        </div>
+    </div>
+</div>

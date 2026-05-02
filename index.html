@@ -2,258 +2,33 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta tag essencial para que o layout se adapte corretamente em telas de celulares (Responsividade) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tutor de Escalas</title>
-    <style>
-        /* ==========================================================================
-           CSS BASE & RESET (Substituindo o CDN do Tailwind para uso 100% offline)
-           Funcionalidade: Permite que o App funcione sem internet, copiando as classes
-           utilitárias mais comuns do framework TailwindCSS.
-           ========================================================================== */
-        
-        /* Reset Universal: Remove margens nativas dos navegadores e facilita o cálculo de tamanhos */
-        *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border-width: 0; border-style: solid; border-color: currentColor; }
-        html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.5; }
-        body { transition: background-color 0.3s, color 0.3s; margin: 0; }
-        button, input, select { font-family: inherit; font-size: 100%; margin: 0; outline: none; }
-        button { cursor: pointer; background-color: transparent; }
-        a { text-decoration: inherit; color: inherit; }
-        svg { display: block; vertical-align: middle; }
-
-        /* ==========================================================================
-           CLASSES UTILITÁRIAS (Estilo Tailwind)
-           ========================================================================== */
-        /* Layout & Flexbox (Para alinhar componentes vertical e horizontalmente) */
-        .flex { display: flex; } .grid { display: grid; } .hidden { display: none !important; } .block { display: block; }
-        .inline-block { display: inline-block; } .inline-flex { display: inline-flex; }
-        .flex-col { flex-direction: column; } .flex-row { flex-direction: row; } .flex-wrap { flex-wrap: wrap; }
-        .items-center { align-items: center; } .items-end { align-items: flex-end; }
-        .justify-center { justify-content: center; } .justify-between { justify-content: space-between; } .justify-end { justify-content: flex-end; } .justify-start { justify-content: flex-start; }
-        .gap-1 { gap: 0.25rem; } .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; } .gap-6 { gap: 1.5rem; }
-        .flex-1 { flex: 1 1 0%; } .flex-none { flex: none; } .flex-shrink-0 { flex-shrink: 0; }
-
-        /* Dimensões (Larguras e Alturas) */
-        .w-full { width: 100%; } .w-4 { width: 1rem; } .h-4 { height: 1rem; } .w-5 { width: 1.25rem; } .h-5 { height: 1.25rem; }
-        .w-8 { width: 2rem; } .h-8 { height: 2rem; } .w-10 { width: 2.5rem; } .h-10 { height: 2.5rem; }
-        .w-12 { width: 3rem; } .w-16 { width: 4rem; } .w-20 { width: 5rem; } .w-32 { width: 8rem; } .w-36 { width: 9rem; } .w-44 { width: 11rem; } .w-48 { width: 12rem; } .w-64 { width: 16rem; }
-        .min-w-\[900px\] { min-width: 900px; } .min-h-\[38px\] { min-height: 38px; }
-        .max-w-\[1400px\] { max-width: 1400px; } .min-h-screen { min-height: 100vh; }
-        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; } .inset-y-0 { top: 0; bottom: 0; }
-        .transform { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
-        .-translate-y-1\/2 { --tw-translate-y: -50%; }
-
-        /* Espaçamentos (Paddings e Margins) */
-        .mx-auto { margin-left: auto; margin-right: auto; }
-        .mb-1 { margin-bottom: 0.25rem; } .mb-2 { margin-bottom: 0.5rem; } .mb-4 { margin-bottom: 1rem; } .mb-8 { margin-bottom: 2rem; } .mb-10 { margin-bottom: 2.5rem; }
-        .mt-1 { margin-top: 0.25rem; } .mt-3 { margin-top: 0.75rem; } .mt-4 { margin-top: 1rem; } .mt-12 { margin-top: 3rem; }
-        .ml-2 { margin-left: 0.5rem; } .ml-0\.5 { margin-left: 0.125rem; } .mr-2 { margin-right: 0.5rem; }
-        .p-5 { padding: 1.25rem; } .p-6 { padding: 1.5rem; } .pb-4 { padding-bottom: 1rem; }
-        .px-1 { padding-left: 0.25rem; padding-right: 0.25rem; } .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; } .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; } .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
-        .pr-8 { padding-right: 2rem; }
-
-        /* Tipografia */
-        .text-xs { font-size: 0.75rem; line-height: 1rem; } .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .text-base { font-size: 1rem; line-height: 1.5rem; } .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-        .text-2xl { font-size: 1.5rem; line-height: 2rem; } .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-        .font-normal { font-weight: 400; } .font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
-        .text-center { text-align: center; } .uppercase { text-transform: uppercase; } .whitespace-nowrap { white-space: nowrap; }
-        .tracking-wide { letter-spacing: 0.025em; } .text-ellipsis { text-overflow: ellipsis; } .overflow-hidden { overflow: hidden; }
-        .overflow-x-auto { overflow-x: auto; } .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        /* Posições (Para sobreposições, como menus e botões invisíveis) */
-        .relative { position: relative; } .absolute { position: absolute; } .top-0 { top: 0; } .right-0 { right: 0; }
-        .origin-top-right { transform-origin: top right; } .origin-top-left { transform-origin: top left; } .z-50 { z-index: 50; } .z-\[100\] { z-index: 100; }
-        .pointer-events-none { pointer-events: none; } .opacity-0 { opacity: 0; }
-
-        /* Cores & Bordas Base (Claro Padrão) */
-        .bg-white { background-color: #ffffff; } .bg-gray-50 { background-color: #f9fafb; } .bg-gray-100 { background-color: #f3f4f6; }
-        .bg-gray-200 { background-color: #e5e7eb; } .bg-gray-300 { background-color: #d1d5db; } .bg-blue-50 { background-color: #eff6ff; }
-        .bg-blue-500 { background-color: #3b82f6; } .bg-blue-600 { background-color: #2563eb; } .bg-red-50 { background-color: #fef2f2; } .bg-red-600 { background-color: #dc2626; } .bg-black { background-color: #000000; }
-        .text-gray-500 { color: #6b7280; } .text-gray-600 { color: #4b5563; } .text-gray-700 { color: #374151; }
-        .text-gray-800 { color: #1f2937; } .text-black { color: #000000; } .text-white { color: #ffffff; }
-        .text-blue-500 { color: #3b82f6; } .text-blue-600 { color: #2563eb; } .text-blue-700 { color: #1d4ed8; } .text-blue-900 { color: #1e3a8a; } .text-red-700 { color: #b91c1c; }
-        .border { border-width: 1px; } .border-t { border-top-width: 1px; } .border-b { border-bottom-width: 1px; }
-        .border-l { border-left-width: 1px; } .border-r { border-right-width: 1px; } .border-l-2 { border-left-width: 2px; } .border-l-8 { border-left-width: 8px; }
-        .border-gray-100 { border-color: #f3f4f6; } .border-gray-200 { border-color: #e5e7eb; } .border-gray-300 { border-color: #d1d5db; }
-        .border-gray-400 { border-color: #9ca3af; } .border-gray-500 { border-color: #6b7280; } .border-gray-600 { border-color: #4b5563; }
-        .border-blue-200 { border-color: #bfdbfe; } .border-red-200 { border-color: #fecaca; }
-
-        /* Arredondamento & Sombras */
-        .rounded { border-radius: 0.25rem; } .rounded-sm { border-radius: 0.125rem; } .rounded-md { border-radius: 0.375rem; }
-        .rounded-lg { border-radius: 0.5rem; } .rounded-full { border-radius: 9999px; }
-        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); } .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .drop-shadow-md { filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.07)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.06)); }
-
-        /* Interatividade & Transições */
-        .cursor-pointer { cursor: pointer; } .appearance-none { appearance: none; -webkit-appearance: none; }
-        .transition-colors { transition-property: color, background-color, border-color, fill, stroke; transition-duration: 150ms; }
-        .transition-opacity { transition-property: opacity; transition-duration: 300ms; }
-        .hover\:bg-gray-100:hover { background-color: #f3f4f6; } .hover\:bg-gray-200:hover { background-color: #e5e7eb; }
-        .hover\:bg-blue-100:hover { background-color: #dbeafe; } .hover\:underline:hover { text-decoration: underline; }
-        .focus\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
-        .focus\:ring-2:focus { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6; }
-        .focus-within\:ring-2:focus-within { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6; }
-        
-        /* Ocultar barra de rolagem visualmente mas manter a funcionalidade para celulares (swipe) */
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-
-        /* Media Queries (Responsividade: Ajusta o layout para Telas Médias e Grandes) */
-        @media (min-width: 768px) {
-            .md\:flex-row { flex-direction: row; }
-            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .md\:w-auto { width: auto; }
-            .md\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; } .md\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-            .md\:w-12 { width: 3rem; } .md\:h-12 { height: 3rem; }
-            .md\:inline-block { display: inline-block !important; }
-        }
-        @media (min-width: 1024px) {
-            .lg\:flex-row { flex-direction: row; }
-            .lg\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-            .lg\:w-auto { width: auto; } .lg\:w-\[260px\] { width: 260px; }
-            .lg\:justify-start { justify-content: flex-start; } .lg\:justify-end { justify-content: flex-end; }
-            .lg\:block { display: block; }
-        }
-
-        /* ==========================================================================
-           COMPONENTES ESPECÍFICOS DO APP (Braço da Guitarra)
-           Aqui estilizamos a anatomia da guitarra (Cordas, Trastes e Notas)
-           ========================================================================== */
-        
-        /* Célula individual do traste (fret). Age como container relativo para a corda e a bolinha da nota */
-        .fret-cell { position: relative; }
-        
-        /* Linha horizontal que representa a corda da guitarra (fica no fundo) */
-        .string-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background-color: #6b7280; transform: translateY(-50%); z-index: 10; }
-        
-        /* Bolinha que representa onde o usuário deve posicionar o dedo. Fica por cima da corda (z-index 20) */
-        .note-dot { position: relative; z-index: 20; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: all 0.1s ease-in-out; }
-        
-        /* Classe injetada via JS durante o "Play". Cria um efeito de pulsar e brilho (Neon Amarelo) */
-        .playing-note { box-shadow: 0 0 15px 6px rgba(250, 204, 21, 0.8); transform: scale(1.4); z-index: 30 !important; border: 2px solid white; }
-        
-        /* Bolinha de notação especial para afinação das cordas soltas (Afinador) */
-        .tuning-dot { width: 24px; height: 24px; border-radius: 50%; background-color: #111827; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
-
-        /* Ajustes visuais para os inputs nativos (remove botões de incremento padrão do input number) */
-        select, input[type="number"] {
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
-            background-position: right .5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em;
-        }
-        input[type="number"] { background-image: none; -moz-appearance: textfield; }
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        
-        /* Ajuste do select nativo para linguagens lidas da direita para a esquerda (Árabe, Urdu) */
-        [dir="rtl"] select { background-position: left .5rem center; }
-
-        /* ==========================================================================
-           ESTILOS DO MODO DESAFIO (Gamificação)
-           Funcionalidade: Permite que o usuário teste sua memória musical apagando
-           as notas da tela progressivamente.
-           ========================================================================== */
-        
-        /* Toggle Switch Customizado: Estiliza um checkbox comum do HTML como um interruptor moderno (iOS style) */
-        .toggle-bg { position: relative; display: inline-block; width: 2.5rem; height: 1.25rem; background-color: #d1d5db; border-radius: 9999px; transition: background-color 0.2s; }
-        .toggle-bg::after { content: ''; position: absolute; top: 2px; left: 2px; width: 1rem; height: 1rem; background-color: #fff; border: 1px solid #d1d5db; border-radius: 9999px; transition: transform 0.2s; }
-        input[type="checkbox"]:checked + .toggle-bg { background-color: #2563eb; }
-        input[type="checkbox"]:checked + .toggle-bg::after { transform: translateX(20px); border-color: #fff; }
-        input[type="checkbox"]:focus + .toggle-bg { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6; }
-        
-        /* Esconde o checkbox real do HTML da tela, mas mantém acessível para leitores de tela */
-        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
-
-        /* Quando o Desafio fica extremo (nível 10+), esta classe é ativada via JS para invisibilizar as notas.
-           Atenção DEV Jr: Usamos opacity: 0 ao invés de display: none para preservar o grid e o tamanho da guitarra */
-        .challenge-hide-notes .note-dot { opacity: 0 !important; pointer-events: none; }
-
-        /* ==========================================================================
-           SKINS CUSTOMIZADAS (Arquitetura de Temas de Cores Globais)
-           Funcionalidade: Permite ao usuário escolher o visual do App (Claro, Escuro, Vintage).
-           Como Funciona: O JavaScript troca o atributo [data-skin] na tag <body>. 
-           O CSS abaixo detecta essa mudança e sobrescreve variáveis/cores em toda a árvore DOM.
-           ========================================================================== */
-
-        /* 1. Skin: Light (Azul bem clarinho) - Usa as cores bases naturais já definidas acima */
-        body[data-skin="light"] { background-color: #f0f8ff; color: #333; }
-
-        /* 2. Skin: Dark (Estúdio Noturno) - Sobrescreve as cores para tons pastéis de cinza e azul escuro */
-        body[data-skin="dark"] { background-color: #121212; color: #e0e0e0; }
-        body[data-skin="dark"] .bg-white, body[data-skin="dark"] .bg-gray-50 { background-color: #1e1e1e !important; color: #e0e0e0 !important; border-color: #333 !important; }
-        body[data-skin="dark"] select, body[data-skin="dark"] input { background-color: #2c2c2c !important; color: #ffffff !important; border-color: #444 !important; }
-        body[data-skin="dark"] .text-gray-500, body[data-skin="dark"] .text-gray-600, body[data-skin="dark"] .text-gray-700, body[data-skin="dark"] .text-gray-800, body[data-skin="dark"] .text-black { color: #b0b0b0 !important; }
-        body[data-skin="dark"] .string-line { background-color: #555 !important; }
-        body[data-skin="dark"] .border-gray-400, body[data-skin="dark"] .border-gray-100, body[data-skin="dark"] .border-gray-200 { border-color: #444 !important; }
-        body[data-skin="dark"] .border-gray-500, body[data-skin="dark"] .border-gray-600 { border-color: #555 !important; }
-        body[data-skin="dark"] .bg-gray-200 { background-color: #2a2a2a !important; }
-        body[data-skin="dark"] .note-dot.bg-gray-300 { background-color: #333 !important; color: #666 !important; border-color: #444 !important; }
-        body[data-skin="dark"] .bg-blue-50 { background-color: #1e3a5f !important; color: #93c5fd !important; border-color: #2563eb !important; }
-        body[data-skin="dark"] .bg-red-50 { background-color: #5f1e1e !important; color: #fca5a5 !important; border-color: #dc2626 !important; }
-        body[data-skin="dark"] .text-blue-600 { color: #60a5fa !important; }
-
-        /* 3. Skin: Vintage (Tom Acústico / Papel Antigo) - Focado em cores quentes, sépia e marrom */
-        body[data-skin="vintage"] { background-color: #f4ecd8; color: #4a3b2c; }
-        body[data-skin="vintage"] .bg-white, body[data-skin="vintage"] .bg-gray-50 { background-color: #fdfbf7 !important; color: #4a3b2c !important; border-color: #d8c8b8 !important; }
-        body[data-skin="vintage"] select, body[data-skin="vintage"] input { background-color: #f9f4e8 !important; color: #3d2b1f !important; border-color: #d8c8b8 !important; }
-        body[data-skin="vintage"] .text-gray-500, body[data-skin="vintage"] .text-gray-600, body[data-skin="vintage"] .text-gray-700, body[data-skin="vintage"] .text-gray-800, body[data-skin="vintage"] .text-black { color: #6b5b4b !important; }
-        body[data-skin="vintage"] .string-line { background-color: #a89f91 !important; }
-        body[data-skin="vintage"] .border-gray-400, body[data-skin="vintage"] .border-gray-100, body[data-skin="vintage"] .border-gray-200 { border-color: #d8c8b8 !important; }
-        body[data-skin="vintage"] .border-gray-500, body[data-skin="vintage"] .border-gray-600 { border-color: #b8a898 !important; }
-        body[data-skin="vintage"] .bg-gray-200 { background-color: #eaddc5 !important; }
-        body[data-skin="vintage"] .note-dot.bg-black, body[data-skin="vintage"] .tuning-dot { background-color: #3d2b1f !important; }
-        body[data-skin="vintage"] .note-dot.bg-red-600 { background-color: #c24127 !important; }
-        body[data-skin="vintage"] .note-dot.bg-gray-300 { background-color: #eaddc5 !important; color: #a89f91 !important; border-color: #d8c8b8 !important; }
-        body[data-skin="vintage"] .bg-blue-50 { background-color: #e6e1c5 !important; color: #5c4b37 !important; border-color: #d8c8b8 !important; }
-        body[data-skin="vintage"] .bg-red-50 { background-color: #e6c5c5 !important; color: #7a3b3b !important; border-color: #d8b8b8 !important; }
-        body[data-skin="vintage"] .text-blue-600 { color: #8b5a2b !important; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<!-- Ponto de Entrada da Interface. Conforme solicitado, o App inicializa forçando a skin CLARA (light) via [data-skin] -->
 <body class="p-6 max-w-[1400px] mx-auto relative min-h-screen" data-skin="light">
 
-<!-- ==========================================================================
-     OVERLAY DE CONTAGEM REGRESSIVA (UX: PREPARAÇÃO DO USUÁRIO)
-     Atenção DEV Jr: Este overlay permite que o usuário posicione as mãos 
-     antes da escala começar a tocar. Por segurança ele tem z-index altíssimo (999).
-     A propriedade pointer-events: none; permite que o usuário clique no botão
-     "Parar" através dele, abortando a contagem caso tenha clicado por engano.
-     ========================================================================== -->
 <div id="countdown-overlay" class="hidden transition-opacity duration-300" style="position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
     <span id="countdown-text" data-i18n="starting_in" style="color: #fff; font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.1em;">Iniciando em</span>
     <span id="countdown-number" style="color: #60a5fa; font-size: 8rem; font-weight: bold; line-height: 1; text-shadow: 0 0 20px rgba(59,130,246,0.6);">3..</span>
 </div>
 
-<!-- ==========================================================================
-     BARRA DE FERRAMENTAS E CONTROLES MESTRES (Header)
-     Funcionalidade: É o painel superior onde o usuário configura as preferências 
-     globais da aplicação (Skin, Controles Musicais e Idioma).
-     ========================================================================== -->
-<div class="relative flex flex-wrap items-center justify-between mb-4 z-[100] gap-4 w-full">
+<div id="help-container"></div>
 
-    <!-- Esquerda: Seletor de Tema (Skin) -->
-    <!-- Feature: Dropdown customizado. Foi feito via HTML puro (sem a tag nativa <select>) 
-         para permitir usar emojis e estilos ricos que a tag <select> não suporta. -->
+<div class="relative flex flex-wrap items-center justify-between mb-4 z-[100] gap-4 w-full">
     <div class="flex-none order-1">
         <div class="relative inline-block text-left">
             <div>
-                <!-- O botão exibe apenas o Emoji dinâmico do tema atual (Ex: ☀️) -->
                 <button type="button" id="skin-menu-btn" class="inline-flex justify-between items-center gap-1 md:gap-2 rounded-md border border-gray-300 shadow-sm px-2 py-1 md:px-3 md:py-1.5 bg-gray-50 text-xs md:text-sm font-medium text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" aria-expanded="true" aria-haspopup="true">
                     <span id="current-skin-icon" class="text-sm md:text-base">☀️</span>
-                    <!-- Ícone de seta para baixo indicando que é um dropdown -->
-                    <svg class="h-3 w-3 md:h-4 md:w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <svg class="h-3 w-3 md:h-4 md:w-4 text-gray-500" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </button>
             </div>
-            
-            <!-- Opções abertas do Dropdown de Temas (Ativado via JS removendo a classe 'hidden') -->
             <div id="skin-menu-dropdown" class="origin-top-left absolute left-0 mt-2 w-36 rounded-md shadow-lg bg-white border border-gray-200 focus:outline-none hidden z-[100]" role="menu" aria-orientation="vertical" tabindex="-1">
                 <div class="py-1" role="none">
-                    <!-- Os atributos data-i18n puxam os textos do dicionário no final do arquivo -->
                     <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 transition-colors" role="menuitem" onclick="event.preventDefault(); setSkin('light', '☀️')"><span data-i18n="skin_light">☀️ Claro</span></a>
                     <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 transition-colors" role="menuitem" onclick="event.preventDefault(); setSkin('dark', '🌙')"><span data-i18n="skin_dark">🌙 Escuro</span></a>
                     <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 transition-colors" role="menuitem" onclick="event.preventDefault(); setSkin('vintage', '🎸')"><span data-i18n="skin_vintage">🎸 Vintage</span></a>
@@ -262,100 +37,69 @@
         </div>
     </div>
 
-    <!-- Centro: Controles Musicais (Pílulas Azuis) -->
-    <!-- Funcionalidade: Define as regras teóricas (Ex: Escala de Do Maior) a serem desenhadas -->
-    <!-- Atenção DEV Jr: Usamos a técnica de "Select Invisível" (opacity: 0). 
-         Um <span> visível mostra o texto formatado lindamente enquanto o <select> nativo 
-         do HTML fica transparente jogado por cima capturando o clique do dedo do usuário. -->
     <div class="flex-1 flex flex-wrap justify-center items-center gap-2 order-3 lg:order-2 w-full lg:w-auto mt-2 lg:mt-0">
-        
-        <!-- Seleção de Tônica (Notas Root: C, D, E...) -->
         <div class="relative bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors focus-within:ring-2 focus-within:ring-blue-500 shadow-sm">
             <span id="tom-display" class="block px-4 py-1.5 pointer-events-none text-sm font-medium pr-8">C-dó</span>
-            <select id="tom" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer appearance-none">
-                <!-- As options de notas musicais serão injetadas via JS (baseado na linguagem para ajustar a notação do solfejo) -->
-            </select>
-            <!-- SVG de Setinha da combobox posicionado absolutamente à direita -->
+            <select id="tom" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer appearance-none"></select>
             <svg class="absolute w-4 h-4 pointer-events-none text-blue-500" style="top: 50%; right: 0.75rem; transform: translateY(-50%);" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 8 4 4 4-4"/></svg>
         </div>
 
-        <!-- Categoria da Escala (Maior, Menor, Pentatônica, etc) -->
         <div class="relative bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors focus-within:ring-2 focus-within:ring-blue-500 shadow-sm">
             <span id="escala-display" class="block px-4 py-1.5 pointer-events-none text-sm font-medium pr-8">Pentatônica</span>
             <select id="escala" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer appearance-none"></select>
             <svg class="absolute w-4 h-4 pointer-events-none text-blue-500" style="top: 50%; right: 0.75rem; transform: translateY(-50%);" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 8 4 4 4-4"/></svg>
         </div>
 
-        <!-- Modo Específico da Categoria (Ex: Se for modo grego, lista Dórico, Jônio, etc) -->
         <div class="relative bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors focus-within:ring-2 focus-within:ring-blue-500 shadow-sm">
             <span id="modo-display" class="block px-4 py-1.5 pointer-events-none text-sm font-medium pr-8">Maior</span>
             <select id="modo" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer appearance-none"></select>
             <svg class="absolute w-4 h-4 pointer-events-none text-blue-500" style="top: 50%; right: 0.75rem; transform: translateY(-50%);" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 8 4 4 4-4"/></svg>
         </div>
 
-        <!-- Algoritmo do Exercício (Padrões de repetição, saltos e arpejos) -->
         <div class="relative bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors focus-within:ring-2 focus-within:ring-blue-500 shadow-sm">
             <span id="exercicio-display" class="block px-4 py-1.5 pointer-events-none text-sm font-medium truncate pr-8 max-w-[200px] md:max-w-none">1. Subir e descer</span>
             <select id="exercicio" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer appearance-none"></select>
             <svg class="absolute w-4 h-4 pointer-events-none text-blue-500" style="top: 50%; right: 0.75rem; transform: translateY(-50%);" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 8 4 4 4-4"/></svg>
         </div>
 
-        <!-- NOVO: Botão e Menu Dropdown de Volume de Som -->
-        <!-- Funcionalidade: Controla o ganho geral da Web Audio API através de um slider pop-up minimalista -->
         <div class="relative inline-block text-left ml-1">
-            <!-- Botão Ícone (Altifalante) -->
             <button type="button" id="volume-menu-btn" class="flex items-center justify-center bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm" style="width: 32px; height: 32px;" title="Volume">
-                <!-- Tamanho do SVG cravado via style inline para não explodir na tela -->
                 <svg style="width: 16px; height: 16px;" fill="currentColor" viewBox="0 0 20 20"><path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"/></svg>
             </button>
-            
-            <!-- Popup do Slider (Range) -->
-            <!-- Largura fixa de 140px adicionada via style para garantir estabilidade visual -->
             <div id="volume-menu-dropdown" class="origin-top absolute mt-2 p-3 rounded-md shadow-lg bg-white border border-gray-200 focus:outline-none hidden z-[100]" style="top: 100%; left: 50%; transform: translateX(-50%); width: 140px;">
-                <!-- Wrapper Flex para exibir o ícone de 'Mute' ao lado esquerdo da barra -->
                 <div class="flex items-center gap-2">
                     <svg style="width: 14px; height: 14px;" class="text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                    <!-- Barra deslizante nativa estilizada -->
                     <input type="range" id="volume-slider" min="0" max="100" value="80" class="w-full cursor-pointer" style="accent-color: #2563eb;">
                 </div>
             </div>
         </div>
+
+        <div class="relative inline-block text-left ml-1">
+            <button type="button" id="help-btn" class="flex items-center justify-center bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm" style="width: 32px; height: 32px;" title="Ajuda">
+                <svg style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </button>
+        </div>
     </div>
 
-    <!-- Direita: Seletor de Idioma (Menu Dropdown Customizado) -->
-    <!-- Funcionalidade: Permite alterar as descrições e teorias musicais para +10 idiomas. -->
     <div class="flex-none order-2 lg:order-3">
         <div class="relative inline-block text-left">
             <div>
                 <button type="button" id="lang-menu-btn" class="inline-flex justify-between items-center gap-1 md:gap-2 rounded-md border border-gray-300 shadow-sm px-2 py-1 md:px-3 md:py-1.5 bg-gray-50 text-xs md:text-sm font-medium text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" aria-expanded="true" aria-haspopup="true">
-                    <!-- O botão exibe apenas a Bandeira SVG (injetada via JS) para poupar espaço -->
                     <span id="current-flag" class="flex items-center justify-center"></span>
-                    <!-- A tag com o nome do idioma possui a classe hidden (oculta) -->
                     <span id="current-lang-name" class="hidden">Português</span>
-                    <svg class="h-3 w-3 md:h-4 md:w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <svg class="h-3 w-3 md:h-4 md:w-4 text-gray-500" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                 </button>
             </div>
-
-            <!-- Listagem de idiomas suportados (Injetada via JS com bandeiras SVG) -->
             <div id="lang-menu-dropdown" class="origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white border border-gray-200 focus:outline-none hidden z-[100]" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                <div class="py-1" id="lang-menu-list" role="none">
-                    <!-- Links injetados dinamicamente via JS -->
-                </div>
+                <div class="py-1" id="lang-menu-list" role="none"></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ==========================================================================
-     CONTROLES DE REPRODUÇÃO E DESAFIO (Sub-Header)
-     Conforme solicitado, realocamos estes controles cruciais da base do site
-     para logo abaixo da barra superior de seleção de tons.
-     ========================================================================== -->
 <div class="flex flex-wrap justify-center items-center gap-4 mb-8 relative z-50">
-    
-    <!-- Filtro de Cordas (Onde o exercício será executado) -->
     <div class="relative bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors focus-within:ring-2 focus-within:ring-blue-500 shadow-sm">
         <span id="cordas-display" class="block px-4 py-1.5 pointer-events-none text-sm font-medium pr-8">6 cordas</span>
         <select id="filtro-cordas" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer appearance-none">
@@ -368,44 +112,28 @@
         <svg class="absolute w-4 h-4 pointer-events-none text-blue-500" style="top: 50%; right: 0.75rem; transform: translateY(-50%);" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 8 4 4 4-4"/></svg>
     </div>
 
-    <!-- Controle de Velocidade (BPM) (Formato Botão) -->
-    <!-- Funcionalidade: Controla quão rápido as notas piscam e soam -->
     <div class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full transition-colors text-sm font-medium">
         <span data-i18n="lbl_bpm" style="margin-right: 0.5rem;">Velocidade</span>
-        
-        <!-- Botão de redução rápida (-10 BPM) -->
         <button id="btn-bpm-minus" class="bg-white border border-blue-200 hover:bg-blue-100 shadow-sm rounded-full transition-colors flex items-center justify-center text-blue-600" style="width: 22px; height: 22px;" dir="ltr" title="-10 BPM">
-            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"></path>
             </svg>
         </button>
-        
-        <!-- O input number guarda o valor matematicamente, mas é bloqueado para clique (somente leitura) -->
         <input type="number" id="bpm" value="160" min="40" max="300" class="w-8 text-center bg-transparent border-none focus:outline-none cursor-default p-0 font-bold mx-1" dir="ltr" readonly style="background-color: transparent !important; border-color: transparent !important; color: inherit !important; pointer-events: none;">
-        
-        <!-- Botão de avanço rápido (+10 BPM) -->
         <button id="btn-bpm-plus" class="bg-white border border-blue-200 hover:bg-blue-100 shadow-sm rounded-full transition-colors flex items-center justify-center text-blue-600" style="width: 22px; height: 22px;" dir="ltr" title="+10 BPM">
-            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
             </svg>
         </button>
-
-        <!-- Divisor vertical com MARGEM COMPACTA -->
         <div class="border-l border-blue-300 h-4" style="margin-left: 0.5rem; margin-right: 0.5rem;"></div>
-
-        <!-- Toggle Auto-Incremento (Speed Trainer) com Switch Customizado -->
         <label class="flex items-center cursor-pointer" title="Aumenta a velocidade automaticamente a cada X repetições">
             <span data-i18n="lbl_auto" class="font-medium text-sm" style="margin-left: 0.35rem; margin-right: 0.25rem;">auto</span>
             <div class="relative flex items-center" style="transform: scale(0.85); transform-origin: left center;">
                 <input type="checkbox" id="auto-bpm-toggle" class="sr-only">
-                <!-- Mesma classe de interruptor (toggle) estético usado no Desafio -->
                 <div class="toggle-bg"></div>
             </div>
         </label>
-
-        <!-- Select de ciclos para o Auto-Incremento com espaçamento enxuto e sem espaços invisíveis -->
         <div class="relative flex items-center" style="margin-left: -0.1rem;">
-            <!-- Usando padding CSS mínimo para otimizar espaço de tela e ocultando a seta nativa -->
             <select id="auto-bpm-cycles" class="bg-blue-100/50 text-blue-700 border border-blue-200 rounded-full py-0.5 text-xs font-bold focus:outline-none cursor-pointer appearance-none disabled:opacity-50 disabled:cursor-not-allowed transition-opacity opacity-50 text-center" style="padding-left: 0.4rem; padding-right: 1.1rem; background-image: none;" disabled>
                 <option value="1">1x</option>
                 <option value="2" selected>2x</option>
@@ -413,12 +141,10 @@
                 <option value="4">4x</option>
                 <option value="5">5x</option>
             </select>
-            <!-- Setinha reposicionada e otimizada -->
             <svg id="auto-bpm-arrow" class="absolute pointer-events-none text-blue-500 opacity-30 transition-opacity" style="width: 11px; height: 11px; right: 0.35rem;" fill="none" viewBox="0 0 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 8 4 4 4-4"/></svg>
         </div>
     </div>
 
-    <!-- Toggle (Interruptor) do Modo Desafio (Gamificação) -->
     <label class="flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors text-sm font-medium cursor-pointer">
         <span data-i18n="lbl_challenge">Desafio</span>
         <div class="relative flex items-center">
@@ -428,23 +154,10 @@
     </label>
 </div>
 
-<!-- ==========================================================================
-     SISTEMA CAGED (Grid com as 5 caixas isoladas)
-     Funcionalidade: O Sistema CAGED recorta o braço contínuo da guitarra em 5
-     blocos lógicos fáceis de decorar e que cobrem 4 trastes de tamanho.
-     ========================================================================== -->
-<!-- Div Álvo: Recebe a injeção do HTML via JavaScript das 5 posições formatadas no layout flex -->
 <div id="positions-container" class="flex flex-wrap justify-start gap-4 md:gap-6 mb-8" dir="ltr"></div>
 
-<!-- ==========================================================================
-     BRAÇO PRINCIPAL DA GUITARRA (Mostra todo o comprimento 0-15)
-     Funcionalidade: Desenha todo o braço da guitarra para o usuário ter uma visão
-     panorâmica de como a escala se estende infinitamente pelas oitavas.
-     ========================================================================== -->
-<!-- Botão Tocar Escala Completa movido para CIMA do braço e fora do scroll para ficar sempre centralizado na tela -->
 <div class="flex justify-center mb-4">
     <button id="btn-play-main" onclick="togglePlay('main', 0, 15)" class="flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors text-sm font-medium shadow-sm">
-        <!-- Ícones SVG simples e independentes (A classe 'hidden' é alternada via JS para trocar visual Play/Stop) -->
         <svg class="w-4 h-4 icon-play" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
         <svg class="w-4 h-4 icon-stop hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5h10v10H5z"></path></svg>
         <span class="btn-text" data-i18n="btn_play_full">Tocar Escala Completa</span>
@@ -453,1110 +166,14 @@
 
 <div class="mb-8 overflow-x-auto hide-scrollbar">
     <div id="main-fretboard-container" class="min-w-[900px] flex flex-col">
-        <!-- Alvo Dinâmico: O JavaScript irá preencher esta div vazia com as divs das notas musicais -->
         <div id="main-fretboard" dir="ltr"></div>
     </div>
 </div>
 
-<!-- ==========================================================================
-     LÓGICA PRINCIPAL DO APLICATIVO (JAVASCRIPT)
-     ========================================================================== -->
-<script>
-    /**
-     * ========================================================================
-     * 1. DICIONÁRIO DE INTERNACIONALIZAÇÃO (i18n - Internacionalization)
-     * ========================================================================
-     * Funcionalidade: Suporte Multilíngue nativo e offline. 
-     * Atenção DEV Jr: Como não queremos depender de arquivos JSON externos ou 
-     * requisições HTTP (fetch), colocamos todas as linguagens "Hardcoded" em um objeto.
-     * Isso permite que o app rode de um pendrive na floresta amazônica sem quebrar.
-     */
-    const i18n = {
-        'pt': { 'str_all': '6 cordas', 'lbl_auto': 'auto', 'starting_in': 'Iniciando em', 'roots': ['C-dó', 'C#-dó#', 'D-ré', 'D#-ré#', 'E-mi', 'F-fá', 'F#-fá#', 'G-sol', 'G#-sol#', 'A-lá', 'A#-lá#', 'B-si'], 'skin_light': '☀️ Claro', 'skin_dark': '🌙 Escuro', 'skin_vintage': '🎸 Vintage', 'title': 'Tutor de Escalas', 'lbl_root': 'Tom', 'lbl_scale': 'Escala', 'lbl_mode': 'Variação', 'lbl_ex': 'Exercício', 'lbl_bpm': 'Velocidade', 'lbl_challenge': 'Desafio', 'btn_play_full': 'Tocar Escala Completa', 'btn_play': 'Tocar', 'btn_stop': 'Parar', 'position': 'Posição', 'frets': 'Trastes', 'ex_1': '1. Subir e descer a escala toda', 'ex_2': '2. 2 vezes cada nota', 'ex_3': '3. 3 vezes cada nota', 'ex_4': '4. Grupos de 3 (1-2-3, 2-3-4...)', 'ex_5': '5. Grupos de 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Saltos de Terças (1-3, 2-4, 3-5...)', 'ex_7': '7. Arpejos Tríades', 'ex_8': '8. Arpejos Tétrades', 'ex_9': '9. Salto de Cordas (6-4, 5-3, 4-2...)', 'Pentatônica': 'Pentatônica', 'Maior': 'Maior', 'Menor': 'Menor', 'Modos Gregos': 'Modos Gregos', 'Jônio (Maior)': 'Jônio (Maior)', 'Dórico': 'Dórico', 'Frígio': 'Frígio', 'Lídio': 'Lídio', 'Mixolídio': 'Mixolídio', 'Eólio (Menor)': 'Eólio (Menor)', 'Lócrio': 'Lócrio', 'Escala Blues': 'Escala Blues', 'Menor Harmônica': 'Menor Harmônica', 'Padrão': 'Padrão', 'Menor Melódica': 'Menor Melódica', 'Escalas Simétricas': 'Escalas Simétricas', 'Diminuta (Tom-Semitom)': 'Diminuta (Tom-Semitom)', 'Dom Diminuta (Semitom-Tom)': 'Dom Diminuta (Semitom-Tom)', 'Hexafônica (Tons Inteiros)': 'Hexafônica (Tons Inteiros)' },
-        'de': { 'str_all': '6 Saiten', 'lbl_auto': 'auto', 'starting_in': 'Startet in', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ Hell', 'skin_dark': '🌙 Dunkel', 'skin_vintage': '🎸 Vintage', 'title': 'Tonleiter-Tutor', 'lbl_root': 'Grundton', 'lbl_scale': 'Tonleiter', 'lbl_mode': 'Variation', 'lbl_ex': 'Übung', 'lbl_bpm': 'Tempo', 'lbl_challenge': 'Herausforderung', 'btn_play_full': 'Ganze Tonleiter spielen', 'btn_play': 'Spielen', 'btn_stop': 'Stopp', 'position': 'Position', 'frets': 'Bünde', 'ex_1': '1. Ganze Tonleiter hoch und runter', 'ex_2': '2. Jede Note 2 mal', 'ex_3': '3. Jede Note 3 mal', 'ex_4': '4. 3er-Gruppen (1-2-3, 2-3-4...)', 'ex_5': '5. 4er-Gruppen (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Terzsprünge (1-3, 2-4, 3-5...)', 'ex_7': '7. Dreiklang-Arpeggios', 'ex_8': '8. Vierklang-Arpeggios', 'ex_9': '9. Saitensprünge (6-4, 5-3, 4-2...)', 'Pentatônica': 'Pentatonik', 'Maior': 'Dur', 'Menor': 'Moll', 'Modos Gregos': 'Kirchentonarten', 'Jônio (Maior)': 'Ionisch (Dur)', 'Dórico': 'Dorisch', 'Frígio': 'Phrygisch', 'Lídio': 'Lydisch', 'Mixolídio': 'Mixolydisch', 'Eólio (Menor)': 'Äolisch (Moll)', 'Lócrio': 'Lokrisch', 'Escala Blues': 'Blues-Tonleiter', 'Menor Harmônica': 'Harmonisch Moll', 'Padrão': 'Standard', 'Menor Melódica': 'Melodisch Moll', 'Escalas Simétricas': 'Symmetrische Tonleitern', 'Diminuta (Tom-Semitom)': 'Vermindert (G-H)', 'Dom Diminuta (Semitom-Tom)': 'Dom. Vermindert (H-G)', 'Hexafônica (Tons Inteiros)': 'Ganztonleiter' },
-        'en': { 'str_all': '6 strings', 'lbl_auto': 'auto', 'starting_in': 'Starting in', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ Light', 'skin_dark': '🌙 Dark', 'skin_vintage': '🎸 Vintage', 'title': 'Scale Tutor', 'lbl_root': 'Root', 'lbl_scale': 'Scale', 'lbl_mode': 'Variation', 'lbl_ex': 'Exercise', 'lbl_bpm': 'Speed', 'lbl_challenge': 'Challenge', 'btn_play_full': 'Play Full Scale', 'btn_play': 'Play', 'btn_stop': 'Stop', 'position': 'Position', 'frets': 'Frets', 'ex_1': '1. Up and down the whole scale', 'ex_2': '2. 2 times each note', 'ex_3': '3. 3 times each note', 'ex_4': '4. Groups of 3 (1-2-3, 2-3-4...)', 'ex_5': '5. Groups of 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Third leaps (1-3, 2-4, 3-5...)', 'ex_7': '7. Triad Arpeggios', 'ex_8': '8. Tetrad Arpeggios', 'ex_9': '9. String skipping (6-4, 5-3, 4-2...)', 'Pentatônica': 'Pentatonic', 'Maior': 'Major', 'Menor': 'Minor', 'Modos Gregos': 'Greek Modes', 'Jônio (Maior)': 'Ionian (Major)', 'Dórico': 'Dorian', 'Frígio': 'Phrygian', 'Lídio': 'Lydian', 'Mixolídio': 'Mixolydian', 'Eólio (Menor)': 'Aeolian (Minor)', 'Lócrio': 'Locrian', 'Escala Blues': 'Blues Scale', 'Menor Harmônica': 'Harmonic Minor', 'Padrão': 'Standard', 'Menor Melódica': 'Melodic Minor', 'Escalas Simétricas': 'Symmetrical Scales', 'Diminuta (Tom-Semitom)': 'Diminished (W-H)', 'Dom Diminuta (Semitom-Tom)': 'Dom Diminished (H-W)', 'Hexafônica (Tons Inteiros)': 'Whole Tone' },
-        'es': { 'str_all': '6 cuerdas', 'lbl_auto': 'auto', 'starting_in': 'Iniciando en', 'roots': ['C-do', 'C#-do#', 'D-re', 'D#-re#', 'E-mi', 'F-fa', 'F#-fa#', 'G-sol', 'G#-sol#', 'A-la', 'A#-la#', 'B-si'], 'skin_light': '☀️ Claro', 'skin_dark': '🌙 Oscuro', 'skin_vintage': '🎸 Vintage', 'title': 'Tutor de Escalas', 'lbl_root': 'Tono', 'lbl_scale': 'Escala', 'lbl_mode': 'Variación', 'lbl_ex': 'Ejercicio', 'lbl_bpm': 'Velocidad', 'lbl_challenge': 'Desafío', 'btn_play_full': 'Tocar Escala Completa', 'btn_play': 'Tocar', 'btn_stop': 'Detener', 'position': 'Posición', 'frets': 'Trastes', 'ex_1': '1. Subir y bajar toda la escala', 'ex_2': '2. 2 veces cada nota', 'ex_3': '3. 3 veces cada nota', 'ex_4': '4. Grupos de 3 (1-2-3, 2-3-4...)', 'ex_5': '5. Grupos de 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Saltos de Terceras (1-3, 2-4, 3-5...)', 'ex_7': '7. Arpegios Tríadas', 'ex_8': '8. Arpegios Tétradas', 'ex_9': '9. Salto de Cuerdas (6-4, 5-3, 4-2...)', 'Pentatônica': 'Pentatónica', 'Maior': 'Mayor', 'Menor': 'Menor', 'Modos Gregos': 'Modos Griegos', 'Jônio (Maior)': 'Jónico (Mayor)', 'Dórico': 'Dórico', 'Frígio': 'Frigio', 'Lídio': 'Lidio', 'Mixolídio': 'Mixolidio', 'Eólio (Menor)': 'Eólico (Menor)', 'Lócrio': 'Locrio', 'Escala Blues': 'Escala Blues', 'Menor Harmônica': 'Menor Armónica', 'Padrão': 'Estándar', 'Menor Melódica': 'Menor Melódica', 'Escalas Simétricas': 'Escalas Simétricas', 'Diminuta (Tom-Semitom)': 'Disminuida (T-S)', 'Dom Diminuta (Semitom-Tom)': 'Dom Disminuida (S-T)', 'Hexafônica (Tons Inteiros)': 'Hexáfona (Tonos Enteros)' },
-        'fr': { 'str_all': '6 cordes', 'lbl_auto': 'auto', 'starting_in': 'Démarrage dans', 'roots': ['C-do', 'C#-do#', 'D-ré', 'D#-ré#', 'E-mi', 'F-fa', 'F#-fa#', 'G-sol', 'G#-sol#', 'A-la', 'A#-la#', 'B-si'], 'skin_light': '☀️ Clair', 'skin_dark': '🌙 Sombre', 'skin_vintage': '🎸 Vintage', 'title': 'Tuteur de Gammes', 'lbl_root': 'Tonalité', 'lbl_scale': 'Gamme', 'lbl_mode': 'Variation', 'lbl_ex': 'Exercice', 'lbl_bpm': 'Vitesse', 'lbl_challenge': 'Défi', 'btn_play_full': 'Jouer la Gamme Complète', 'btn_play': 'Jouer', 'btn_stop': 'Arrêter', 'position': 'Position', 'frets': 'Frettes', 'ex_1': '1. Monter et descendre toute la gamme', 'ex_2': '2. 2 fois chaque note', 'ex_3': '3. 3 fois chaque note', 'ex_4': '4. Groupes de 3 (1-2-3, 2-3-4...)', 'ex_5': '5. Groupes de 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Sauts de Tierces (1-3, 2-4, 3-5...)', 'ex_7': '7. Arpèges Triades', 'ex_8': '8. Arpèges Tétrades', 'ex_9': '9. Saut de Cordes (6-4, 5-3...)', 'Pentatônica': 'Pentatonique', 'Maior': 'Majeure', 'Menor': 'Mineure', 'Modos Gregos': 'Modes Grecs', 'Jônio (Maior)': 'Ionien (Majeur)', 'Dórico': 'Dorien', 'Frígio': 'Phrygien', 'Lídio': 'Lydien', 'Mixolídio': 'Mixolydien', 'Eólio (Menor)': 'Éolien (Mineur)', 'Lócrio': 'Locrien', 'Escala Blues': 'Gamme Blues', 'Menor Harmônica': 'Mineure Harmonique', 'Padrão': 'Standard', 'Menor Melódica': 'Mineure Mélodique', 'Escalas Simétricas': 'Gammes Symétriques', 'Diminuta (Tom-Semitom)': 'Diminuée (Ton-Demi-ton)', 'Dom Diminuta (Semitom-Tom)': 'Dom Diminuée (Demi-ton-Ton)', 'Hexafônica (Tons Inteiros)': 'Par Tons (Hexatonique)' },
-        'ru': { 'str_all': '6 струн', 'lbl_auto': 'auto', 'starting_in': 'Начало через', 'roots': ['C-до', 'C#-до#', 'D-ре', 'D#-ре#', 'E-ми', 'F-фа', 'F#-фа#', 'G-соль', 'G#-соль#', 'A-ля', 'A#-ля#', 'B-си'], 'skin_light': '☀️ Светлая', 'skin_dark': '🌙 Темная', 'skin_vintage': '🎸 Винтаж', 'title': 'Репетитор по Гаммам', 'lbl_root': 'Тоника', 'lbl_scale': 'Гамма', 'lbl_mode': 'Вариация', 'lbl_ex': 'Упражнение', 'lbl_bpm': 'Скорость', 'lbl_challenge': 'Вызов', 'btn_play_full': 'Играть Всю Гамму', 'btn_play': 'Играть', 'btn_stop': 'Стоп', 'position': 'Позиция', 'frets': 'Лады', 'ex_1': '1. Вверх и вниз по всей гамме', 'ex_2': '2. По 2 раза каждую ноту', 'ex_3': '3. По 3 раза каждую ноту', 'ex_4': '4. Группы по 3 (1-2-3, 2-3-4...)', 'ex_5': '5. Группы по 4 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. Скачки на терцию (1-3, 2-4, 3-5...)', 'ex_7': '7. Арпеджио Трезвучий', 'ex_8': '8. Арпеджио Септаккордов', 'ex_9': '9. Пропуск струн (6-4, 5-3, 4-2...)' },
-        'zh': { 'str_all': '6 弦', 'lbl_auto': 'auto', 'starting_in': '即将开始', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ 浅色', 'skin_dark': '🌙 深色', 'skin_vintage': '🎸 复古', 'title': '音阶导师', 'lbl_root': '主音', 'lbl_scale': '音阶', 'lbl_mode': '变奏', 'lbl_ex': '练习', 'lbl_bpm': '速度', 'lbl_challenge': '挑战', 'btn_play_full': '弹奏全音阶', 'btn_play': '弹奏', 'btn_stop': '停止', 'position': '位置', 'frets': '品格', 'ex_1': '1. 上下全音阶', 'ex_2': '2. 每个音符弹2次', 'ex_3': '3. 每个音符弹3次', 'ex_4': '4. 三音组 (1-2-3, 2-3-4...)', 'ex_5': '5. 四音组 (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. 三度跳跃 (1-3, 2-4, 3-5...)', 'ex_7': '7. 三和弦琶音', 'ex_8': '8. 七和弦琶音', 'ex_9': '9. 跳弦 (6-4, 5-3, 4-2...)' },
-        'hi': { 'str_all': '6 तार', 'lbl_auto': 'auto', 'starting_in': 'में शुरू हो रहा है', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ हल्का', 'skin_dark': '🌙 गहरा', 'skin_vintage': '🎸 विंटेज', 'title': 'स्केल ट्यूटर', 'lbl_root': 'मूल स्वर', 'lbl_scale': 'स्केल', 'lbl_mode': 'रूपांतर', 'lbl_ex': 'व्यायाम', 'lbl_bpm': 'गति', 'lbl_challenge': 'चुनौती', 'btn_play_full': 'पूरा स्केल बजाएं', 'btn_play': 'बजाएं', 'btn_stop': 'रुकें', 'position': 'स्थिति', 'frets': 'फ्रेट्स', 'ex_1': '1. पूरा स्केल ऊपर-नीचे', 'ex_2': '2. 2 बार प्रत्येक स्वर', 'ex_3': '3. 3 बार प्रत्येक स्वर', 'ex_4': '4. 3 के समूह (1-2-3, 2-3-4...)', 'ex_5': '5. 4 के समूह (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. थर्ड्स जंप (1-3, 2-4, 3-5...)', 'ex_7': '7. ट्रायड आर्पेजियोस', 'ex_8': '8. टेट्राड आर्पेजियोस', 'ex_9': '9. स्ट्रिंग जंपिंग (6-4, 5-3, 4-2...)' },
-        'ar': { 'str_all': '6 أوتار', 'lbl_auto': 'auto', 'starting_in': 'يبدأ في', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ فاتح', 'skin_dark': '🌙 داكن', 'skin_vintage': '🎸 كلاسيكي', 'title': 'معلم السلالم', 'lbl_root': 'الجذر', 'lbl_scale': 'السلم', 'lbl_mode': 'تنوع', 'lbl_ex': 'تمرين', 'lbl_bpm': 'السرعة', 'lbl_challenge': 'تحدي', 'btn_play_full': 'عزف السلم كاملاً', 'btn_play': 'عزف', 'btn_stop': 'إيقاف', 'position': 'موضع', 'frets': 'دساتين', 'ex_1': '1. صعود وهبوط السلم', 'ex_2': '2. مرتان لكل نغمة', 'ex_3': '3. 3 مرات لكل نغمة', 'ex_4': '4. مجموعات ثلاثية (1-2-3, 2-3-4...)', 'ex_5': '5. مجموعات رباعية (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. قفزات ثلثية (1-3, 2-4, 3-5...)', 'ex_7': '7. تتابعات ثلاثية', 'ex_8': '8. تتابعات رباعية', 'ex_9': '9. قفز الأوتار (6-4, 5-3, 4-2...)' },
-        'bn': { 'str_all': '৬ তার', 'lbl_auto': 'auto', 'starting_in': 'শুরু হচ্ছে', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ হালকা', 'skin_dark': '🌙 গাঢ়', 'skin_vintage': '🎸 ভিন্টেজ', 'title': 'স্কেল টিউটর', 'lbl_root': 'রুট (Root)', 'lbl_scale': 'স্কেল', 'lbl_mode': 'ভিন্নতা', 'lbl_ex': 'ব্যায়াম', 'lbl_bpm': 'গতি', 'lbl_challenge': 'চ্যালেঞ্জ', 'btn_play_full': 'সম্পূর্ণ স্কেল বাজান', 'btn_play': 'বাজান', 'btn_stop': 'থামুন', 'position': 'অবস্থান', 'frets': 'ফ্রেট', 'ex_1': '১. সম্পূর্ণ স্কেল উপরে-নিচে', 'ex_2': '২. প্রতিটি নোট ২ বার', 'ex_3': '৩. প্রতিটি নোট ৩ বার', 'ex_4': '৪. ৩ এর গ্রুপ (১-২-৩, ২-৩-৪...)', 'ex_5': '৫. ৪ এর গ্রুপ (১-২-৩-৪, ২-৩-৪-৫...)', 'ex_6': '৬. থার্ডস জাম্প (১-৩, ২-৪, ৩-৫...)', 'ex_7': '৭. ট্রায়াড আর্পেজিওস', 'ex_8': '৮. টেট্রাড আর্পেজিওস', 'ex_9': '৯. স্ট্রিং স্কিপিং (৬-৪, ৫-৩, ৪-২...)' },
-        'ur': { 'str_all': '6 تار', 'lbl_auto': 'auto', 'starting_in': 'شروع ہو رہا ہے', 'roots': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], 'skin_light': '☀️ ہلکا', 'skin_dark': '🌙 گہرا', 'skin_vintage': '🎸 ونٹیج', 'title': 'سکیل ٹیوٹر', 'lbl_root': 'روٹ', 'lbl_scale': 'سکیل', 'lbl_mode': 'تغیر', 'lbl_ex': 'مشق', 'lbl_bpm': 'رفتار', 'lbl_challenge': 'چیلنج', 'btn_play_full': 'پورا سکیل بجائیں', 'btn_play': 'بجائیں', 'btn_stop': 'روکیں', 'position': 'پوزیشن', 'frets': 'فریٹس', 'ex_1': '1. پورا سکیل اوپر نیچے', 'ex_2': '2. 2 بار ہر نوٹ', 'ex_3': '3. 3 بار ہر نوٹ', 'ex_4': '4. 3 کے گروپس (1-2-3, 2-3-4...)', 'ex_5': '5. 4 کے گروپس (1-2-3-4, 2-3-4-5...)', 'ex_6': '6. تھرڈز جمپ (1-3, 2-4, 3-5...)', 'ex_7': '7. ٹرائڈ آرپیجیوس', 'ex_8': '8. ٹیٹراڈ آرپیجیوس', 'ex_9': '9. سٹرنگ سکپنگ (6-4, 5-3, 4-2...)' }
-    };
+<!-- Importação do JavaScript Local -->
+ <script src="flags.js"></script>
+<script src="consts.js"></script>
+<script src="script.js"></script>
 
-    // Metadados visuais das linguagens com SVGs desenhados em vetor para contornar a falta de emojis no Windows!
-    const baseSvg = '<svg class="w-5 h-3.5 rounded-[2px] shadow-[0_0_1px_rgba(0,0,0,0.5)] flex-shrink-0" preserveAspectRatio="none" viewBox="0 0 64 48">';
-    const langMetadata = {
-        'pt': { name: 'Português', svg: `${baseSvg}<rect width="64" height="48" fill="#009b3a"/><polygon points="32,4 60,24 32,44 4,24" fill="#fedf00"/><circle cx="32" cy="24" r="10" fill="#002776"/></svg>` },
-        'ru': { name: 'Русский',   svg: `${baseSvg}<rect width="64" height="16" fill="#fff"/><rect y="16" width="64" height="16" fill="#0039a6"/><rect y="32" width="64" height="16" fill="#d52b1e"/></svg>` },
-        'hi': { name: 'हिन्दी',     svg: `${baseSvg}<rect width="64" height="16" fill="#f93"/><rect y="16" width="64" height="16" fill="#fff"/><rect y="32" width="64" height="16" fill="#138808"/><circle cx="32" cy="24" r="6" fill="#000080"/></svg>` },
-        'zh': { name: '中文',      svg: `${baseSvg}<rect width="64" height="48" fill="#ee1c25"/><polygon points="12,8 14,14 20,14 15,18 17,24 12,20 7,24 9,18 4,14 10,14" fill="#ff0"/></svg>` },
-        'de': { name: 'Deutsch',   svg: `${baseSvg}<rect width="64" height="16" fill="#000"/><rect y="16" width="64" height="16" fill="#d00"/><rect y="32" width="64" height="16" fill="#ffce00"/></svg>` },
-        'en': { name: 'English',   svg: `${baseSvg}<rect width="64" height="48" fill="#bf0a30"/><rect y="6.8" width="64" height="6.8" fill="#fff"/><rect y="20.4" width="64" height="6.8" fill="#fff"/><rect y="34" width="64" height="6.8" fill="#fff"/><rect width="26" height="26" fill="#002868"/></svg>` },
-        'es': { name: 'Español',   svg: `${baseSvg}<rect width="64" height="12" fill="#aa151b"/><rect y="12" width="64" height="24" fill="#f1bf00"/><rect y="36" width="64" height="12" fill="#aa151b"/></svg>` },
-        'fr': { name: 'Français',  svg: `${baseSvg}<rect width="21.3" height="48" fill="#002395"/><rect x="21.3" width="21.3" height="48" fill="#fff"/><rect x="42.6" width="21.3" height="48" fill="#ed2939"/></svg>` },
-        'ar': { name: 'العربية',  svg: `${baseSvg}<rect width="64" height="48" fill="#006c35"/><rect x="16" y="22" width="32" height="4" fill="#fff"/></svg>` },
-        'bn': { name: 'বাংলা',     svg: `${baseSvg}<rect width="64" height="48" fill="#006a4e"/><circle cx="28" cy="24" r="14" fill="#f42a41"/></svg>` },
-        'ur': { name: 'اردو',      svg: `${baseSvg}<rect width="64" height="48" fill="#115740"/><rect width="16" height="48" fill="#fff"/><circle cx="40" cy="24" r="12" fill="#fff"/><circle cx="44" cy="20" r="10" fill="#115740"/></svg>` }
-    };
-
-    // Variável de estado global que armazena a Linguagem Padrão do Sistema
-    let currentLang = 'pt';
-
-    /**
-     * Função utilitária (Getter) para pegar a tradução correta da chave enviada.
-     * Atenção DEV Jr: Implementamos uma lógica de Fallback Automático aqui.
-     * Se não existir a tradução em, digamos, Russo, ele tenta achar em Inglês. Se falhar, busca em PT.
-     */
-    function t(key) {
-        if (i18n[currentLang] && i18n[currentLang][key]) return i18n[currentLang][key];
-        if (i18n['en'] && i18n['en'][key]) return i18n['en'][key];
-        if (i18n['pt'] && i18n['pt'][key]) return i18n['pt'][key];
-        return key;
-    }
-
-    /**
-     * Função utilitária para estética do Menu de Exercícios.
-     * Encurta inteligentemente o título longo do exercício para encaixar na barra visual,
-     * removendo "rabichos" de explicações desnecessários sem precisar lotar o dicionário i18n com duplicações.
-     */
-    function getShortExText(fullText) {
-        let short = fullText.split(' (')[0]; // Ex: "4. Cordas graves (6 a 3)" vira "4. Cordas graves"
-        
-        // Remove trechos finais que alongam as traduções no componente de select principal
-        const removals = [' a escala toda', ' the whole scale', ' toda la escala', ' toute la gamme', ' по всей гамме', ' cada nota', ' each note', ' chaque note', ' каждую ноту'];
-        removals.forEach(r => {
-            short = short.replace(new RegExp(r, 'gi'), '');
-        });
-        
-        return short.trim();
-    }
-
-    /**
-     * ========================================================================
-     * 2. VARIÁVEIS CONSTANTES DE TEORIA MUSICAL E LÓGICA DO BRAÇO (FRETBOARD)
-     * ========================================================================
-     */
-    
-    // As 12 notas fundamentais do sistema temperado ocidental (Usamos notação americana cifrada como indexador fixo)
-    const notasCromaticas = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    
-    // Índices mapeando as notas da afinação padrão (Standard E) em relação ao array "notasCromaticas"
-    // Corda 6 (E2) = Índice 4 no array (E)
-    // Corda 5 (A2) = Índice 9 no array (A)... e assim por diante.
-    // Atenção DEV Jr: Este array lê as cordas fisicamente de Cima para Baixo visualmente (1ª para 6ª).
-    const afinacaoIndices = [4, 11, 7, 2, 9, 4];
-    
-    // Frequências exatas em Hertz(Hz) das 6 cordas soltas da guitarra (E4, B3, G3, D3, A2, E2)
-    // Essa base matemática é o que permite ao sintetizador calcular o som dos trastes
-    const openStringFreqs = [329.63, 246.94, 196.00, 146.83, 110.00, 82.41];
-
-    /**
-     * ========================================================================
-     * 3. GERENCIAMENTO DE ESTADO CENTRAL (STATE MANAGEMENT) E ÁUDIO ENGINE
-     * ========================================================================
-     * Funcionalidade: Mantém em uma única variável de memória o status de quem 
-     * está tocando, qual música e em qual andamento. Similar ao Redux/Context do React.
-     */
-    let audioCtx; // Objeto mestre da API de Áudio Nativa do Browser (Web Audio API)
-    let globalVolume = 0.8; // Controla o ganho geral mestre. Começa em 80%
-    
-    // Árvore de Estado (State Tree)
-    let playbackState = {
-        diagramId: null,      // Aponta para qual braço visual está sendo tocado ('main', 'pos-0', etc.)
-        timeoutId: null,      // ID do timer de repetição das notas
-        countdownIntervalId: null, // ID do timer da contagem regressiva 3, 2, 1
-        currentIndex: 0,      // Qual nota da sequência (índice da array) está soando agora
-        cycleCount: 0,        // Quantas vezes o exercício "girou completo" (Crucial para aGamificação do Desafio)
-        sequence: [],         // A lista serializada de notas gerada pelo algoritmo e que o sintetizador vai "ler"
-        sequences: {},        // Cache das sequências geradas para não precisarmos recalcular a cada Play
-        playing: false,       // Flag booleano central. Se false, o loop morre.
-        lastHighlightedNote: null // ID do HTML da última bolinha acesa para o JS apagá-la no próximo frame (animação)
-    };
-
-    /**
-     * Inicializador do Contexto de Áudio (Singleton)
-     * Atenção DEV Jr: Por políticas contra SPAM do Google Chrome/Safari, nenhum som pode ser 
-     * tocado pelo browser sem que o usuário faça uma "interação" antes (um click). Por isso 
-     * essa função só é instanciada quando o usuário clica em "Tocar Escala" pela primeira vez.
-     */
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    /**
-     * Sintetizador Básico usando a Web Audio API (Onda Sawtooth + Filtro Lowpass).
-     * Funcionalidade: Gera o som de uma nota da guitarra em tempo real baseando-se apenas em física.
-     * @param {number} stringIdx O índice da corda (0 a 5) que foi apertada.
-     * @param {number} fret A casa (traste) apertada na corda selecionada.
-     */
-    function playPluck(stringIdx, fret) {
-        // Bloqueia execução de som inútil se o volume mestre estiver zerado na barra
-        if (globalVolume <= 0) return; 
-
-        initAudio(); // Garante o contexto vivo
-        
-        // Magia Matemática: Frequência Traste(N) = FrequenciaCordaSolta * 2^(Traste/12)
-        // Isso eleva meio tom para cada traste somado de acordo com a escala temperada igualitária
-        const freq = openStringFreqs[stringIdx] * Math.pow(2, fret / 12);
-
-        // Nodes da Arquitetura do Áudio
-        const osc = audioCtx.createOscillator();     // Gerador de Som
-        const gainNode = audioCtx.createGain();      // Controlador de Volume
-        const filter = audioCtx.createBiquadFilter();// Filtro de Frequências (Equilização)
-
-        // Onda 'sawtooth' (dente de serra) dá aquele caráter "rasgado/metálico/rico" da guitarra
-        osc.type = 'sawtooth';
-        osc.frequency.value = freq;
-
-        // O filtro lowpass tira os chiados excessivos de agudo. Vai subindo o corte quanto mais agudo o traste for.
-        filter.type = 'lowpass';
-        filter.frequency.value = 1500 + (fret * 100);
-
-        // Conecta as caixinhas virtuais como se fosse um cabeamento físico: Oscilador -> Filtro -> Volume -> Caixa de Som
-        osc.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        // Envelope ADSR (Attack, Decay, Sustain, Release)
-        // Funcionalidade: Modula o volume para simular uma palhetada (Explode alto e vai sumindo aos poucos)
-        const now = audioCtx.currentTime;
-        gainNode.gain.setValueAtTime(0, now);
-        
-        // Attack violento baseando o "teto" de som no Volume Global do App
-        gainNode.gain.linearRampToValueAtTime(globalVolume, now + 0.02); 
-        // Decay/Release longo e suave (Cai pra quase 0% no decorrer de 2.5s)
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5); 
-
-        // Aciona a nota e a mata completamente após 2.5s para economizar processamento de RAM
-        osc.start(now);
-        osc.stop(now + 2.5);
-    }
-
-    /**
-     * ========================================================================
-     * 4. BANCO DE DADOS DE ESCALAS MUSICAIS
-     * ========================================================================
-     * Funcionalidade: Define o DNA e a formula matemática para desenhar centenas de combinações.
-     * Atenção DEV Jr: Este objeto dita as regras das "distâncias".
-     * Propriedade "i" = Array contendo o deslocamento em Semitons a partir do Root (Nota base/Tom).
-     * Exemplo Maior: [0, 2, 4, 5, 7, 9, 11] = Tônica, Tom, Tom, Semitom, Tom, Tom, Tom.
-     * Propriedade "c" = Caged Offset. Um macete arquitetural. Ele indica quantos semitons este modo 
-     * está "longe" do modo Maior Padrão para que o algoritmo consiga fatiar as caixinhas do CAGED perfeitamente.
-     */
-    const bancoDeEscalas = {
-        'Pentatônica': {
-            'Maior': { i: [0, 2, 4, 7, 9], c: 0 },
-            'Menor': { i: [0, 3, 5, 7, 10], c: 3 }
-        },
-        'Modos Gregos': {
-            'Jônio (Maior)': { i: [0, 2, 4, 5, 7, 9, 11], c: 0 },
-            'Dórico': { i: [0, 2, 3, 5, 7, 9, 10], c: -2 },
-            'Frígio': { i: [0, 1, 3, 5, 7, 8, 10], c: -4 },
-            'Lídio': { i: [0, 2, 4, 6, 7, 9, 11], c: -5 },
-            'Mixolídio': { i: [0, 2, 4, 5, 7, 9, 10], c: -7 },
-            'Eólio (Menor)': { i: [0, 2, 3, 5, 7, 8, 10], c: 3 },
-            'Lócrio': { i: [0, 1, 3, 5, 6, 8, 10], c: 1 }
-        },
-        'Escala Blues': {
-            'Maior': { i: [0, 2, 3, 4, 7, 9], c: 0 },
-            'Menor': { i: [0, 3, 5, 6, 7, 10], c: 3 }
-        },
-        'Menor Harmônica': {
-            'Padrão': { i: [0, 2, 3, 5, 7, 8, 11], c: 3 }
-        },
-        'Menor Melódica': {
-            'Padrão': { i: [0, 2, 3, 5, 7, 9, 11], c: 3 }
-        },
-        'Escalas Simétricas': {
-            'Diminuta (Tom-Semitom)': { i: [0, 2, 3, 5, 6, 8, 9, 11], c: 0 },
-            'Dom Diminuta (Semitom-Tom)': { i: [0, 1, 3, 4, 6, 7, 9, 10], c: 0 },
-            'Hexafônica (Tons Inteiros)': { i: [0, 2, 4, 6, 8, 10], c: 0 }
-        }
-    };
-
-    /**
-     * ========================================================================
-     * 5. LOGICA DE INTERFACE & INTERNACIONALIZAÇÃO (UI ENGINE)
-     * ========================================================================
-     * Lida com a abertura e fechamento de menus, aplicação de traduções e a
-     * técnica de "Reconstrução Dinâmica" (onde o DOM é apagado e regerado a cada mudança).
-     */
-    
-    // Captura os elementos DOM relativos aos sub-menus de Linguagem, Skin e Volume
-    const langMenuBtn = document.getElementById('lang-menu-btn');
-    const langMenuDropdown = document.getElementById('lang-menu-dropdown');
-    
-    const skinMenuBtn = document.getElementById('skin-menu-btn');
-    const skinMenuDropdown = document.getElementById('skin-menu-dropdown');
-
-    const volMenuBtn = document.getElementById('volume-menu-btn');
-    const volMenuDropdown = document.getElementById('volume-menu-dropdown');
-
-    // Comportamento do Click: Abre o menu atual e obriga o fechamento dos concorrentes caso estivessem abertos
-    langMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede o evento de borbulhar até o document e fechar imediatamente
-        langMenuDropdown.classList.toggle('hidden');
-        skinMenuDropdown.classList.add('hidden'); 
-        volMenuDropdown.classList.add('hidden'); 
-    });
-    
-    skinMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        skinMenuDropdown.classList.toggle('hidden');
-        langMenuDropdown.classList.add('hidden'); 
-        volMenuDropdown.classList.add('hidden'); 
-    });
-
-    volMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        volMenuDropdown.classList.toggle('hidden');
-        langMenuDropdown.classList.add('hidden'); 
-        skinMenuDropdown.classList.add('hidden'); 
-    });
-
-    // Detecta "click out" (se o usuário clicar no fundo do app, oculta os sub-menus abertos)
-    document.addEventListener('click', (e) => {
-        if (!langMenuBtn.contains(e.target) && !langMenuDropdown.contains(e.target)) langMenuDropdown.classList.add('hidden');
-        if (!skinMenuBtn.contains(e.target) && !skinMenuDropdown.contains(e.target)) skinMenuDropdown.classList.add('hidden');
-        if (!volMenuBtn.contains(e.target) && !volMenuDropdown.contains(e.target)) volMenuDropdown.classList.add('hidden');
-    });
-
-    /**
-     * Ação disparada quando um Idioma é clicado na listagem.
-     * Altera a variável global currentLang e ordena a recompilação da tela toda via applyLanguage()
-     */
-    function setLang(code, langName) {
-        document.getElementById('current-flag').innerHTML = langMetadata[code].svg;
-        document.getElementById('current-lang-name').innerText = langName;
-        langMenuDropdown.classList.add('hidden');
-        currentLang = code;
-        applyLanguage();
-    }
-
-    /**
-     * Ação disparada quando um Tema(Skin) é clicado na listagem.
-     * Funcionalidade: Oculta o menu e apenas escreve a variavel no body (data-skin). 
-     * O próprio CSS cuida do resto sobrescrevendo todas as cores.
-     */
-    function setSkin(skinName, icon) {
-        document.body.setAttribute('data-skin', skinName);
-        document.getElementById('current-skin-icon').innerText = icon;
-        skinMenuDropdown.classList.add('hidden');
-    }
-
-    /**
-     * Motor Pesado de Tradução UI.
-     * Ele lê as configs antigas da tela antes de desmontá-la, injeta as traduções nativas e remonta.
-     */
-    function applyLanguage() {
-        // Guarda as seleções atuais antes de regerar o HTML (para o usuário não perder a escala que estava olhando)
-        const selCat = document.getElementById('escala').value || 'Pentatônica';
-        const selModo = document.getElementById('modo').value || 'Maior';
-        const selEx = document.getElementById('exercicio').value || '1';
-
-        document.documentElement.lang = currentLang;
-
-        // Habilita Roteamento Visual Right-to-Left se a linguagem lida for Árabe ou Urdu (Inversão em Espelho da UI)
-        if (currentLang === 'ar' || currentLang === 'ur') document.body.dir = 'rtl';
-        else document.body.dir = 'ltr';
-
-        // Passo 1: Traduz todos os labels (botões, pequenos titulos) iterando pelo atributo chave "data-i18n"
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            el.innerText = t(key);
-        });
-
-        // Passo 2: Reconstrói os Exercícios no <select> com traduções limpas e injeta o Short Text no label visível principal
-        const exSelect = document.getElementById('exercicio');
-        exSelect.innerHTML = '';
-        // Agora só temos 9 exercícios dinâmicos no dicionário!
-        for (let i = 1; i <= 9; i++) {
-            let opt = document.createElement('option');
-            opt.value = i.toString();
-            opt.text = t(`ex_${i}`);
-            opt.dataset.short = getShortExText(t(`ex_${i}`));
-            exSelect.add(opt);
-        }
-        exSelect.value = selEx;
-        document.getElementById('exercicio-display').innerText = exSelect.options[exSelect.selectedIndex].dataset.short;
-
-        // Passo 3: Reconstrói a combobox de Categorias de Escalas (mantendo a Key original em PT como value para a lógica interna não quebrar)
-        const catSelect = document.getElementById('escala');
-        catSelect.innerHTML = '';
-        for (const cat in bancoDeEscalas) {
-            catSelect.add(new Option(t(cat), cat)); 
-        }
-        catSelect.value = bancoDeEscalas[selCat] ? selCat : 'Pentatônica';
-        document.getElementById('escala-display').innerText = catSelect.options[catSelect.selectedIndex].text;
-
-        // Passo 4: Atualiza o Dropdown secundário de "Variações" ou "Modos Gregos"
-        atualizarModos(false);
-        const modoSelect = document.getElementById('modo');
-        if ([...modoSelect.options].some(o => o.value === selModo)) {
-            modoSelect.value = selModo;
-        }
-        document.getElementById('modo-display').innerText = modoSelect.options[modoSelect.selectedIndex].text;
-
-        // Novo: Atualiza o Dropdown de Filtro de Cordas traduzindo apenas a primeira opção
-        const cordasSelect = document.getElementById('filtro-cordas');
-        cordasSelect.options[0].text = t('str_all');
-        document.getElementById('cordas-display').innerText = cordasSelect.options[cordasSelect.selectedIndex].text;
-
-        // Passo 5: Reconstrói a combobox de Tons Base. Idiomas ocidentais ganham Solfejo Latino (C-Dó, D-Ré). Orientais e Inglês/Alemão não.
-        const tomSelect = document.getElementById('tom');
-        const selTom = tomSelect.value || 'C';
-        tomSelect.innerHTML = '';
-        // Resgata o array de raízes da linguagem atual (Faz Fallback para Inglês puro [C,D,E] se não existir)
-        const rootsArr = (i18n[currentLang] && i18n[currentLang].roots) ? i18n[currentLang].roots : i18n['en'].roots;
-        
-        notasCromaticas.forEach((nota, idx) => {
-            let opt = document.createElement('option');
-            opt.value = nota; // O valor por baixo dos panos é SEMPRE apenas 'C', 'D' pro Motor entender.
-            opt.text = rootsArr[idx]; // O visualizador assume o "C-do" esteticamente
-            tomSelect.add(opt);
-        });
-        
-        tomSelect.value = selTom;
-        document.getElementById('tom-display').innerText = tomSelect.options[tomSelect.selectedIndex].text;
-
-        // Depois de tudo reconstruido linguísticamente, força a reconstrução física dos gráficos do Braço da Guitarra (updateUI)
-        updateUI();
-    }
-
-    /**
-     * Lida com o relacionamento "Pai-Filho" entre Categoria Musical e Variação Musical.
-     * Exemplo: Se Pentatonica, carrega apenas as opções "Maior e Menor". Se Grego, carrega as 7 variáveis gregas.
-     */
-    function atualizarModos(triggerUpdateUI = true) {
-        const cat = document.getElementById('escala').value;
-        const modos = bancoDeEscalas[cat];
-        const selectModo = document.getElementById('modo');
-        const oldModo = selectModo.value;
-
-        selectModo.innerHTML = ''; // Limpa as tags HTML do Dropdown Nativo
-        for (const modo in modos) {
-            selectModo.add(new Option(t(modo), modo));
-        }
-        
-        // Tenta preservar a seleção do modo se ele for intercambiável (Ex: Maior -> Maior)
-        if (oldModo && [...selectModo.options].some(o => o.value === oldModo)) {
-            selectModo.value = oldModo;
-        }
-        
-        // Reflete a alteração no "Select Invisível Falso"
-        document.getElementById('modo-display').innerText = selectModo.options[selectModo.selectedIndex].text;
-
-        // Em alguns fluxos o recálculo dos trastes deve ser evitado (false) para não causar loops infinitos no carregamento inicial
-        if (triggerUpdateUI) updateUI();
-    }
-
-    /**
-     * ========================================================================
-     * 6. LÓGICA CORE DA ESCALA E DO ALGORITMO (TEORIA MUSICAL NO CÓDIGO)
-     * ========================================================================
-     */
-
-    /**
-     * Funcionalidade: Lê todos os menus de cima e compila um Set Único com as Notas da Escala.
-     * Exemplo Prático: Usuário escolhe: C, Pentatonica, Menor. 
-     * A função lê a base 0(C) -> e soma o offset do banco de dados [0, 3, 5, 7, 10].
-     * Resultado Matemático -> Retorna um Set Set(C, D#, F, G, A#)
-     */
-    function getScaleData() {
-        const tom = document.getElementById('tom').value;
-        const categoria = document.getElementById('escala').value;
-        const modo = document.getElementById('modo').value;
-
-        const rootIdx = notasCromaticas.indexOf(tom); // Busca o "A" e retorna indice numérico = 9
-        if (!bancoDeEscalas[categoria] || !bancoDeEscalas[categoria][modo]) return null; // Segurança
-
-        const dadosModo = bancoDeEscalas[categoria][modo];
-        
-        // Aqui a mágica de Teoria Musical Acontece. Mapeamos os indices somando ao Index Inicial da Nota Tom.
-        // O uso do % 12 (Módulo de 12) garante que se a matemática estourar a oitava (Ex: soma de B+D), ele volta a ler o índice 1 (Dó sustenido) perfeitamente!
-        const notasDaEscala = new Set(dadosModo.i.map(i => notasCromaticas[(rootIdx + i) % 12]));
-
-        // Empacotamos e enviamos tudo pronto pro renderizador trabalhar mais fácil
-        return { root: tom, rootIdx: rootIdx, notes: notasDaEscala, cagedOffset: dadosModo.c };
-    }
-
-    /**
-     * O ALGORITMO DE FAIXAS "CAGED"
-     * Funcionalidade: Extrai a matriz gigante de uma guitarra e retorna os pontos em Trastes [X, Y]
-     * de onde recortar perfeitamente para desenhar as 5 formas clássicas da guitarra ensinadas nas escolas.
-     */
-    function getPositionWindows(rootIdx, cagedOffset) {
-        // Primeiro, resolvemos o offset: Converte qualquer escala de volta para a sua escala "Irmã Maior"
-        // para conseguirmos aplicar a matemática do modelo CAGED original nela.
-        let relMajorIdx = (rootIdx + cagedOffset + 12) % 12;
-
-        // Procuramos matematicamente em qual traste a nota tônica se encontra especificamente na Sexta Corda Grossa (E-String)
-        // Isso é subtrair a diferença "E (Indice 4)" do nosso Root Index e tratar com o Módulo de 12.
-        let r = (relMajorIdx - 4 + 12) % 12;
-
-        // O Array Raw Windows. É uma lista com as coordenadas de inicio e fim (traste inicial e traste final) em que as 5 grandes posturas repousam na guitarra.
-        let rawWindows = [
-            [r - 1, r + 2],  // Forma do Modelo E (A tônica repousa no dedo indicador)
-            [r + 1, r + 5],  // Forma do Modelo D
-            [r + 4, r + 7],  // Forma do Modelo C (A tônica repousa no dedo mindinho)
-            [r + 6, r + 9],  // Forma do Modelo A
-            [r + 9, r + 12]  // Forma do Modelo G
-        ];
-
-        // Normalizador de Braço: Transpõe e corrige caixas que bateram os limites do número de trastes da nossa guitarra digital
-        let normalized = rawWindows.map(w => {
-            let [s, e] = w;
-
-            // Se o desenho de notas começar só lá na casa 13, nós subtraímos uma oitava inteira de ambas as réguas para exibir no comecinho do braço
-            if (s >= 12) { s -= 12; e -= 12; }
-
-            // Se a matemática devolveu uma caixa com Traste negativo (ex: Traste -2), é matematicamente invisível na guitarra real!
-            if (s < 0) {
-                // Se invadiu apenas um ou dois trastes negativamente, a gente trunca e manda ler a "Corda Solta" (Nut)
-                if (e >= 1) s = 0; 
-                // Se invadiu demais, a gente joga pro outro lado jogando pro final do braço somando uma oitava inteira
-                else { s += 12; e += 12; } 
-            }
-
-            // Uma última checagem de integridade (nunca devolver janela que inicia abaixo de 0)
-            if (s < 0) s = 0;
-            return [s, e];
-        });
-
-        // Limpeza de duplicados via Map Stringficado, convertendo Map em Array e reordenando do Traste Zero (Pestana) até o final do braço!
-        let uniqueMap = new Map();
-        normalized.forEach(w => uniqueMap.set(`${w[0]}-${w[1]}`, w));
-        let finalWindows = Array.from(uniqueMap.values()).sort((a, b) => a[0] - b[0]);
-
-        // Se o processo de limpeza engolir um dos blocos, damos Fallback pras fatias universais.
-        if (finalWindows.length < 5) finalWindows = [ [0,3], [2,5], [5,8], [7,10], [9,12] ];
-        
-        return finalWindows.slice(0, 5); // Retorna garantia cravada de envio de apenas 5 coordenadas
-    }
-
-    /**
-     * ========================================================================
-     * 7. ENGINE GERADORA DE EXERCÍCIOS ("Coreografia")
-     * ========================================================================
-     * Funcionalidade: Converte uma "Caixa CAGED" que era apenas um desenho estático,
-     * numa coreografia / lista serializada baseada em algoritmos predefinidos para 
-     * o motor de áudio conseguir palhetar em tempo linear as notas certas.
-     */
-    function generateExerciseData(diagramId, startFret, endFret, scaleData, exercicio, filtroCordas) {
-        
-        // Fase 1: Varredura Completa. 
-        // Passamos varrendo todas as 6 cordas verticalmente, e da casa A até B horizontalmente.
-        let baseNotes = [];
-        for (let s = 5; s >= 0; s--) { // De 5 (Corda Bordão E) a 0 (Corda mizinha aguda)
-            for (let f = startFret; f <= endFret; f++) {
-                let noteIdx = (afinacaoIndices[s] + f) % 12;
-                let note = notasCromaticas[noteIdx];
-                
-                // Se a nota atual sob exame não pertencer à Escala que o usuário quer... ignoramos! 
-                // Se pertencer, anexamos ao nosso array cru
-                if (scaleData.notes.has(note)) { 
-                    let pitch = openStringFreqs[s] * Math.pow(2, f / 12); // Pega a freq para ordenar com precisão científica depois
-                    baseNotes.push({ string: s, fret: f, id: `note-${diagramId}-${s}-${f}`, noteIdx: noteIdx, pitch: pitch });
-                }
-            }
-        }
-
-        // --- FASE 1.5: FILTRO DE CORDAS ---
-        // Exclui da coreografia as notas que estão fora das cordas requisitadas pelo novo Filtro
-        // Lembrete: O index lógico vai de 0 (Corda 1 Aguda) até 5 (Corda 6 Grave)
-        if (filtroCordas === '1-3') {
-            baseNotes = baseNotes.filter(n => n.string <= 2);
-        } else if (filtroCordas === '1-4') {
-            baseNotes = baseNotes.filter(n => n.string <= 3);
-        } else if (filtroCordas === '3-6') {
-            baseNotes = baseNotes.filter(n => n.string >= 2);
-        } else if (filtroCordas === '4-6') {
-            baseNotes = baseNotes.filter(n => n.string >= 3);
-        }
-
-        // Ordenação. Garante de forma brutal que a nota lida em index 0 seja sempre a mais grave da caixa.
-        baseNotes.sort((a, b) => a.pitch - b.pitch);
-        let exSeq = [];
-
-        // Fase 2: Roteamento de Padrões e Algoritmos.
-        // Cada If/Else constrói a Array exSeq (Exercise Sequence) aplicando manipulações cruas do Array Principal (baseNotes)
-
-        if (exercicio === "1") {
-            // Algoritmo Mais Básico: Copia o array todo + O reverso dele tirando apenas a última nota para não dar duplo click nela
-            exSeq = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
-        }
-        else if (exercicio === "2") {
-            // Alternated Picking x2: Roda tudo de novo, mas empurra a nota no array duas vezes seguidas
-            let upDown = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
-            upDown.forEach(n => { exSeq.push(n, n); });
-        }
-        else if (exercicio === "3") {
-            let upDown = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
-            upDown.forEach(n => { exSeq.push(n, n, n); });
-        }
-        else if (exercicio === "4") {
-            // Sincopado 3x3: Usa Loops For para ir pulando de 3 em 3 chaves do array original [A, B, C], depois [B, C, D]
-            for (let i = 0; i < baseNotes.length - 2; i++) exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2]);
-            let rev = [...baseNotes].reverse();
-            for (let i = 0; i < rev.length - 2; i++) exSeq.push(rev[i], rev[i+1], rev[i+2]);
-        }
-        else if (exercicio === "5") {
-            // Sincopado 4x4 (Aranha Clássica da Guitarra 1-2-3-4)
-            for (let i = 0; i < baseNotes.length - 3; i++) exSeq.push(baseNotes[i], baseNotes[i+1], baseNotes[i+2], baseNotes[i+3]);
-            let rev = [...baseNotes].reverse();
-            for (let i = 0; i < rev.length - 3; i++) exSeq.push(rev[i], rev[i+1], rev[i+2], rev[i+3]);
-        }
-        else if (exercicio === "6") {
-            // Pulos de Terça Matemáticos: Pega a nota, pula a intermediária da escala e vai pra que estaria no indice +2 da lista
-            for (let i = 0; i < baseNotes.length - 2; i++) exSeq.push(baseNotes[i], baseNotes[i+2]);
-            let rev = [...baseNotes].reverse();
-            for (let i = 0; i < rev.length - 2; i++) exSeq.push(rev[i], rev[i+2]);
-        }
-        else if (exercicio === "7") {
-            // Arpejos Tríades Específicos: Usamos filtro isolando os intervalos puros em Modulo (Base = 0, Maior=4/Menor=3, Quinta=7)
-            let filtered = baseNotes.filter(n => { return [0, 3, 4, 6, 7, 8].includes((n.noteIdx - scaleData.rootIdx + 12) % 12); });
-            exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
-        }
-        else if (exercicio === "8") {
-            // Tétrades (Acordes com 7ª e/ou diminutos agregados)
-            let filtered = baseNotes.filter(n => { return [0, 3, 4, 6, 7, 8, 9, 10, 11].includes((n.noteIdx - scaleData.rootIdx + 12) % 12); });
-            exSeq = [...filtered, ...[...filtered].reverse().slice(1)];
-        }
-        else if (exercicio === "9") {
-            // Salto de Cordas. Em vez de avançar na array, ordenamos o motor ler a Array 6 inteira, Pular para Array 4 inteira e etc.
-            let stringPattern = [5, 3, 4, 2, 3, 1, 2, 0];
-            stringPattern.forEach(sIndex => { exSeq.push(...baseNotes.filter(n => n.string === sIndex)); });
-            let revPattern = [0, 2, 1, 3, 2, 4, 3, 5];
-            revPattern.forEach(sIndex => { exSeq.push(...baseNotes.filter(n => n.string === sIndex).reverse()); });
-        }
-
-        // Catch Seguro de Prevenção: Caso o algoritmo filtre tanto que corte tudo, devolve a escala crua por segurança
-        if (exSeq.length === 0) exSeq = [...baseNotes, ...[...baseNotes].reverse().slice(1)];
-
-        // O renderizador de DOM só quer saber quais LEDs de bolinhas ele precisa desenhar na tela, por isso retornamos um Objeto "Set" com IDs únicos
-        let activeNoteIds = new Set(exSeq.map(n => n.id));
-        
-        // Empacota e retorna
-        return { sequence: exSeq, activeNoteIds: activeNoteIds };
-    }
-
-    /**
-     * ========================================================================
-     * 8. ENGINE DE RENDERIZAÇÃO DO DOM HTML DA GUITARRA FÍSICA
-     * ========================================================================
-     * Funcionalidade: Constrói dinamicamente e com extrema perfomance todo o Grid HTML 
-     * posicionando trastes e marcadores da caixa exigida, baseando-se apenas em loopings (X, Y).
-     */
-    function renderGuitarFretboard(diagramId, startFret, endFret, scaleData, showTuningLabels, numberPos, activeNoteIds) {
-        
-        let html = `<div id="diagram-${diagramId}" class="flex flex-col transition-opacity duration-300">`;
-
-        // Lógica de Responsividade Interna: Grid CSS Dinâmico.
-        // Calculamos os espaçamentos dinamicamente aqui no Javascript e inserimos no atributo `style=""`
-        let gridCols = startFret === 0 ? '40px ' : ''; // O Pestana(Nut)/Casa 0 tem largura fixa
-        // Estratégia Dupla: Escala principal recebe larguras relativas flúidas (1fr), CAGED recebem fixa rígida (3.5rem)
-        let colWidth = diagramId === 'main' ? 'minmax(0, 1fr)' : '3.5rem';
-        for(let f = (startFret === 0 ? 1 : startFret); f <= endFret; f++) gridCols += `${colWidth} `;
-
-        // Régua Numérica do Topo (Se solicitada)
-        if (numberPos === 'top') {
-            html += `<div class="flex mb-1">`;
-            if (showTuningLabels) html += `<div class="w-[35px] flex-shrink-0"></div>`; // Margem para compensar o label
-            html += `<div class="flex-1 grid" style="grid-template-columns: ${gridCols};" dir="ltr">`;
-            // Itera traste por traste inserindo os números (Ex: 0, 1, 2...)
-            for (let f = startFret; f <= endFret; f++) {
-                let isTarget = f === 5 || f === 12; // Destaca visualmente as casas 5 e 12 com negrito mais proeminente
-                let textCls = isTarget ? 'font-bold text-[1.1rem] text-black' : 'text-sm text-gray-500';
-                html += `<div class="text-center flex items-center justify-center ${textCls}">${f}</div>`;
-            }
-            html += `</div></div>`;
-        }
-
-        html += `<div class="flex">`;
-
-        // Painel Lateral (As bolinhas flutuantes com o E, A, D, G... das cordas soltas puras)
-        if (showTuningLabels) {
-            html += `<div class="w-[35px] flex-shrink-0 grid" style="grid-template-rows: repeat(6, 1fr);" dir="ltr">`;
-            for (let s = 0; s < 6; s++) {
-                let openNote = notasCromaticas[afinacaoIndices[s]];
-                html += `<div class="flex items-center justify-center"><div class="tuning-dot">${openNote}</div></div>`;
-            }
-            html += `</div>`;
-        }
-
-        // O CORPO PRINCIPAL DO BRAÇO DA GUITARRA (A Malha X, Y / Cordas vs Trastes)
-        html += `<div class="flex-1 grid border-t border-b border-gray-600 bg-white shadow-sm" style="grid-template-columns: ${gridCols}; grid-template-rows: repeat(6, 1fr);" dir="ltr">`;
-
-        for (let s = 0; s < 6; s++) {
-            for (let f = startFret; f <= endFret; f++) {
-                // Matemática de Identificação e Posição da Nota sob Exame na Célula
-                let noteIdx = (afinacaoIndices[s] + f) % 12;
-                let note = notasCromaticas[noteIdx];
-                let isScale = scaleData.notes.has(note); 
-                let isRoot = note === scaleData.root;    
-
-                // CSS Injetável (Define quem tem borda grossa, fina, onde tá a pestana ou se tem marcação padrão bg-200)
-                let bgCls = (f === 0 || f === 12) ? 'bg-gray-200' : '';
-                let borderCls = 'border-l border-gray-400'; // Borda padrão
-
-                // Overrides de borda física do braço
-                if (f === 0) borderCls = 'border-l-8 border-gray-500';
-                if (f === startFret && f !== 0) borderCls = 'border-l-2 border-gray-500';
-                if (f === endFret) borderCls += ' border-r border-gray-600';
-
-                // Injecção de Célula Vazia de Traste (Com um risco "arame" atravessando o div pela classe string-line)
-                html += `<div class="fret-cell ${bgCls} ${borderCls} flex items-center justify-center min-h-[38px]"><div class="string-line"></div>`;
-
-                // Sub-Bloco: Renderização das Bolinhas e Notas 
-                if (isScale) {
-                    let noteId = `note-${diagramId}-${s}-${f}`;
-                    // Valida se a nota sob análise não apenas percente à teoria da escala, mas é requisitada na listagem de "ActiveNotes" desenhada pelos Algoritmos de Exercícios. Ex: C, D, E.
-                    let isActive = activeNoteIds && activeNoteIds.has(noteId);
-
-                    // Estilização base do ponto
-                    let bgDot = 'bg-gray-300 text-gray-500 border border-gray-400';
-                    if (isActive) bgDot = isRoot ? 'bg-red-600' : 'bg-black'; // Hierarquia de Tônica Vermelha
-
-                    // Finalmente, injeta a bolinha em html!
-                    html += `<div id="${noteId}" class="note-dot ${bgDot}">${note}</div>`;
-                }
-                html += `</div>`; // Fechamento Célula do Traste
-            }
-        }
-        html += `</div></div>`; // Fechamentos Braço
-
-        // Régua Numérica Secundária Inferior (Técnica replicada da superior)
-        if (numberPos === 'bottom') {
-            html += `<div class="flex mt-1">`;
-            if (showTuningLabels) html += `<div class="w-[35px] flex-shrink-0"></div>`;
-            html += `<div class="flex-1 grid" style="grid-template-columns: ${gridCols};" dir="ltr">`;
-            for (let f = startFret; f <= endFret; f++) {
-                let isTarget = f === 5 || f === 12;
-                let textCls = isTarget ? 'font-bold text-sm text-black' : 'text-xs text-gray-500';
-                html += `<div class="text-center flex items-center justify-center ${textCls}">${f}</div>`;
-            }
-            html += `</div></div>`;
-        }
-
-        html += `</div>`;
-        return html; // Retorna todo esse gigantesco código processado de volta na String
-    }
-
-    /**
-     * ========================================================================
-     * 9. REPRODUTOR TEMPORAL E MODO DESAFIO (SEQUENCER)
-     * ========================================================================
-     */
-
-    // Função auxiliar que varre a classe de Efeito Neon de Brilho da nota do Tick atual 
-    function clearPlaybackHighlight() {
-        if (playbackState.lastHighlightedNote) {
-            let el = document.getElementById(playbackState.lastHighlightedNote);
-            if (el) el.classList.remove('playing-note');
-            playbackState.lastHighlightedNote = null;
-        }
-    }
-
-    // Funcionalidade de Parada Completa Assíncrona e Global (Zera todos os estados estéticos dos botões das outras casinhas)
-    function stopPlayback() {
-        if (playbackState.timeoutId) clearTimeout(playbackState.timeoutId);
-        
-        // UX: Se o utilizador clicou em Stop durante a contagem de 3,2,1... Abortar tudo!
-        if (playbackState.countdownIntervalId) {
-            clearInterval(playbackState.countdownIntervalId);
-            playbackState.countdownIntervalId = null;
-        }
-        
-        // Fecha/Oculta o balão de contagem se estiver aberto
-        const overlay = document.getElementById('countdown-overlay');
-        if (overlay) overlay.classList.add('hidden');
-        
-        clearPlaybackHighlight();
-
-        // Se por acaso estávamos em modo Gamificação Severa, removemos a class CSS Global da área
-        document.querySelectorAll('[id^="diagram-"]').forEach(el => el.classList.remove('challenge-hide-notes'));
-
-        // Reset Estético e Funcional: Mapeia de volta todos os botões da tela para "Tocar" Azul
-        document.querySelectorAll('[id^="btn-play-"]').forEach(btn => {
-            btn.querySelector('.icon-play').classList.remove('hidden');
-            btn.querySelector('.icon-stop').classList.add('hidden');
-            let textEl = btn.querySelector('.btn-text');
-            if (textEl) {
-                let isMain = btn.id === 'btn-play-main';
-                textEl.innerText = isMain ? t('btn_play_full') : t('btn_play');
-                textEl.dataset.originalText = textEl.innerText;
-            }
-            btn.classList.replace('bg-red-50', 'bg-blue-50');
-            btn.classList.replace('text-red-700', 'text-blue-700');
-            btn.classList.replace('border-red-200', 'border-blue-200');
-        });
-
-        playbackState.playing = false;
-        playbackState.diagramId = null;
-    }
-
-    /**
-     * O Loop do Reprodutor Musical (Mecanismo Sintetizador).
-     * Atenção DEV Jr: Ao invés de usarmos `setInterval()` do Javascript, usamos a técnica de 
-     * recursividade mútua com o `setTimeout`. Por quê? Porque se o usuário alterar a VELOCIDADE BPM 
-     * no meio da música rodando, a próxima "puxada" de SetTimeout irá instantaneamente absorver o 
-     * novo timing milissegundos matematicamente, sem dessincronizar.
-     */
-    function playNextNote() {
-        if (!playbackState.playing) return; // Disjuntor Catcher de Segurança
-
-        let seq = playbackState.sequence;
-        
-        // Bloqueio vital de segurança: Se a escala/caixa não possui NENHUMA nota naquelas cordas filtradas... Aborta!
-        if (!seq || seq.length === 0) {
-            stopPlayback();
-            return;
-        }
-
-        // Bumper de Conclusão. Bateu no limite da array? Zera o índice e incrementa os Ciclos (Contador de Gamificação)
-        if (playbackState.currentIndex >= seq.length) {
-            playbackState.currentIndex = 0;
-            playbackState.cycleCount++;
-
-            // ==== LÓGICA AUTO INCREMENTO DE VELOCIDADE (SPEED TRAINER) ====
-            // Funcionalidade: Aumenta em 10 BPM automaticamente cada vez que a escala completa X ciclos!
-            const autoBpmToggle = document.getElementById('auto-bpm-toggle');
-            if (autoBpmToggle && autoBpmToggle.checked) {
-                const cyclesTarget = parseInt(document.getElementById('auto-bpm-cycles').value) || 1;
-                // Exemplo: Se o alvo é 2x. Na volta 2, 4, 6... o resto da divisão por 2 será 0, triggando o aumento.
-                if (playbackState.cycleCount % cyclesTarget === 0) {
-                    const currentBpm = parseInt(document.getElementById('bpm').value) || 120;
-                    if (currentBpm < 300) changeBPM(10); // Usa a função existente para somar +10 e atualizar a UI instantaneamente
-                }
-            }
-        }
-
-        clearPlaybackHighlight();
-
-        // ==== LÓGICA MODO DESAFIO (GAMIFICAÇÃO DE DIFICULDADE PROGRESSIVA) ====
-        let isChallengeOn = document.getElementById('desafio').checked;
-        // Só aplica Desafio Extremo Cego aos recortes CAGED menores para treino de memória digital específica.
-        let isPositionDiagram = playbackState.diagramId && playbackState.diagramId.startsWith('pos-');
-
-        // Módulo da Fase Ciclo: Limita o ciclo matemático de 0 a 11. Bateu 12, reseta a lógica toda ao nível Fácil!
-        let cyclePhase = isChallengeOn && isPositionDiagram ? (playbackState.cycleCount % 12) : 0;
-        
-        // Fase Dificil Nível 1: (Ciclos de Volta entre a 9 e a 10) = Sem luz guiada para forçar o foco.
-        let hideHighlight = cyclePhase >= 8;
-        // Fase Extremamente Difícil: (Últimos ciclos) = Fica tudo opaco cego (invisível) exigindo ouvir e digitar da memória visual cerebral
-        let hideNotes = cyclePhase >= 10;
-
-        // Manipula dinamicamente a propriedade opacity das classes filhas baseados na string ID principal do diagrama ativado
-        let diagramEl = document.getElementById(`diagram-${playbackState.diagramId}`);
-        if (diagramEl) {
-            if (hideNotes) diagramEl.classList.add('challenge-hide-notes'); 
-            else diagramEl.classList.remove('challenge-hide-notes');
-        }
-
-        // Pega os dados brutos da Nota Atual pela Array Serializada
-        let currentNote = seq[playbackState.currentIndex];
-        let noteEl = document.getElementById(currentNote.id);
-        
-        // Executa a injeção do Efeito de Brilho caso não estivesse bloqueado pelas regras cruéis da gamificação acima
-        if (noteEl && !hideHighlight && !hideNotes) {
-            noteEl.classList.add('playing-note');
-            playbackState.lastHighlightedNote = currentNote.id; // Guarda este cara pro JS apagá-lo na próxima recursão
-        }
-
-        // Dá o play sonoro físico através do sintetizador!
-        playPluck(currentNote.string, currentNote.fret);
-        playbackState.currentIndex++; // Move a catraca em +1 nota a ser processada pela música!
-
-        // Conversão física de Ritmo Base e Fórmula Musical 
-        let bpm = parseInt(document.getElementById('bpm').value) || 120;
-        let msPerBeat = 60000 / bpm; // Exemplo didático: Dividir 60000(1 minuto em ms) por 60 BPM = 1 Batida a cada exatos 1000 milissegundos.
-
-        // Empurra na callstack do Threading Javascript pra me chamar de novo sem travar o processamento paralelo UI!
-        playbackState.timeoutId = setTimeout(playNextNote, msPerBeat);
-    }
-    
-    /**
-     * UX/UI Funcionalidade: A Contagem Regressiva para posicionar a mão!
-     * Cria um Loop de 1 em 1 segundo e no fim invoca o Callback que é o Reprodutor Musical (playNextNote)
-     */
-    function startCountdown(callback) {
-        const overlay = document.getElementById('countdown-overlay');
-        const numberEl = document.getElementById('countdown-number');
-        let count = 3; // Valor inicial
-        
-        numberEl.innerText = count + '..'; // Atualiza número no html
-        overlay.classList.remove('hidden'); // Exibe a tela preta com transparência
-
-        playbackState.countdownIntervalId = setInterval(() => {
-            count--; // Decrementa
-            
-            if (count > 0) {
-                numberEl.innerText = count + '..';
-            } else {
-                // Ao chegar em 0, limpamos as memórias dos loops
-                clearInterval(playbackState.countdownIntervalId);
-                playbackState.countdownIntervalId = null;
-                overlay.classList.add('hidden'); // Escondemos o ecrã
-                
-                // Se o utilizador não desistiu a meio e clicou em Parar, invocamos o start do aúdio!
-                if (playbackState.playing) {
-                    callback();
-                }
-            }
-        }, 1000); // 1000 milissegundos = 1 segundo cravado
-    }
-
-    /**
-     * Função Inicializadora atrelada às funções onclick do HTML de cada botãosinho CAGED Play
-     */
-    function togglePlay(diagramId, startFret, endFret) {
-        let scaleData = getScaleData();
-        if (!scaleData) return; // Dropdowns vazios previnem crashs
-
-        // Sistema de Toggle (Disjuntor inteligente): Se eu cliquei no botão que já é o que tá rodando no Playstate, eu o desligo!
-        if (playbackState.playing && playbackState.diagramId === diagramId) {
-            stopPlayback();
-        } else {
-            // Se eu estava em 1 braço e cliquei num segundo braço diferente, eu desligo tudo à força primeiramente
-            stopPlayback();
-            
-            // Populo o State Tree com a lista pre-calculada daquele botão
-            playbackState.diagramId = diagramId;
-            playbackState.sequence = playbackState.sequences[diagramId] || [];
-            playbackState.currentIndex = 0;
-            playbackState.cycleCount = 0; 
-            playbackState.playing = true; // Sinaleiro Verde de Processamento Ativo
-
-            // Retorno à visualidade forçada contra quebra por gamificação
-            let diagramEl = document.getElementById(`diagram-${diagramId}`);
-            if (diagramEl) diagramEl.classList.remove('challenge-hide-notes');
-
-            // Substituição bruta via DOM puro das classes e SVGs (Transição de Azul Tocar -> Vermelho Parar)
-            let btn = document.getElementById(`btn-play-${diagramId}`);
-            btn.querySelector('.icon-play').classList.add('hidden');
-            btn.querySelector('.icon-stop').classList.remove('hidden');
-            let textEl = btn.querySelector('.btn-text');
-            if (textEl) {
-                textEl.dataset.originalText = textEl.innerText;
-                textEl.innerText = t('btn_stop');
-            }
-            btn.classList.replace('bg-blue-50', 'bg-red-50');
-            btn.classList.replace('text-blue-700', 'text-red-700');
-            btn.classList.replace('border-blue-200', 'border-red-200');
-
-            initAudio();    // Acorda o browser sonoro e quebra policy locks do Autoplay 
-            
-            // Em vez de dispararmos imediatamente o 'playNextNote()', redirecionamos o fluxo
-            // pela barreira de Contagem Regressiva para o aluno posicionar as mãos.
-            startCountdown(() => {
-                playNextNote(); // Dispara o laço principal temporal recursivo
-            });
-        }
-    }
-
-    /**
-     * ========================================================================
-     * 10. RECONSTRUTOR GLOBAL CORE E SINCRONIZADOR UI
-     * ========================================================================
-     * Funcionalidade: Função vital. Chamada religiosamente sempre que o usuário 
-     * altera algum campo na barra de ferramentas master ou linguagem.
-     * Atenção DEV Jr: A técnica aqui é a "Reatividade Bruta". É muito mais limpo apagar 
-     * TODO o HTML da tela e redesenhar do zero do que tentar criar funções super complexas 
-     * apenas para "atualizar" as cores/trastes das divs que já existem em memória. 
-     */
-    function updateUI() {
-        stopPlayback(); // O usuário mudou de ideia visual, aborta qualquer ruído.
-
-        const scaleData = getScaleData(); // Requisita o DNA Matemático
-        if (!scaleData) return; 
-
-        const exercicioId = document.getElementById('exercicio').value;
-        const filtroCordas = document.getElementById('filtro-cordas').value; // Puxa o valor do novo filtro
-        playbackState.sequences = {};
-
-        // Injeta os inputs no Algoritmo CAGED que retorna estritamente a posição dos 5 boxes na guitarra inteira.
-        const windows = getPositionWindows(scaleData.rootIdx, scaleData.cagedOffset);
-
-        // ============================================================
-        // Passo 1: Construir Escala Principal Gigante (Main Fretboard)
-        // ============================================================
-        let mainFullSequence = [];
-        let mainActiveIds = new Set();
-
-        // Passa rodando um ForEach pelos 5 blocos minúsculos extraídos, pede que eles construam o Exercício 
-        // e vão juntando/unindo as strings deles como pecinhas de Lego pra formar o som linear do braço gigante
-        windows.forEach((win, index) => {
-            let data = generateExerciseData('main', win[0], win[1], scaleData, exercicioId, filtroCordas);
-            mainFullSequence = mainFullSequence.concat(data.sequence); // Concatenação Pura
-            data.activeNoteIds.forEach(id => mainActiveIds.add(id));
-        });
-
-        // Grava no StateTree pra servir o Motor do Syntetizer 
-        playbackState.sequences['main'] = mainFullSequence;
-
-        const mainFretboard = document.getElementById('main-fretboard');
-        // Renderiza tudo no motor DOM injetando string literal como div (Traste Fixo 0 a 15 de tamanho físico da App Visual)
-        mainFretboard.innerHTML = renderGuitarFretboard('main', 0, 15, scaleData, false, 'bottom', mainActiveIds);
-
-        // ============================================================
-        // Passo 2: Construir Células Menores do Sistema CAGED Dinâmico
-        // ============================================================
-        const positionsContainer = document.getElementById('positions-container');
-        positionsContainer.innerHTML = ''; // Esvazia o Flexbox Central antes de adicionar.
-
-        // Itera criando as 5 caixinhas HTML individualmente
-        windows.forEach((win, index) => {
-            let [start, end] = win; // Desestrutura a matriz bidimensional em 2 inteiros (Start Traste / End Traste)
-            let diagId = `pos-${index}`; // Um ID único como Hash do objeto DOM gerado
-
-            // Extrai a coreografia da Caixa Específica Menor passando o filtro
-            let data = generateExerciseData(diagId, start, end, scaleData, exercicioId, filtroCordas);
-            playbackState.sequences[diagId] = data.sequence;
-
-            let positionWrapper = document.createElement('div');
-            positionWrapper.className = 'flex flex-col';
-
-            // Monta cabeçalhos da Caixinha (Botão Play Independente Miniaturizado + Título Posição)
-            let headerDiv = document.createElement('div');
-            headerDiv.className = 'flex items-center justify-center gap-2 mb-2';
-            headerDiv.innerHTML = `
-                <button id="btn-play-${diagId}" onclick="togglePlay('${diagId}', ${start}, ${end})" class="flex items-center justify-center bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors flex-shrink-0" style="width: 22px; height: 22px;" title="${t('btn_play')}">
-                    <svg class="icon-play" style="width: 11px; height: 11px; margin-left: 1.5px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
-                    <svg class="icon-stop hidden" style="width: 11px; height: 11px;" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5h10v10H5z"></path></svg>
-                </button>
-                <span class="text-xs md:text-sm font-semibold text-gray-700 whitespace-nowrap">${t('position')} ${index + 1} (${t('frets')} ${start}-${end})</span>
-            `;
-
-            // Envia comando e monta Div Pura de Fretboard passando False no Label de Afinação pra não exibir A,E,D de novo fora do braço
-            let fretboardDiv = document.createElement('div');
-            fretboardDiv.innerHTML = renderGuitarFretboard(diagId, start, end, scaleData, false, 'bottom', data.activeNoteIds);
-
-            positionWrapper.appendChild(headerDiv);
-            positionWrapper.appendChild(fretboardDiv);
-
-            // Injeta Fisicamente no Document Object Model HTML!
-            positionsContainer.appendChild(positionWrapper);
-        });
-    }
-
-    /**
-     * ========================================================================
-     * 11. TRIGGERS / EVENT LISTENERS GLOBAIS DE USUÁRIO
-     * ========================================================================
-     */
-    
-    // Escuta as alterações nos <select> invisíveis. Quando mexem via touch ou click, ele atualiza 
-    // a <span> estética falsa logo embaixo (O famoso truque Select Overlay UI) e invoca Reconstrução do Motor (updateUI).
-    document.getElementById('tom').addEventListener('change', function() {
-        document.getElementById('tom-display').innerText = this.options[this.selectedIndex].text;
-        updateUI();
-    });
-    
-    document.getElementById('escala').addEventListener('change', function() {
-        document.getElementById('escala-display').innerText = this.options[this.selectedIndex].text;
-        atualizarModos(true); // Se ele mexeu em Categoria Escala, eu OBRIGATORIAMENTE tenho que recalcular e destruir os Modos Gregos primeiro
-    });
-    
-    document.getElementById('modo').addEventListener('change', function() {
-        document.getElementById('modo-display').innerText = this.options[this.selectedIndex].text;
-        updateUI();
-    });
-    
-    // No caso do Exercício, ele é alimentado com o dataset.short (O texto curto criado pela Função getShortExText)
-    document.getElementById('exercicio').addEventListener('change', function() {
-        document.getElementById('exercicio-display').innerText = this.options[this.selectedIndex].dataset.short;
-        updateUI();
-    });
-
-    // Escuta do NOVO combo de Filtro de Cordas
-    document.getElementById('filtro-cordas').addEventListener('change', function() {
-        document.getElementById('cordas-display').innerText = this.options[this.selectedIndex].text;
-        updateUI();
-    });
-
-    // Impede via validação on-input que algum usuário engasgue a memória tentando botar "4000 BPM" manual de Velocidade
-    document.getElementById('bpm').addEventListener('input', function() {
-        if (this.value < 40) this.value = 40;
-        if (this.value > 300) this.value = 300;
-    });
-
-    // Escuta do Slider de Volume Mestre
-    document.getElementById('volume-slider').addEventListener('input', function(e) {
-        // Converte a barra de 0 a 100 para o ganho decimal 0.0 a 1.0 que a AudioAPI exige
-        let val = parseInt(e.target.value);
-        // Fallback de segurança: se o slider falhar, recua para 80% do volume para nunca mutar acidentalmente
-        if (isNaN(val)) val = 80; 
-        globalVolume = val / 100;
-    });
-
-    // Sub-Controles de Click Dinâmico para alterar a Velocidade BPM por cliques de botões (+10 / -10)
-    function changeBPM(amount) {
-        const bpmInput = document.getElementById('bpm');
-        let currentVal = parseInt(bpmInput.value) || 120;
-        let newVal = currentVal + amount;
-        if (newVal < 40) newVal = 40;
-        if (newVal > 300) newVal = 300;
-        bpmInput.value = newVal; // Aplica modificação visual instantânea. A próxima leitura de loop do áudio já capturará esse ID no meio da música!
-    }
-    document.getElementById('btn-bpm-minus').addEventListener('click', () => changeBPM(-10));
-    document.getElementById('btn-bpm-plus').addEventListener('click', () => changeBPM(10));
-
-    // Lógica UI do Auto BPM (Ativa/Desativa esteticamente o select de ciclos)
-    document.getElementById('auto-bpm-toggle').addEventListener('change', function() {
-        const selectEl = document.getElementById('auto-bpm-cycles');
-        const arrowEl = document.getElementById('auto-bpm-arrow');
-        if (this.checked) {
-            selectEl.disabled = false;
-            selectEl.classList.remove('opacity-50', 'cursor-not-allowed');
-            arrowEl.classList.remove('opacity-30');
-            arrowEl.classList.add('opacity-100');
-        } else {
-            selectEl.disabled = true;
-            selectEl.classList.add('opacity-50', 'cursor-not-allowed');
-            arrowEl.classList.remove('opacity-100');
-            arrowEl.classList.add('opacity-30');
-        }
-    });
-
-    /**
-     * ========================================================================
-     * INIT APP (BOOT INITIALIZATION)
-     * ========================================================================
-     */
-    function initApp() { 
-        // 1. Auto-Detecção de Idioma do Browser
-        // Funcionalidade: Tenta capturar o idioma do sistema (ex: "pt-BR" ou "en-US") e extrai apenas a base "pt" / "en"
-        const userLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-        
-        // Se a linguagem do utilizador existir no nosso dicionário restrito, alteramos o estado global ANTES de pintar o ecrã!
-        if (i18n[userLang] && langMetadata[userLang]) {
-            currentLang = userLang;
-        }
-
-        // Constrói o menu dinâmico de linguagens para injetar matematicamente os SVGs
-        const langListEl = document.getElementById('lang-menu-list');
-        langListEl.innerHTML = '';
-        Object.keys(langMetadata).forEach(code => {
-            const btn = document.createElement('a');
-            btn.href = '#';
-            btn.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors';
-            btn.innerHTML = `${langMetadata[code].svg} <span>${langMetadata[code].name}</span>`;
-            btn.onclick = (e) => { e.preventDefault(); setLang(code, langMetadata[code].name); };
-            langListEl.appendChild(btn);
-        });
-
-        // Configura o botão superior imediatamente com a bandeira carregada
-        document.getElementById('current-flag').innerHTML = langMetadata[currentLang].svg;
-        document.getElementById('current-lang-name').innerText = langMetadata[currentLang].name;
-
-        // 2. O primeiro boot precisa que a arquitetura leia a língua que está escrita, monte os Selects e finalmente pinte as guitarras
-        applyLanguage(); 
-    }
-    
-    initApp(); // Sobe o sistema silenciosamente aguardando o clique do usuário
-</script>
 </body>
 </html>
