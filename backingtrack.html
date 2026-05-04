@@ -1,0 +1,25 @@
+<div id="bt-modal" class="hidden transition-opacity duration-300" style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); z-index: 1000;" dir="ltr">
+    <div class="bg-white rounded-lg shadow-xl max-w-[95%] md:max-w-xl w-full max-h-[90vh] overflow-y-auto relative p-6 border border-gray-200">
+        <button type="button" id="close-bt-btn" class="absolute text-gray-500 hover:text-gray-800 focus:outline-none transition-colors cursor-pointer" style="top: 1rem; right: 1rem; width: 24px; height: 24px;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        
+        <h2 class="text-xl font-bold text-blue-700 mb-2 border-b border-gray-200 pb-2" data-i18n="bt_modal_title">Ideia de Harmonia</h2>
+        <p class="text-gray-600 text-sm mb-4" data-i18n="bt_modal_text">Grave ou procure por uma Backing Track (Trilha de Fundo) com os seguintes acordes para improvisar perfeitamente em cima desta escala:</p>
+        
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4 text-center mb-2">
+            <p id="bt-chords" class="text-2xl font-bold tracking-widest text-blue-800">C | F | G</p>
+        </div>
+        
+        <p id="bt-desc" class="text-center text-sm font-medium text-gray-700 bg-gray-100 py-2 rounded shadow-sm mb-6">Estilo: Pop / Rock</p>
+
+        <!-- SECÇÃO DO CAMPO HARMÔNICO -->
+        <div id="bt-harmonic-section" class="mt-6 hidden">
+            <h3 class="text-lg font-bold text-blue-700 mb-2 border-b border-gray-200 pb-1" data-i18n="lbl_harmonic_field">Campo Harmônico</h3>
+            <div id="bt-harmonic-field" class="text-sm text-gray-700">
+                <!-- A tabela de acordes gerada pelo backingtrack.js entrará aqui -->
+            </div>
+        </div>
+
+    </div>
+</div>

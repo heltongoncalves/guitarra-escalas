@@ -2,8 +2,6 @@
  * ========================================================================
  * SEQUENCIADOR E ANIMAÇÕES MUSICAIS (PLAYBACK)
  * ========================================================================
- * Responsabilidade: Manter o estado da música (a tocar/parada),
- * gerir a árvore temporal (`setTimeout`) e a animação neon nas notas.
  */
 
 let playbackState = {
@@ -47,11 +45,13 @@ function stopPlayback() {
         let textEl = btn.querySelector('.btn-text');
         if (textEl) {
             let isMain = btn.id === 'btn-play-main';
-            textEl.innerText = isMain ? t('btn_play_full') : t('btn_play');
+            textEl.innerText = isMain ? (typeof t === 'function' ? t('btn_play_full') : 'Tocar Escala Completa') : (typeof t === 'function' ? t('btn_play') : 'Tocar');
         }
-        btn.classList.replace('bg-red-50', 'bg-blue-50');
-        btn.classList.replace('text-red-700', 'text-blue-700');
-        btn.classList.replace('border-red-200', 'border-blue-200');
+        
+        // Volta para a cor cinza metálica quando a música para
+        btn.classList.replace('bg-red-50', 'bg-gray-100');
+        btn.classList.replace('text-red-700', 'text-gray-800');
+        btn.classList.replace('border-red-200', 'border-gray-300');
     });
 
     playbackState.playing = false;
@@ -77,7 +77,7 @@ function playNextNote() {
             const cyclesTarget = parseInt(document.getElementById('auto-bpm-cycles').value) || 1;
             if (playbackState.cycleCount % cyclesTarget === 0) {
                 const currentBpm = parseInt(document.getElementById('bpm').value) || 120;
-                if (currentBpm < 300) changeBPM(10); 
+                if (currentBpm < 300 && typeof changeBPM === 'function') changeBPM(10); 
             }
         }
     }
@@ -106,7 +106,6 @@ function playNextNote() {
         playbackState.lastHighlightedNote = currentNote.id; 
     }
 
-    // Chama o módulo de audio.js
     if (typeof playPluck === 'function') {
         playPluck(currentNote.string, currentNote.fret);
     }
@@ -145,7 +144,7 @@ function startCountdown(callback) {
 }
 
 function togglePlay(diagramId, startFret, endFret) {
-    let scaleData = getScaleData();
+    let scaleData = typeof getScaleData === 'function' ? getScaleData() : null;
     if (!scaleData) return; 
 
     if (playbackState.playing && playbackState.diagramId === diagramId) {
@@ -167,11 +166,13 @@ function togglePlay(diagramId, startFret, endFret) {
         btn.querySelector('.icon-stop').classList.remove('hidden');
         let textEl = btn.querySelector('.btn-text');
         if (textEl) {
-            textEl.innerText = t('btn_stop');
+            textEl.innerText = typeof t === 'function' ? t('btn_stop') : 'Parar';
         }
-        btn.classList.replace('bg-blue-50', 'bg-red-50');
-        btn.classList.replace('text-blue-700', 'text-red-700');
-        btn.classList.replace('border-blue-200', 'border-red-200');
+        
+        // Fica com fundo vermelho enquanto toca
+        btn.classList.replace('bg-gray-100', 'bg-red-50');
+        btn.classList.replace('text-gray-800', 'text-red-700');
+        btn.classList.replace('border-gray-300', 'border-red-200');
 
         if (typeof initAudio === 'function') initAudio();    
         

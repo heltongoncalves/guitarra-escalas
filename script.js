@@ -2,8 +2,6 @@
  * ========================================================================
  * CONTROLADOR CENTRAL E BOOT (MAIN SCRIPT)
  * ========================================================================
- * Responsabilidade: Orquestrar a inicialização (Boot) da aplicação e atuar 
- * como elo de ligação atualizando as UI quando as regras musicais mudam.
  */
 
 function updateUI() {
@@ -30,10 +28,10 @@ function updateUI() {
     if (typeof playbackState !== 'undefined') playbackState.sequences['main'] = mainFullSequence;
 
     const mainFretboard = document.getElementById('main-fretboard');
-    mainFretboard.innerHTML = renderGuitarFretboard('main', 0, 15, scaleData, false, 'bottom', mainActiveIds);
+    if (mainFretboard) mainFretboard.innerHTML = renderGuitarFretboard('main', 0, 15, scaleData, false, 'bottom', mainActiveIds);
 
     const positionsContainer = document.getElementById('positions-container');
-    positionsContainer.innerHTML = ''; 
+    if (positionsContainer) positionsContainer.innerHTML = ''; 
 
     windows.forEach((win, index) => {
         let [start, end] = win; 
@@ -47,8 +45,10 @@ function updateUI() {
 
         let headerDiv = document.createElement('div');
         headerDiv.className = 'flex items-center justify-center gap-2 mb-2';
+        
+        // Pílulas e botões com as novas cores cinza metálicas (gray-100)
         headerDiv.innerHTML = `
-            <button id="btn-play-${diagId}" onclick="togglePlay('${diagId}', ${start}, ${end})" class="flex items-center justify-center bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded-full transition-colors flex-shrink-0" style="width: 22px; height: 22px;" title="${typeof t === 'function' ? t('btn_play') : 'Tocar'}">
+            <button id="btn-play-${diagId}" onclick="togglePlay('${diagId}', ${start}, ${end})" class="flex items-center justify-center bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300 rounded-full transition-colors flex-shrink-0" style="width: 22px; height: 22px;" title="${typeof t === 'function' ? t('btn_play') : 'Tocar'}">
                 <svg class="icon-play" style="width: 11px; height: 11px; margin-left: 1.5px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
                 <svg class="icon-stop hidden" style="width: 11px; height: 11px;" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5h10v10H5z"></path></svg>
             </button>
@@ -61,8 +61,12 @@ function updateUI() {
         positionWrapper.appendChild(headerDiv);
         positionWrapper.appendChild(fretboardDiv);
 
-        positionsContainer.appendChild(positionWrapper);
+        if (positionsContainer) positionsContainer.appendChild(positionWrapper);
     });
+
+    if (typeof updateBackingTrackButton === 'function') {
+        updateBackingTrackButton();
+    }
 }
 
 // Escuta de alteração nas seleções musicais
@@ -91,25 +95,43 @@ document.getElementById('filtro-cordas').addEventListener('change', function() {
     updateUI();
 });
 
-// Boot Inicial
+// Boot Inicial Modular
 async function initApp() { 
     const userLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
     
     if (typeof i18n !== 'undefined' && i18n[userLang] && typeof langMetadata !== 'undefined' && langMetadata[userLang]) {
-        currentLang = userLang;
+        if (typeof currentLang !== 'undefined') currentLang = userLang;
     }
 
     try {
         const response = await fetch('help.html');
         if (response.ok) {
             const htmlText = await response.text();
-            document.getElementById('help-container').innerHTML = htmlText;
+            const helpContainer = document.getElementById('help-container');
+            if (helpContainer) helpContainer.innerHTML = htmlText;
             
             const closeHelpBtn = document.getElementById('close-help-btn');
             if (closeHelpBtn && typeof closeHelp !== 'undefined') closeHelpBtn.addEventListener('click', closeHelp);
         }
     } catch (error) {
-        console.warn("⚠️ Ficheiro help.html não carregado via protocolo HTTP.");
+        console.warn("Ficheiro help.html não carregado.");
+    }
+
+    try {
+        const responseBt = await fetch('backingtrack.html');
+        if (responseBt.ok) {
+            const htmlTextBt = await responseBt.text();
+            const btContainer = document.getElementById('bt-container');
+            if (btContainer) btContainer.innerHTML = htmlTextBt;
+            
+            const closeBtBtn = document.getElementById('close-bt-btn');
+            if (closeBtBtn) closeBtBtn.addEventListener('click', () => {
+                const modal = document.getElementById('bt-modal');
+                if (modal) modal.classList.add('hidden');
+            });
+        }
+    } catch (error) {
+        console.warn("Ficheiro backingtrack.html não carregado.");
     }
 
     const langListEl = document.getElementById('lang-menu-list');
@@ -125,13 +147,15 @@ async function initApp() {
                 langListEl.appendChild(btn);
             });
     
-            document.getElementById('current-flag').innerHTML = langMetadata[currentLang].svg;
-            document.getElementById('current-lang-name').innerText = langMetadata[currentLang].name;
+            if (typeof currentLang !== 'undefined') {
+                document.getElementById('current-flag').innerHTML = langMetadata[currentLang].svg;
+                document.getElementById('current-lang-name').innerText = langMetadata[currentLang].name;
+            }
         }
     }
 
     if (typeof applyLanguage === 'function') applyLanguage(); 
+    if (typeof updateBackingTrackButton === 'function') updateBackingTrackButton();
 }
 
-// Inicia a aplicação
 initApp();

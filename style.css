@@ -201,3 +201,54 @@ body[data-skin="vintage"] .note-dot.bg-gray-300 { background-color: #eaddc5 !imp
 body[data-skin="vintage"] .bg-blue-50 { background-color: #e6e1c5 !important; color: #5c4b37 !important; border-color: #d8c8b8 !important; }
 body[data-skin="vintage"] .bg-red-50 { background-color: #e6c5c5 !important; color: #7a3b3b !important; border-color: #d8b8b8 !important; }
 body[data-skin="vintage"] .text-blue-600 { color: #8b5a2b !important; }
+
+/* ==========================================================================
+   MODO ESCURO: RESTAURAÇÃO DOS BOTÕES AZUIS (NEON)
+   ========================================================================== */
+
+/* 1. Fundo principal das pílulas e botões */
+[data-skin="dark"] .bg-gray-100,
+[data-skin="dark"] .bg-white.border-gray-300 {
+    background-color: #172554 !important; /* Azul escuro profundo */
+}
+
+/* 2. Fundo ao passar o rato (hover) e fundos secundários */
+[data-skin="dark"] .hover\:bg-gray-200:hover,
+[data-skin="dark"] .bg-gray-200 {
+    background-color: #1e3a8a !important; /* Azul vibrante */
+}
+
+/* 3. Fundo do contador de repetições (Auto-BPM) */
+[data-skin="dark"] .bg-gray-200\/50 {
+    background-color: rgba(30, 58, 138, 0.5) !important;
+}
+
+/* 4. Bordas dos botões */
+[data-skin="dark"] .border-gray-300 {
+    border-color: #2563eb !important; /* Borda azul luminosa */
+}
+
+/* 5. Cores dos textos principais (Pentatônica, Maior, etc) */
+[data-skin="dark"] .text-gray-800,
+[data-skin="dark"] .text-gray-700 {
+    color: #bfdbfe !important; /* Azul clarinho */
+}
+
+/* 6. Cores dos ícones (Setas, Som, Ajuda) e textos secundários */
+[data-skin="dark"] .text-gray-500,
+[data-skin="dark"] .text-gray-600 {
+    color: #60a5fa !important; /* Azul brilhante */
+}
+
+/* ==========================================================================
+   BÓNUS: Ajuste do botão vermelho "Parar" para não ofuscar no modo escuro
+   ========================================================================== */
+[data-skin="dark"] .bg-red-50 {
+    background-color: #450a0a !important; /* Vermelho muito escuro */
+}
+[data-skin="dark"] .text-red-700 {
+    color: #fca5a5 !important; /* Texto rosa claro */
+}
+[data-skin="dark"] .border-red-200 {
+    border-color: #dc2626 !important; /* Borda vermelha forte */
+}

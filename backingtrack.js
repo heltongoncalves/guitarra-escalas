@@ -4,11 +4,16 @@
  * ========================================================================
  */
 
-// Função matemática que calcula a progressão de acordes
 function getBackingTrackInfo() {
-    const tom = document.getElementById('tom').value; 
-    const categoria = document.getElementById('escala').value; 
-    const modo = document.getElementById('modo').value; 
+    const tomEl = document.getElementById('tom');
+    const categoriaEl = document.getElementById('escala');
+    const modoEl = document.getElementById('modo');
+
+    if (!tomEl || !categoriaEl || !modoEl) return { chords: "", description: "" };
+
+    const tom = tomEl.value; 
+    const categoria = categoriaEl.value; 
+    const modo = modoEl.value; 
 
     const notasBase = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const rootIdx = notasBase.indexOf(tom);
@@ -70,7 +75,6 @@ function getBackingTrackInfo() {
         descKey = 'bt_desc_14'; defaultDesc = 'Vamp Estático / Drone'; suffix = "";
     }
 
-    // Tenta traduzir usando a chave, mas se falhar (retorna a própria chave), utiliza o Fallback Padrão
     let stylePrefix = "Estilo:";
     if (typeof t === 'function') {
         const transPrefix = t('bt_style');
@@ -88,33 +92,124 @@ function getBackingTrackInfo() {
     return { chords, description };
 }
 
-// Atualiza dinamicamente o texto do botão de backing track
+function generateHarmonicField(tom, categoria, modo) {
+    const notasBase = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const rootIdx = notasBase.indexOf(tom);
+    
+    if (typeof bancoDeEscalas === 'undefined' || !bancoDeEscalas[categoria] || !bancoDeEscalas[categoria][modo]) return "";
+
+    const intervals = bancoDeEscalas[categoria][modo].i;
+    
+    // CORREÇÃO: Em vez de devolver vazio para ocultar o bloco, envia um aviso visual e intuitivo!
+    if (intervals.length !== 7) {
+        const warning = typeof t === 'function' ? t('hf_not_applicable') : 'Campo harmônico diatônico não aplicável para esta escala.';
+        return `<p class="text-gray-500 italic mt-2">${warning}</p>`;
+    }
+
+    const scaleNotes = intervals.map(interval => notasBase[(rootIdx + interval) % 12]);
+    const romanUpper = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+    const romanLower = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii'];
+    
+    const noteNamesPt = {'C':'Dó', 'C#':'Dó#', 'D':'Ré', 'D#':'Ré#', 'E':'Mi', 'F':'Fá', 'F#':'Fá#', 'G':'Sol', 'G#':'Sol#', 'A':'Lá', 'A#':'Lá#' , 'B':'Si'};
+    
+    const getDesc = (note, type) => {
+        if (typeof currentLang !== 'undefined' && currentLang !== 'pt') return "";
+        let name = noteNamesPt[note];
+        if (type === "") return `(${name} maior)`;
+        if (type === "m") return `(${name} menor)`;
+        if (type === "°") return `(${name} diminuto)`;
+        if (type === "+") return `(${name} aumentado)`;
+        return "";
+    };
+
+    let html = '<ul class="space-y-3 mt-2 pl-2">';
+    
+    for (let d = 0; d < 7; d++) {
+        let rootNote = scaleNotes[d];
+        let thirdNote = scaleNotes[(d + 2) % 7];
+        let fifthNote = scaleNotes[(d + 4) % 7];
+        
+        let rIdx = notasBase.indexOf(rootNote);
+        let tIdx = notasBase.indexOf(thirdNote);
+        let fIdx = notasBase.indexOf(fifthNote);
+        
+        let dist3 = (tIdx - rIdx + 12) % 12; 
+        let dist5 = (fIdx - rIdx + 12) % 12; 
+        
+        let chordType = "";
+        let roman = "";
+        
+        if (dist3 === 4 && dist5 === 7) {
+            chordType = ""; roman = romanUpper[d]; 
+        } else if (dist3 === 3 && dist5 === 7) {
+            chordType = "m"; roman = romanLower[d]; 
+        } else if (dist3 === 3 && dist5 === 6) {
+            chordType = "°"; roman = romanLower[d] + "°"; 
+        } else if (dist3 === 4 && dist5 === 8) {
+            chordType = "+"; roman = romanUpper[d] + "+"; 
+        } else {
+            chordType = "?"; roman = romanUpper[d]; 
+        }
+        
+        const degreeLbl = typeof t === 'function' ? t('lbl_degree') : 'Grau';
+        const desc = getDesc(rootNote, chordType);
+        const descHtml = desc ? ` <span class="text-gray-600 font-normal italic text-xs ml-1">${desc}</span>` : '';
+        
+        html += `<li class="flex items-center py-1 border-b border-gray-100 last:border-0">
+                    <span class="w-24 flex-shrink-0 text-gray-800 font-bold">• ${roman} (${d+1}º ${degreeLbl}):</span> 
+                    <span class="font-bold text-blue-700 text-base ml-2">${rootNote}${chordType}</span>
+                    ${descHtml}
+                    <span class="text-xs text-gray-500 ml-auto">- ${rootNote}, ${thirdNote}, ${fifthNote}</span>
+                 </li>`;
+    }
+    
+    html += '</ul>';
+    return html;
+}
+
 function updateBackingTrackButton() {
     const info = getBackingTrackInfo();
     const btnTextEl = document.getElementById('bt-button-text');
+    
     if (btnTextEl) {
         const formattedChords = info.chords.replace(/\|/g, '  |  ');
-        
-        // Garante que a etiqueta só altera se a tradução for bem sucedida
         let lbl = 'Backing Track';
         if (typeof t === 'function') {
             const transLbl = t('lbl_backing_track');
             if (transLbl && transLbl !== 'lbl_backing_track') lbl = transLbl;
         }
-        
         btnTextEl.innerText = `${lbl}: ${formattedChords}`;
     }
     
-    // Atualiza o modal caso esteja aberto
     const chordsEl = document.getElementById('bt-chords');
     const descEl = document.getElementById('bt-desc');
+    const hfEl = document.getElementById('bt-harmonic-field');
+    const hfSection = document.getElementById('bt-harmonic-section');
+    
     if (chordsEl) chordsEl.innerText = info.chords.replace(/\|/g, '  |  ');
     if (descEl) descEl.innerText = info.description;
+    
+    if (hfEl && hfSection) {
+        const tomEl = document.getElementById('tom');
+        const categoriaEl = document.getElementById('escala');
+        const modoEl = document.getElementById('modo');
+        
+        if(tomEl && categoriaEl && modoEl) {
+            const hfContent = generateHarmonicField(tomEl.value, categoriaEl.value, modoEl.value);
+            
+            // Agora garantimos que NUNCA adiciona a classe 'hidden'. Assim você verá sempre o título da área!
+            hfEl.innerHTML = hfContent;
+            hfSection.classList.remove('hidden');
+        }
+    }
 }
 
 function showBackingTrack() {
     updateBackingTrackButton(); 
-    document.getElementById('bt-modal').classList.remove('hidden');
+    const modal = document.getElementById('bt-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
 }
 
 document.addEventListener('click', (e) => {
@@ -122,8 +217,12 @@ document.addEventListener('click', (e) => {
     if (btModal && e.target === btModal) btModal.classList.add('hidden');
 });
 
-document.getElementById('tom').addEventListener('change', updateBackingTrackButton);
-document.getElementById('escala').addEventListener('change', updateBackingTrackButton);
-document.getElementById('modo').addEventListener('change', updateBackingTrackButton);
+const tomEl = document.getElementById('tom');
+const escalaEl = document.getElementById('escala');
+const modoEl = document.getElementById('modo');
+
+if (tomEl) tomEl.addEventListener('change', updateBackingTrackButton);
+if (escalaEl) escalaEl.addEventListener('change', updateBackingTrackButton);
+if (modoEl) modoEl.addEventListener('change', updateBackingTrackButton);
 
 setTimeout(updateBackingTrackButton, 200);
