@@ -1,0 +1,149 @@
+/* ==========================================================================
+   BRAÇO DA GUITARRA (FRETBOARD)
+   ========================================================================== */
+
+.fretboard-container {
+    display: flex; flex-direction: column; width: 100%;
+    position: relative;
+    border-radius: 4px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
+    overflow: hidden;
+    background-color: #1e1e1e;
+}
+
+.string {
+    display: flex; width: 100%; height: 34px; position: relative;
+    z-index: 1; 
+}
+
+/* A MÁGICA DA TEXTURA: Célula de traste individual */
+.fret, .fret-cell {
+    position: relative; 
+    z-index: auto !important; 
+    display: flex; justify-content: center; align-items: center;
+    border-right: none !important; 
+    
+    /* CORREÇÃO: Adicionado ../ antes de img/ */
+    background-image: url('../img/fret.png') !important;
+    background-size: 100% 100% !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: transparent !important; 
+}
+
+.fret::after, .fret-cell::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    right: -2px; 
+    width: 4px; 
+    
+    /* CORREÇÃO: Adicionado ../ antes de img/ */
+    background-image: url('../img/traste.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    z-index: 4 !important; 
+    pointer-events: none;
+}
+
+/* Pestana (Traste 0) */
+.fret.fret-0, .fret-cell.fret-0 {
+    border-right: 6px solid #cbd5e1 !important; 
+    background-image: none !important;
+    background-color: #f8fafc !important;
+}
+
+.fret.fret-0::after, .fret-cell.fret-0::after,
+.fret:last-child::after, .fret-cell:last-child::after {
+    display: none !important;
+}
+
+/* NUMERAÇÃO DOS TRASTES */
+.fret-numbers {
+    display: flex; width: 100%; height: 20px;
+    font-size: 11px; color: #ffffff; font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.fret-numbers > div {
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* CORDAS E ESPESSURAS */
+.string-line {
+    position: absolute; 
+    left: 0; 
+    right: 0 !important; 
+    top: 50%; transform: translateY(-50%);
+    background: linear-gradient(to bottom, #f1f5f9, #94a3b8, #e2e8f0) !important;
+    z-index: 5 !important; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.8) !important;
+    pointer-events: none; 
+    display: block !important; 
+    height: 2px !important; 
+}
+
+.fret.fret-0 .string-line, .fret-cell.fret-0 .string-line {
+    right: -6px !important;
+}
+
+.string:nth-of-type(1) .string-line, .string-1 .string-line { height: 1px !important; }
+.string:nth-of-type(2) .string-line, .string-2 .string-line { height: 1.5px !important; }
+.string:nth-of-type(3) .string-line, .string-3 .string-line { height: 2px !important; }
+.string:nth-of-type(4) .string-line, .string-4 .string-line { height: 2.5px !important; }
+.string:nth-of-type(5) .string-line, .string-5 .string-line { height: 3.2px !important; }
+.string:nth-of-type(6) .string-line, .string-6 .string-line { height: 4.2px !important; }
+
+/* NOTAS (DOTS), DIGITAÇÃO E ANIMAÇÕES */
+.note-dot { 
+    position: relative; 
+    z-index: 10 !important; 
+    width: 28px; 
+    height: 28px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; justify-content: center; 
+    color: white; 
+    box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 -2px 4px rgba(0,0,0,0.3);
+    transition: all 0.1s ease-in-out; 
+}
+
+.note-label {
+    font-size: 11px; 
+    font-weight: bold; 
+    color: inherit; 
+    z-index: 1; 
+    pointer-events: none;
+}
+
+.finger-hint {
+    position: absolute;
+    bottom: -2px; 
+    right: -2px; 
+    width: 14px; 
+    height: 14px; 
+    background-color: white; 
+    color: black; 
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.5);
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 9px; 
+    font-weight: bold; 
+    z-index: 2; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    pointer-events: none;
+}
+
+.note-hidden { opacity: 0 !important; pointer-events: none; }
+
+.playing-note { 
+    box-shadow: 0 0 16px 8px rgba(250, 204, 21, 0.85) !important; 
+    transform: scale(1.35) !important; 
+    z-index: 30 !important; 
+    border: 2px solid white !important; 
+}
+
+.tuning-dot { width: 24px; height: 24px; border-radius: 50%; background-color: #111827; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }

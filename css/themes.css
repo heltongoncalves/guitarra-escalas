@@ -1,0 +1,105 @@
+/* ==========================================================================
+   THEMES, SKINS & EFEITOS DE VIDRO (GLASSMORPHISM)
+   ========================================================================== */
+
+/* Transição do Background Dinâmico */
+body { 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    transition: background-image 0.5s ease-in-out, background-color 0.3s ease;
+}
+
+/* Filtros e Películas de Cor do Fundo */
+body[data-skin="light"]::before {
+    content: ''; position: fixed; inset: 0; z-index: -1;
+    background-color: rgba(240, 248, 255, 0.15); 
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+}
+body[data-skin="dark"]::before {
+    content: ''; position: fixed; inset: 0; z-index: -1;
+    background-color: rgba(15, 23, 42, 0.45); 
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+body[data-skin="vintage"]::before {
+    content: ''; position: fixed; inset: 0; z-index: -1;
+    background-color: rgba(222, 184, 135, 0.25); 
+    backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+}
+
+/* Estilos de Vidro para Containers */
+.bg-gray-100, .bg-blue-50, .bg-white {
+    background-color: rgba(255, 255, 255, 0.45) !important; 
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Modal e Modificadores Dark Mode Genéricos */
+#bt-modal > div {
+    background-color: rgba(255, 255, 255, 0.6) !important; 
+    backdrop-filter: blur(20px);
+}
+[data-skin="dark"] #bt-modal > div {
+    background-color: rgba(30, 41, 59, 0.65) !important; 
+}
+[data-skin="dark"] .bg-gray-100, 
+[data-skin="dark"] .bg-blue-50, 
+[data-skin="dark"] .bg-white {
+    background-color: rgba(30, 41, 59, 0.4) !important; 
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+[data-skin="dark"] .fret-numbers {
+    color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+
+/* ==========================================================================
+   SKINS CUSTOMIZADAS ESPECÍFICAS
+   ========================================================================== */
+
+/* 1. Skin: Light */
+/* CORREÇÃO: Adicionado ../ antes de img/ */
+body[data-skin="light"] { 
+    color: #333; 
+    background-image: url('../img/escalas-fundo-claro.jpg');
+}
+
+/* 2. Skin: Dark */
+/* CORREÇÃO: Adicionado ../ antes de img/ */
+body[data-skin="dark"] { 
+    color: #e0e0e0; 
+    background-image: url('../img/escalas-fundo-escuro.jpg');
+}
+body[data-skin="dark"] select, body[data-skin="dark"] input { background-color: #2c2c2c !important; color: #ffffff !important; border-color: #444 !important; }
+body[data-skin="dark"] .note-dot.bg-gray-300 { background-color: #333 !important; color: #666 !important; border-color: #444 !important; }
+
+/* Botões Neon (Modo Escuro) */
+[data-skin="dark"] .bg-gray-100,
+[data-skin="dark"] .bg-white.border-gray-300 { background-color: #172554 !important; }
+[data-skin="dark"] .hover\:bg-gray-200:hover,
+[data-skin="dark"] .bg-gray-200 { background-color: #1e3a8a !important; }
+[data-skin="dark"] .bg-gray-200\/50 { background-color: rgba(30, 58, 138, 0.5) !important; }
+[data-skin="dark"] .border-gray-300 { border-color: #2563eb !important; }
+[data-skin="dark"] .text-gray-800, [data-skin="dark"] .text-gray-700 { color: #bfdbfe !important; }
+[data-skin="dark"] .text-gray-500, [data-skin="dark"] .text-gray-600 { color: #60a5fa !important; }
+[data-skin="dark"] .bg-red-50 { background-color: #450a0a !important; }
+[data-skin="dark"] .text-red-700 { color: #fca5a5 !important; }
+[data-skin="dark"] .border-red-200 { border-color: #dc2626 !important; }
+
+/* 3. Skin: Vintage */
+/* CORREÇÃO: Adicionado ../ antes de img/ */
+body[data-skin="vintage"] { 
+    color: #4a3b2c; 
+    background-image: url('../img/escalas-fundo-vintage.jpg');
+}
+body[data-skin="vintage"] select, body[data-skin="vintage"] input { background-color: #f9f4e8 !important; color: #3d2b1f !important; border-color: #d8c8b8 !important; }
+body[data-skin="vintage"] .text-gray-500, body[data-skin="vintage"] .text-gray-600, body[data-skin="vintage"] .text-gray-700, body[data-skin="vintage"] .text-gray-800, body[data-skin="vintage"] .text-black { color: #6b5b4b !important; }
+body[data-skin="vintage"] .border-gray-400, body[data-skin="vintage"] .border-gray-100, body[data-skin="vintage"] .border-gray-200 { border-color: #d8c8b8 !important; }
+body[data-skin="vintage"] .border-gray-500, body[data-skin="vintage"] .border-gray-600 { border-color: #b8a898 !important; }
+body[data-skin="vintage"] .bg-gray-200 { background-color: #eaddc5 !important; }
+body[data-skin="vintage"] .note-dot.bg-black, body[data-skin="vintage"] .tuning-dot { background-color: #3d2b1f !important; }
+body[data-skin="vintage"] .note-dot.bg-red-600 { background-color: #c24127 !important; }
+body[data-skin="vintage"] .note-dot.bg-gray-300 { background-color: #eaddc5 !important; color: #a89f91 !important; border-color: #d8c8b8 !important; }
+body[data-skin="vintage"] .bg-blue-50 { background-color: #e6e1c5 !important; color: #5c4b37 !important; border-color: #d8c8b8 !important; }
+body[data-skin="vintage"] .bg-red-50 { background-color: #e6c5c5 !important; color: #7a3b3b !important; border-color: #d8b8b8 !important; }
+body[data-skin="vintage"] .text-blue-600 { color: #8b5a2b !important; }
