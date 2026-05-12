@@ -2,7 +2,6 @@
  * ========================================================================
  * NÚCLEO DA APLICAÇÃO (CORE & BOOT) - app.js
  * ========================================================================
- * Orquestra a renderização principal (updateUI) e o boot do app.
  */
 
 function updateUI() {
@@ -17,25 +16,34 @@ function updateUI() {
     let filtroCordas = filtroCordasEl ? filtroCordasEl.value : 'all'; 
 
     let sugerirDigitacao = document.getElementById('sugerir-digitacao')?.checked || false;
-    // NOVO: Captura o estado do botão "Padrão Invertido"
     let inverterCordas = document.getElementById('inverter-cordas')?.checked || false;
     
     if (typeof playbackState !== 'undefined') playbackState.sequences = {};
 
     let windows = typeof getPositionWindows === 'function' ? getPositionWindows(scaleData.rootIdx, scaleData.cagedOffset) : [];
+    
     let mainFullSequence = [];
     let mainActiveIds = new Set();
     let allPositionsData = [];
+    let processedPositions = []; 
 
     if (typeof generateExerciseData === 'function') {
-        windows.forEach((win, index) => {
-            let data = generateExerciseData('main', win[0], win[1], scaleData, exercicioId, filtroCordas);
-            if (data && data.sequence) mainFullSequence = mainFullSequence.concat(data.sequence); 
-            if (data && data.activeNoteIds) data.activeNoteIds.forEach(id => mainActiveIds.add(id));
+        let mainData = generateExerciseData('main', 0, 15, scaleData, exercicioId, filtroCordas);
+        if (mainData && mainData.sequence) mainFullSequence = mainFullSequence.concat(mainData.sequence); 
+        if (mainData && mainData.activeNoteIds) mainData.activeNoteIds.forEach(id => mainActiveIds.add(id));
 
-            let posData = generateExerciseData(`pos-${index}`, win[0], win[1], scaleData, exercicioId, filtroCordas);
+        windows.forEach((win, index) => {
+            let [start, end] = win;
+            let diagId = `pos-${index}`;
+
+            // Gera os dados primeiro para descobrir o que realmente sobreviveu ao filtro
+            let posData = generateExerciseData(diagId, start, end, scaleData, exercicioId, filtroCordas);
+            
             let activeFrets = new Set();
             let activeNotes = new Set();
+            let minFret = 99;
+            let maxFret = -1;
+
             if (posData && posData.activeNoteIds) {
                 posData.activeNoteIds.forEach(id => {
                     let parts = id.split('-');
@@ -43,9 +51,31 @@ function updateUI() {
                     let f = parseInt(parts[parts.length-1]);
                     activeFrets.add(f);
                     activeNotes.add(`${s}-${f}`);
+                    
+                    if (f > 0 && f < minFret) minFret = f; 
+                    if (f > maxFret) maxFret = f;
                 });
             }
-            allPositionsData.push({ start: win[0], end: win[1], activeFrets, activeNotes });
+
+            // NOVO: Algoritmo "Shrink-to-Fit" Real
+            // Ajusta o tamanho da escala exata e perfeitamente ao redor das notas renderizadas
+            let newStart = start;
+            let newEnd = end;
+
+            if (activeFrets.size > 0) {
+                newEnd = maxFret; 
+                if (activeFrets.has(0) || start === 0) {
+                    newStart = 0;
+                } else if (minFret !== 99) {
+                    newStart = minFret; 
+                }
+            }
+
+            // Proteção visual para não achatar demais a UI em escalas muito pequenas
+            if (newEnd - newStart < 2) newEnd = newStart + 2;
+
+            processedPositions.push({ id: diagId, start: newStart, end: newEnd, data: posData, activeFrets, activeNotes });
+            allPositionsData.push({ start: newStart, end: newEnd, activeFrets, activeNotes });
         });
     }
 
@@ -53,7 +83,6 @@ function updateUI() {
 
     let mainFretboard = document.getElementById('main-fretboard');
     if (mainFretboard && typeof renderGuitarFretboard === 'function') {
-        // Passa o inverterCordas para a renderização da escala completa
         mainFretboard.innerHTML = renderGuitarFretboard('main', 0, 15, scaleData, false, 'bottom', mainActiveIds, sugerirDigitacao, allPositionsData, inverterCordas);
         if (typeof applyFretboardMagic === 'function') applyFretboardMagic('main', 0, 15);
     }
@@ -62,12 +91,8 @@ function updateUI() {
     if (positionsContainer) positionsContainer.innerHTML = ''; 
 
     if (typeof generateExerciseData === 'function' && typeof renderGuitarFretboard === 'function') {
-        windows.forEach((win, index) => {
-            let [start, end] = win; 
-            let diagId = `pos-${index}`; 
-
-            let data = generateExerciseData(diagId, start, end, scaleData, exercicioId, filtroCordas);
-            if (typeof playbackState !== 'undefined' && data) playbackState.sequences[diagId] = data.sequence;
+        processedPositions.forEach((pos, index) => {
+            if (typeof playbackState !== 'undefined' && pos.data) playbackState.sequences[pos.id] = pos.data.sequence;
 
             let positionWrapper = document.createElement('div');
             positionWrapper.className = 'flex flex-col relative';
@@ -76,28 +101,26 @@ function updateUI() {
             let posText = typeof t === 'function' ? t('position') : 'Posição';
             let fretsText = typeof t === 'function' ? t('frets') : 'Trastes';
 
-            // Passa o inverterCordas para a renderização das posições pequenas
-            let fretboardHtml = renderGuitarFretboard(diagId, start, end, scaleData, false, 'bottom', data ? data.activeNoteIds : new Set(), sugerirDigitacao, null, inverterCordas);
+            let fretboardHtml = renderGuitarFretboard(pos.id, pos.start, pos.end, scaleData, false, 'bottom', pos.data ? pos.data.activeNoteIds : new Set(), sugerirDigitacao, null, inverterCordas);
 
             positionWrapper.innerHTML = `
-                <button id="btn-play-${diagId}" onclick="if(typeof togglePlay === 'function') togglePlay('${diagId}', ${start}, ${end})" class="floating-play-btn flex items-center justify-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-800 border border-gray-300 rounded-full shadow-sm" title="${btnTitle}">
+                <button id="btn-play-${pos.id}" onclick="if(typeof togglePlay === 'function') togglePlay('${pos.id}', ${pos.start}, ${pos.end})" class="floating-play-btn flex items-center justify-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-800 border border-gray-300 rounded-full shadow-sm" title="${btnTitle}">
                     <svg class="icon-play" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
                     <svg class="icon-stop hidden" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20"><path d="M5 5h10v10H5z"></path></svg>
-                    <span class="text-xs md:text-sm font-semibold whitespace-nowrap">${posText} ${index + 1} (${fretsText} ${start}-${end})</span>
+                    <span class="text-xs md:text-sm font-semibold whitespace-nowrap">${posText} ${index + 1} (${fretsText} ${pos.start}-${pos.end})</span>
                 </button>
                 <div>${fretboardHtml}</div>
             `;
 
             if (positionsContainer) positionsContainer.appendChild(positionWrapper);
-
-            if (typeof applyFretboardMagic === 'function') applyFretboardMagic(diagId, start, end);
+            if (typeof applyFretboardMagic === 'function') applyFretboardMagic(pos.id, pos.start, pos.end);
         });
     }
 
     if (typeof updateBackingTrackButton === 'function') updateBackingTrackButton();
 
     if (typeof setupMainPlaybackObserver === 'function') {
-        setupMainPlaybackObserver(windows);
+        setupMainPlaybackObserver(windows); // Usa o original windows bounds para o tracking da escala inteira
     }
 }
 

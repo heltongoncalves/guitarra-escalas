@@ -2,8 +2,6 @@
  * ========================================================================
  * TEORIA MUSICAL E ALGORITMOS (CAGED E COREOGRAFIAS)
  * ========================================================================
- * Responsabilidade: Ler as escolhas do utilizador e calcular quais notas
- * pertencem à escala e onde estão fisicamente no braço da guitarra.
  */
 
 function getScaleData() {
@@ -21,39 +19,52 @@ function getScaleData() {
 }
 
 function getPositionWindows(rootIdx, cagedOffset) {
-    let relMajorIdx = (rootIdx + cagedOffset + 12) % 12;
-    let r = (relMajorIdx - 4 + 12) % 12;
-
-    let rawWindows = [
-        [r - 1, r + 2],  
-        [r + 1, r + 5],  
-        [r + 4, r + 7],  
-        [r + 6, r + 9],  
-        [r + 9, r + 12]  
+    const baseWindows = [
+        [0, 4],   
+        [2, 6],   
+        [4, 8],   
+        [7, 11],  
+        [9, 13]   
     ];
 
-    let normalized = rawWindows.map(w => {
-        let [s, e] = w;
-        if (s >= 12) { s -= 12; e -= 12; }
-        if (s < 0) {
-            if (e >= 1) s = 0; 
-            else { s += 12; e += 12; } 
+    let windows = [];
+    for (let i = 0; i < 5; i++) {
+        let start = baseWindows[i][0] + rootIdx + cagedOffset;
+        let end = baseWindows[i][1] + rootIdx + cagedOffset;
+        
+        while (start >= 12) {
+            start -= 12;
+            end -= 12;
         }
-        if (s < 0) s = 0;
-        return [s, e];
+        while (start < 0) {
+            start += 12;
+            end += 12;
+        }
+        windows.push([start, end]);
+    }
+
+    windows.sort((a, b) => a[0] - b[0]);
+
+    let uniqueWindows = [];
+    let seenStarts = new Set();
+    windows.forEach(w => {
+        if (!seenStarts.has(w[0])) {
+            seenStarts.add(w[0]);
+            uniqueWindows.push(w);
+        }
     });
 
-    let uniqueMap = new Map();
-    normalized.forEach(w => uniqueMap.set(`${w[0]}-${w[1]}`, w));
-    let finalWindows = Array.from(uniqueMap.values()).sort((a, b) => a[0] - b[0]);
+    if (uniqueWindows.length < 5) uniqueWindows = [ [0,4], [2,6], [4,8], [7,11], [9,13] ];
 
-    if (finalWindows.length < 5) finalWindows = [ [0,3], [2,5], [5,8], [7,10], [9,12] ];
-    
-    return finalWindows.slice(0, 5); 
+    return uniqueWindows.slice(0, 5); 
 }
 
 function generateExerciseData(diagramId, startFret, endFret, scaleData, exercicio, filtroCordas) {
     let baseNotes = [];
+    // Matriz de semitons absolutos da afinação padrão para detectar uníssonos
+    const stringSemitones = [24, 19, 15, 10, 5, 0]; 
+    let tempNotes = [];
+
     for (let s = 5; s >= 0; s--) { 
         for (let f = startFret; f <= endFret; f++) {
             let noteIdx = (afinacaoIndices[s] + f) % 12;
@@ -61,10 +72,32 @@ function generateExerciseData(diagramId, startFret, endFret, scaleData, exercici
             
             if (scaleData.notes.has(note)) { 
                 let pitch = openStringFreqs[s] * Math.pow(2, f / 12); 
-                baseNotes.push({ string: s, fret: f, id: `note-${diagramId}-${s}-${f}`, noteIdx: noteIdx, pitch: pitch });
+                let absPitch = stringSemitones[s] + f; // Identidade exata da nota e oitava
+                tempNotes.push({ string: s, fret: f, id: `note-${diagramId}-${s}-${f}`, noteIdx: noteIdx, pitch: pitch, absPitch: absPitch });
             }
         }
     }
+
+    // --- NOVO: FILTRO DE UNÍSSONOS (Notas Repetidas) ---
+    // Aplica a regra de não repetição apenas nos blocos CAGED, mantendo a Escala Completa intacta
+    if (diagramId !== 'main') {
+        let pitchMap = new Map();
+        tempNotes.forEach(n => {
+            if (!pitchMap.has(n.absPitch)) {
+                pitchMap.set(n.absPitch, n);
+            } else {
+                let existing = pitchMap.get(n.absPitch);
+                // Dá preferência ao menor traste (o que elege a corda solta 0 como vencedora absoluta)
+                if (n.fret < existing.fret) {
+                    pitchMap.set(n.absPitch, n);
+                }
+            }
+        });
+        baseNotes = Array.from(pitchMap.values());
+    } else {
+        baseNotes = tempNotes;
+    }
+    // ---------------------------------------------------
 
     if (filtroCordas === '1-3') {
         baseNotes = baseNotes.filter(n => n.string <= 2);
