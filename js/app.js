@@ -4,6 +4,111 @@
  * ========================================================================
  */
 
+// 1. CARREGAMENTO IMEDIATO DO TEMA (Evita "piscar" a tela em branco antes de aplicar o modo escuro)
+(function loadEarlyTheme() {
+    try {
+        const saved = localStorage.getItem('guitar_tutor_app_state');
+        if (saved) {
+            const state = JSON.parse(saved);
+            if (state.skin) document.body.setAttribute('data-skin', state.skin);
+        }
+    } catch(e) {}
+})();
+
+// FUNÇÃO PARA SALVAR O ESTADO ATUAL
+function saveAppState() {
+    const state = {
+        tom: document.getElementById('tom')?.value,
+        escala: document.getElementById('escala')?.value,
+        modo: document.getElementById('modo')?.value,
+        exercicio: document.getElementById('exercicio')?.value,
+        filtroCordas: document.getElementById('filtro-cordas')?.value,
+        bpm: document.getElementById('bpm')?.value,
+        sugerirDigitacao: document.getElementById('sugerir-digitacao')?.checked,
+        inverterCordas: document.getElementById('inverter-cordas')?.checked,
+        desafio: document.getElementById('desafio')?.checked,
+        autoBpm: document.getElementById('auto-bpm-toggle')?.checked,
+        lang: typeof currentLang !== 'undefined' ? currentLang : 'pt', // Salva o Idioma atual
+        skin: document.body.getAttribute('data-skin'),                 // Salva o Tema atual (Claro, Escuro, Vintage)
+        skinIcon: document.getElementById('current-skin-icon')?.innerText // Salva o Ícone do Solzinho/Lua
+    };
+    localStorage.setItem('guitar_tutor_app_state', JSON.stringify(state));
+}
+
+// FUNÇÃO PARA CARREGAR O ESTADO SALVO (Inputs e Selects)
+function loadAppState() {
+    const saved = localStorage.getItem('guitar_tutor_app_state');
+    if (!saved) return;
+    
+    try {
+        const state = JSON.parse(saved);
+        
+        // Restaura o ícone do tema na barra superior
+        if (state.skinIcon) {
+            const iconEl = document.getElementById('current-skin-icon');
+            if (iconEl) iconEl.innerText = state.skinIcon;
+        }
+
+        if (state.tom) {
+            const el = document.getElementById('tom');
+            if (el) { el.value = state.tom; document.getElementById('tom-display').innerText = el.options[el.selectedIndex]?.text || state.tom; }
+        }
+        if (state.escala) {
+            const el = document.getElementById('escala');
+            if (el) { el.value = state.escala; document.getElementById('escala-display').innerText = el.options[el.selectedIndex]?.text || state.escala; }
+        }
+        
+        if (typeof atualizarModos === 'function') atualizarModos(false); 
+        
+        if (state.modo) {
+            const el = document.getElementById('modo');
+            if (el) { 
+                el.value = state.modo; 
+                if (el.selectedIndex >= 0) {
+                    document.getElementById('modo-display').innerText = el.options[el.selectedIndex].text;
+                } else {
+                    el.selectedIndex = 0;
+                    document.getElementById('modo-display').innerText = el.options[0]?.text || state.modo;
+                }
+            }
+        }
+
+        if (state.exercicio) {
+            const el = document.getElementById('exercicio');
+            if (el) { el.value = state.exercicio; document.getElementById('exercicio-display').innerText = el.options[el.selectedIndex]?.dataset.short || state.exercicio; }
+        }
+        if (state.filtroCordas) {
+            const el = document.getElementById('filtro-cordas');
+            if (el) { el.value = state.filtroCordas; document.getElementById('cordas-display').innerText = el.options[el.selectedIndex]?.text || state.filtroCordas; }
+        }
+        if (state.bpm) {
+            const el = document.getElementById('bpm');
+            if (el) el.value = state.bpm;
+        }
+        if (state.sugerirDigitacao !== undefined) {
+            const el = document.getElementById('sugerir-digitacao');
+            if (el) el.checked = state.sugerirDigitacao;
+        }
+        if (state.inverterCordas !== undefined) {
+            const el = document.getElementById('inverter-cordas');
+            if (el) el.checked = state.inverterCordas;
+        }
+        if (state.desafio !== undefined) {
+            const el = document.getElementById('desafio');
+            if (el) el.checked = state.desafio;
+        }
+        if (state.autoBpm !== undefined) {
+            const el = document.getElementById('auto-bpm-toggle');
+            if (el) {
+                el.checked = state.autoBpm;
+                el.dispatchEvent(new Event('change'));
+            }
+        }
+    } catch (e) {
+        console.error("Erro ao carregar o estado anterior:", e);
+    }
+}
+
 function updateUI() {
     if (typeof stopPlayback === 'function') stopPlayback(); 
     let scaleData = typeof getScaleData === 'function' ? getScaleData() : null; 
@@ -29,36 +134,29 @@ function updateUI() {
 
     if (typeof generateExerciseData === 'function') {
         let mainData = generateExerciseData('main', 0, 15, scaleData, exercicioId, filtroCordas);
-        if (mainData && mainData.sequence) mainFullSequence = mainFullSequence.concat(mainData.sequence); 
         if (mainData && mainData.activeNoteIds) mainData.activeNoteIds.forEach(id => mainActiveIds.add(id));
 
         windows.forEach((win, index) => {
             let [start, end] = win;
             let diagId = `pos-${index}`;
 
-            // Gera os dados primeiro para descobrir o que realmente sobreviveu ao filtro
-            let posData = generateExerciseData(diagId, start, end, scaleData, exercicioId, filtroCordas);
+            let posDataRaw = generateExerciseData(diagId, start, end, scaleData, exercicioId, filtroCordas);
             
             let activeFrets = new Set();
-            let activeNotes = new Set();
             let minFret = 99;
             let maxFret = -1;
 
-            if (posData && posData.activeNoteIds) {
-                posData.activeNoteIds.forEach(id => {
+            if (posDataRaw && posDataRaw.activeNoteIds) {
+                posDataRaw.activeNoteIds.forEach(id => {
                     let parts = id.split('-');
-                    let s = parseInt(parts[parts.length-2]);
                     let f = parseInt(parts[parts.length-1]);
                     activeFrets.add(f);
-                    activeNotes.add(`${s}-${f}`);
                     
                     if (f > 0 && f < minFret) minFret = f; 
                     if (f > maxFret) maxFret = f;
                 });
             }
 
-            // NOVO: Algoritmo "Shrink-to-Fit" Real
-            // Ajusta o tamanho da escala exata e perfeitamente ao redor das notas renderizadas
             let newStart = start;
             let newEnd = end;
 
@@ -71,11 +169,32 @@ function updateUI() {
                 }
             }
 
-            // Proteção visual para não achatar demais a UI em escalas muito pequenas
             if (newEnd - newStart < 2) newEnd = newStart + 2;
 
-            processedPositions.push({ id: diagId, start: newStart, end: newEnd, data: posData, activeFrets, activeNotes });
-            allPositionsData.push({ start: newStart, end: newEnd, activeFrets, activeNotes });
+            let posData = generateExerciseData(diagId, newStart, newEnd, scaleData, exercicioId, filtroCordas);
+            
+            let finalActiveFrets = new Set();
+            let finalActiveNotes = new Set();
+            if (posData && posData.activeNoteIds) {
+                posData.activeNoteIds.forEach(id => {
+                    let parts = id.split('-');
+                    let s = parseInt(parts[parts.length-2]);
+                    let f = parseInt(parts[parts.length-1]);
+                    finalActiveFrets.add(f);
+                    finalActiveNotes.add(`${s}-${f}`);
+                });
+            }
+
+            processedPositions.push({ id: diagId, start: newStart, end: newEnd, data: posData, activeFrets: finalActiveFrets, activeNotes: finalActiveNotes });
+            allPositionsData.push({ start: newStart, end: newEnd, activeFrets: finalActiveFrets, activeNotes: finalActiveNotes });
+
+            if (posData && posData.sequence) {
+                let mainSeqChunk = posData.sequence.map(n => ({
+                    ...n, 
+                    id: `note-main-${n.string}-${n.fret}`
+                }));
+                mainFullSequence = mainFullSequence.concat(mainSeqChunk);
+            }
         });
     }
 
@@ -120,14 +239,34 @@ function updateUI() {
     if (typeof updateBackingTrackButton === 'function') updateBackingTrackButton();
 
     if (typeof setupMainPlaybackObserver === 'function') {
-        setupMainPlaybackObserver(windows); // Usa o original windows bounds para o tracking da escala inteira
+        setupMainPlaybackObserver(windows); 
     }
 }
 
 async function initApp() { 
+    // LÊ O IDIOMA SALVO (Antes de carregar a lista de idiomas)
+    let savedLang = null;
+    try {
+        const saved = localStorage.getItem('guitar_tutor_app_state');
+        if (saved) savedLang = JSON.parse(saved).lang;
+    } catch(e) {}
+    
     let userLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    if (typeof i18n !== 'undefined' && i18n[userLang] && typeof langMetadata !== 'undefined' && langMetadata[userLang]) {
+    
+    if (savedLang && typeof langMetadata !== 'undefined' && langMetadata[savedLang]) {
+        if (typeof currentLang !== 'undefined') currentLang = savedLang;
+    } else if (typeof i18n !== 'undefined' && i18n[userLang] && typeof langMetadata !== 'undefined' && langMetadata[userLang]) {
         if (typeof currentLang !== 'undefined') currentLang = userLang;
+    }
+
+    // NOVO: Intercepta o botão de Tema (Skin) para salvar automaticamente sempre que clicar
+    if (typeof window.setSkin === 'function' && !window.setSkin.isIntercepted) {
+        const originalSetSkin = window.setSkin;
+        window.setSkin = function(skin, icon) {
+            originalSetSkin(skin, icon);
+            saveAppState(); // Salva logo depois de trocar!
+        };
+        window.setSkin.isIntercepted = true;
     }
 
     try {
@@ -163,7 +302,11 @@ async function initApp() {
             btn.href = '#';
             btn.className = 'text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3 transition-colors';
             btn.innerHTML = `${langMetadata[code].svg} <span>${langMetadata[code].name}</span>`;
-            btn.onclick = (e) => { e.preventDefault(); if(typeof setLang === 'function') setLang(code, langMetadata[code].name); };
+            btn.onclick = (e) => { 
+                e.preventDefault(); 
+                if(typeof setLang === 'function') setLang(code, langMetadata[code].name); 
+                saveAppState(); // NOVO: Salva quando troca a língua
+            };
             langListEl.appendChild(btn);
         });
         let currentFlagEl = document.getElementById('current-flag');
@@ -175,6 +318,9 @@ async function initApp() {
 
     if (typeof applyLanguage === 'function') applyLanguage(); 
     if (typeof updateBackingTrackButton === 'function') updateBackingTrackButton();
+
+    loadAppState();
+    updateUI();
 }
 
 initApp();

@@ -12,6 +12,8 @@ window.changeBPM = function(amount) {
     if (newVal < 40) newVal = 40;
     if (newVal > 300) newVal = 300;
     bpmInput.value = newVal; 
+    
+    if (typeof saveAppState === 'function') saveAppState();
 };
 
 // Filtros Principais
@@ -19,24 +21,28 @@ document.getElementById('tom')?.addEventListener('change', function() {
     let display = document.getElementById('tom-display');
     if(display) display.innerText = this.options[this.selectedIndex].text;
     if (typeof updateUI === 'function') updateUI();
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 document.getElementById('escala')?.addEventListener('change', function() {
     let display = document.getElementById('escala-display');
     if(display) display.innerText = this.options[this.selectedIndex].text;
     if (typeof atualizarModos === 'function') atualizarModos(true); 
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 document.getElementById('modo')?.addEventListener('change', function() {
     let display = document.getElementById('modo-display');
     if(display) display.innerText = this.options[this.selectedIndex].text;
     if (typeof updateUI === 'function') updateUI();
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 document.getElementById('exercicio')?.addEventListener('change', function() {
     let display = document.getElementById('exercicio-display');
     if(display) display.innerText = this.options[this.selectedIndex].dataset.short;
     if (typeof updateUI === 'function') updateUI();
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 // Controles Secundários
@@ -44,11 +50,13 @@ document.getElementById('filtro-cordas')?.addEventListener('change', function() 
     let display = document.getElementById('cordas-display');
     if(display) display.innerText = this.options[this.selectedIndex].text;
     if (typeof updateUI === 'function') updateUI();
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 document.getElementById('bpm')?.addEventListener('input', function() {
     if (this.value < 40) this.value = 40;
     if (this.value > 300) this.value = 300;
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 document.getElementById('volume-slider')?.addEventListener('input', function(e) {
@@ -75,15 +83,21 @@ document.getElementById('auto-bpm-toggle')?.addEventListener('change', function(
         arrowEl.classList.remove('opacity-100');
         arrowEl.classList.add('opacity-30');
     }
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 document.getElementById('sugerir-digitacao')?.addEventListener('change', () => {
     if (typeof updateUI === 'function') updateUI();
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
-// NOVO LISTENER: Padrão Invertido
 document.getElementById('inverter-cordas')?.addEventListener('change', () => {
     if (typeof updateUI === 'function') updateUI();
+    if (typeof saveAppState === 'function') saveAppState();
+});
+
+document.getElementById('desafio')?.addEventListener('change', () => {
+    if (typeof saveAppState === 'function') saveAppState();
 });
 
 // Toggle do Menu de Configurações Secundárias
