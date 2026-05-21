@@ -1,42 +1,54 @@
 /**
  * ========================================================================
- * ENGINE DE ÁUDIO (SINTETIZADOR WEB)
+ * MOTOR DE ÁUDIO - SÍNTESE PURA (audio.js)
  * ========================================================================
- * Responsabilidade: Gerar as ondas sonoras puras através da física acústica.
  */
 
-let audioCtx; 
-let globalVolume = 0.8; 
+let audioCtx = null;
+window.globalVolume = 0.8; 
 
 function initAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
 }
 
-function playPluck(stringIdx, fret) {
-    if (globalVolume <= 0) return; 
-
-    initAudio(); 
-    const freq = openStringFreqs[stringIdx] * Math.pow(2, fret / 12);
-
-    const osc = audioCtx.createOscillator();     
-    const gainNode = audioCtx.createGain();      
+// O Som da Guitarra Restaurado (Estilo Pluck Original)
+function playTone(pitch, durationMs) {
+    if (window.globalVolume <= 0 || !pitch) return;
+    initAudio();
+    
+    const osc = audioCtx.createOscillator();
     const filter = audioCtx.createBiquadFilter();
+    const gainNode = audioCtx.createGain();
 
+    // 1. ONDA: Dente de serra (sawtooth) - rica em harmônicos metálicos da corda
     osc.type = 'sawtooth';
-    osc.frequency.value = freq;
+    osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+    const now = audioCtx.currentTime;
+    
+    // 2. FILTRO: Passa-baixa restaurado
+    // Simula a lógica antiga "1500 + fret * 100", deixando as notas agudas com mais brilho
     filter.type = 'lowpass';
-    filter.frequency.value = 1500 + (fret * 100);
-
+    filter.frequency.setValueAtTime(Math.min(3500, pitch + 1500), now);
+    
+    // Conexões físicas
     osc.connect(filter);
     filter.connect(gainNode);
     gainNode.connect(audioCtx.destination);
-
-    const now = audioCtx.currentTime;
+    
+    // 3. ENVELOPE (A mágica do dedilhado):
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(globalVolume, now + 0.02); 
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5); 
-
+    // Ataque rápido de palheta/dedo (0.02s)
+    gainNode.gain.linearRampToValueAtTime(window.globalVolume, now + 0.02);
+    // Decaimento natural e longo da corda vibrando (2.5s) independente da velocidade do BPM
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+    
+    // Dá o play e respeita a cauda de 2.5s para o som morrer naturalmente
     osc.start(now);
     osc.stop(now + 2.5);
 }

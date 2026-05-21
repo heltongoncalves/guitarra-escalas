@@ -1,183 +1,173 @@
 /**
  * ========================================================================
- * SEQUENCIADOR E ANIMAÇÕES MUSICAIS (PLAYBACK)
+ * SEQUENCIADOR E CONTROLO DE RITMO (sequencer.js)
  * ========================================================================
  */
 
-let playbackState = {
-    diagramId: null,      
-    timeoutId: null,      
-    countdownIntervalId: null, 
-    currentIndex: 0,      
-    cycleCount: 0,        
-    sequence: [],         
-    sequences: {},        
-    playing: false,       
-    lastHighlightedNote: null 
+window.playbackState = {
+    isPlaying: false,
+    currentSequence: null,
+    currentIndex: 0,
+    timeoutId: null,
+    sequences: {},
+    currentDiagramId: null,
+    loopCount: 0 
 };
 
-function clearPlaybackHighlight() {
-    if (playbackState.lastHighlightedNote) {
-        let el = document.getElementById(playbackState.lastHighlightedNote);
-        if (el) el.classList.remove('playing-note');
-        playbackState.lastHighlightedNote = null;
-    }
-}
-
-function stopPlayback() {
-    if (playbackState.timeoutId) clearTimeout(playbackState.timeoutId);
-    
-    if (playbackState.countdownIntervalId) {
-        clearInterval(playbackState.countdownIntervalId);
-        playbackState.countdownIntervalId = null;
-    }
-    
-    const overlay = document.getElementById('countdown-overlay');
-    if (overlay) overlay.classList.add('hidden');
-    
-    clearPlaybackHighlight();
-
-    document.querySelectorAll('[id^="diagram-"]').forEach(el => el.classList.remove('challenge-hide-notes'));
-
-    document.querySelectorAll('[id^="btn-play-"]').forEach(btn => {
-        btn.querySelector('.icon-play').classList.remove('hidden');
-        btn.querySelector('.icon-stop').classList.add('hidden');
-        let textEl = btn.querySelector('.btn-text');
-        if (textEl) {
-            let isMain = btn.id === 'btn-play-main';
-            textEl.innerText = isMain ? (typeof t === 'function' ? t('btn_play_full') : 'Tocar Escala Completa') : (typeof t === 'function' ? t('btn_play') : 'Tocar');
-        }
+function updatePlayButtons(activeDiagramId, isPlaying) {
+    document.querySelectorAll('.floating-play-btn').forEach(btn => {
+        const iconPlay = btn.querySelector('.icon-play');
+        const iconStop = btn.querySelector('.icon-stop');
         
-        // Volta para a cor cinza metálica quando a música para
-        btn.classList.replace('bg-red-50', 'bg-gray-100');
-        btn.classList.replace('text-red-700', 'text-gray-800');
-        btn.classList.replace('border-red-200', 'border-gray-300');
+        if (btn.id === `btn-play-${activeDiagramId}` && isPlaying) {
+            btn.classList.replace('bg-gray-800', 'bg-red-600');
+            btn.classList.replace('bg-gray-100', 'bg-red-100');
+            btn.classList.replace('text-gray-800', 'text-red-600');
+        
+            if (iconPlay) iconPlay.classList.add('hidden');
+            if (iconStop) iconStop.classList.remove('hidden');
+        } else {
+            btn.classList.replace('bg-red-600', 'bg-gray-800');
+            btn.classList.replace('bg-red-100', 'bg-gray-100');
+            btn.classList.replace('text-red-600', 'text-gray-800');
+            if (iconPlay) iconPlay.classList.remove('hidden');
+            if (iconStop) iconStop.classList.add('hidden');
+        }
     });
-
-    playbackState.playing = false;
-    playbackState.diagramId = null;
 }
+
+function clearVisuals() {
+    document.querySelectorAll('.note-dot.playing').forEach(el => {
+        el.classList.remove('playing');
+        el.style.transform = '';
+        el.style.boxShadow = '';
+        el.style.borderColor = '';
+    });
+}
+
+window.stopPlayback = function() {
+    window.playbackState.isPlaying = false;
+    if (window.playbackState.timeoutId) {
+        clearTimeout(window.playbackState.timeoutId);
+        window.playbackState.timeoutId = null;
+    }
+    clearVisuals();
+    updatePlayButtons(null, false);
+    
+    if (typeof MicGame !== 'undefined') MicGame.stopEngine();
+};
 
 function playNextNote() {
-    if (!playbackState.playing) return; 
+    if (!window.playbackState.isPlaying) return;
 
-    let seq = playbackState.sequence;
-    
-    if (!seq || seq.length === 0) {
-        stopPlayback();
+    let seq = window.playbackState.sequences[window.playbackState.currentDiagramId];
+
+    if (!seq || window.playbackState.currentIndex >= seq.length) {
+        window.playbackState.loopCount++;
+        window.playbackState.currentIndex = 0; 
+        
+        let autoBpmToggle = document.getElementById('auto-bpm-toggle');
+        let cyclesSelect = document.getElementById('auto-bpm-cycles');
+
+        if (autoBpmToggle && autoBpmToggle.checked && cyclesSelect) {
+            let maxCycles = parseInt(cyclesSelect.value) || 2;
+            if (window.playbackState.loopCount >= maxCycles) {
+                window.playbackState.loopCount = 0; 
+                let bpmInput = document.getElementById('bpm');
+                if (bpmInput) {
+                    let currentBpm = parseInt(bpmInput.value) || 120;
+                    let newBpm = currentBpm + 10;
+                    if (newBpm <= 300) {
+                        bpmInput.value = newBpm;
+                        if (typeof saveAppState === 'function') saveAppState();
+                    }
+                }
+            }
+        }
+    }
+
+    let noteObj = seq[window.playbackState.currentIndex];
+
+    let bpmInput = document.getElementById('bpm');
+    let bpm = bpmInput ? parseInt(bpmInput.value) : 120;
+    if (isNaN(bpm) || bpm < 40) bpm = 120;
+    let msPerBeat = Math.round(60000 / bpm);
+    clearVisuals();
+
+    let el = document.getElementById(noteObj.id);
+    if (el) {
+        el.classList.add('playing');
+        el.style.transform = 'scale(1.3)';
+        el.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.8)';
+        el.style.borderColor = '#fbbf24';
+    }
+
+    if (typeof MicGame !== 'undefined' && MicGame.isToggledOn) {
+        if (!MicGame.forceMute && typeof playTone === 'function') {
+            playTone(noteObj.pitch, msPerBeat);
+        }
+        MicGame.notifyNewNote(noteObj.pitch, noteObj.id);
+    } else {
+        if (typeof playTone === 'function') playTone(noteObj.pitch, msPerBeat);
+    }
+
+    window.playbackState.currentIndex++;
+    window.playbackState.timeoutId = setTimeout(playNextNote, msPerBeat);
+}
+
+window.togglePlay = function(diagramId, startFret, endFret) {
+    if (typeof initAudio === 'function') initAudio();
+    if (window.playbackState.isPlaying && window.playbackState.currentDiagramId === diagramId) {
+        window.stopPlayback();
+        if (typeof MicGame !== 'undefined' && MicGame.isToggledOn) MicGame.notifyGameEnd();
         return;
     }
-
-    if (playbackState.currentIndex >= seq.length) {
-        playbackState.currentIndex = 0;
-        playbackState.cycleCount++;
-
-        const autoBpmToggle = document.getElementById('auto-bpm-toggle');
-        if (autoBpmToggle && autoBpmToggle.checked) {
-            const cyclesTarget = parseInt(document.getElementById('auto-bpm-cycles').value) || 1;
-            if (playbackState.cycleCount % cyclesTarget === 0) {
-                const currentBpm = parseInt(document.getElementById('bpm').value) || 120;
-                if (currentBpm < 300 && typeof changeBPM === 'function') changeBPM(10); 
-            }
-        }
-    }
-
-    clearPlaybackHighlight();
-
-    let isChallengeOn = document.getElementById('desafio').checked;
-    let isPositionDiagram = playbackState.diagramId && playbackState.diagramId.startsWith('pos-');
-
-    let cyclePhase = isChallengeOn && isPositionDiagram ? (playbackState.cycleCount % 12) : 0;
     
-    let hideHighlight = cyclePhase >= 8;
-    let hideNotes = cyclePhase >= 10;
+    window.stopPlayback();
+    let seq = window.playbackState.sequences[diagramId];
+    if (!seq || seq.length === 0) return;
 
-    let diagramEl = document.getElementById(`diagram-${playbackState.diagramId}`);
-    if (diagramEl) {
-        if (hideNotes) diagramEl.classList.add('challenge-hide-notes'); 
-        else diagramEl.classList.remove('challenge-hide-notes');
-    }
+    updatePlayButtons(diagramId, true);
 
-    let currentNote = seq[playbackState.currentIndex];
-    let noteEl = document.getElementById(currentNote.id);
+    window.playbackState.isPlaying = true;
+    window.playbackState.currentDiagramId = diagramId;
+    window.playbackState.currentIndex = 0;
+    window.playbackState.loopCount = 0; 
     
-    if (noteEl && !hideHighlight && !hideNotes) {
-        noteEl.classList.add('playing-note');
-        playbackState.lastHighlightedNote = currentNote.id; 
-    }
-
-    if (typeof playPluck === 'function') {
-        playPluck(currentNote.string, currentNote.fret);
-    }
+    let overlay = document.getElementById('countdown-overlay');
+    let numberEl = document.getElementById('countdown-number');
+    let micMsgEl = document.getElementById('mic-calibrating-msg');
     
-    playbackState.currentIndex++; 
-
-    let bpm = parseInt(document.getElementById('bpm').value) || 120;
-    let msPerBeat = 60000 / bpm; 
-
-    playbackState.timeoutId = setTimeout(playNextNote, msPerBeat);
-}
-
-function startCountdown(callback) {
-    const overlay = document.getElementById('countdown-overlay');
-    const numberEl = document.getElementById('countdown-number');
-    let count = 3; 
-    
-    numberEl.innerText = count + '..'; 
-    overlay.classList.remove('hidden'); 
-
-    playbackState.countdownIntervalId = setInterval(() => {
-        count--; 
+    if (overlay && numberEl) {
+        overlay.classList.remove('hidden');
+        let count = 3;
+        numberEl.innerText = count;
         
-        if (count > 0) {
-            numberEl.innerText = count + '..';
+        if (typeof MicGame !== 'undefined' && MicGame.isToggledOn) {
+            if (micMsgEl) micMsgEl.classList.remove('hidden');
+            MicGame.startCalibrationAndEngine();
         } else {
-            clearInterval(playbackState.countdownIntervalId);
-            playbackState.countdownIntervalId = null;
-            overlay.classList.add('hidden'); 
-            
-            if (playbackState.playing) {
-                callback();
+            if (micMsgEl) micMsgEl.classList.add('hidden');
+        }
+        
+        let countInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                numberEl.innerText = count;
+            } else {
+                clearInterval(countInterval);
+                overlay.classList.add('hidden');
+                if (micMsgEl) micMsgEl.classList.add('hidden');
+                
+                // NOVO: Inicia a contagem de tempo da sessão!
+                if (typeof UserStats !== 'undefined') UserStats.startSession();
+                
+                playNextNote();
             }
-        }
-    }, 1000); 
-}
-
-function togglePlay(diagramId, startFret, endFret) {
-    let scaleData = typeof getScaleData === 'function' ? getScaleData() : null;
-    if (!scaleData) return; 
-
-    if (playbackState.playing && playbackState.diagramId === diagramId) {
-        stopPlayback();
+        }, 1000);
     } else {
-        stopPlayback();
-        
-        playbackState.diagramId = diagramId;
-        playbackState.sequence = playbackState.sequences[diagramId] || [];
-        playbackState.currentIndex = 0;
-        playbackState.cycleCount = 0; 
-        playbackState.playing = true; 
-
-        let diagramEl = document.getElementById(`diagram-${diagramId}`);
-        if (diagramEl) diagramEl.classList.remove('challenge-hide-notes');
-
-        let btn = document.getElementById(`btn-play-${diagramId}`);
-        btn.querySelector('.icon-play').classList.add('hidden');
-        btn.querySelector('.icon-stop').classList.remove('hidden');
-        let textEl = btn.querySelector('.btn-text');
-        if (textEl) {
-            textEl.innerText = typeof t === 'function' ? t('btn_stop') : 'Parar';
-        }
-        
-        // Fica com fundo vermelho enquanto toca
-        btn.classList.replace('bg-gray-100', 'bg-red-50');
-        btn.classList.replace('text-gray-800', 'text-red-700');
-        btn.classList.replace('border-gray-300', 'border-red-200');
-
-        if (typeof initAudio === 'function') initAudio();    
-        
-        startCountdown(() => {
-            playNextNote(); 
-        });
+        // NOVO: Inicia a contagem de tempo da sessão!
+        if (typeof UserStats !== 'undefined') UserStats.startSession();
+        playNextNote();
     }
-}
+};

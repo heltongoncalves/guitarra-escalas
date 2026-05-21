@@ -1,0 +1,27 @@
+Contexto do Projeto: "Tutor de Escalas" (Vanilla JS).
+
+Eu estou criando uma aplicação html para auxiliar o usuário a 
+tocar escalas musicais na guitarra. Eu estava em outro chat, 
+mas como estourou a janela de contexto, estou abrindo nova conversa. 
+Eu vou te mandar o arquivo app.md com as principais regras e resumo da responsabilidade de cada arquivo do projeto.
+Eu também anexei um arquivo chamado resumo_projeto.txt com o código completo do projeto.
+Ele tem a estrutura 
+
+***[caminho do arquivo]
+fonte do arquivo.
+
+Isso permite que eu anexe todo o projeto de uma vez, pois você tem um limite de 10 arquivos anexados.
+
+Assuma que tudo funciona perfeitamente e só altere o que eu te pedir.
+
+Objetivo desta sessão: [Descreva o que precisa ser construído ou refatorado, ex: Implementar a troca dinâmica do idioma no modal de harmonia]
+
+Desconsidere arquivos da pasta /misc.
+
+Sua Tarefa:
+
+Considerando as regras estruturais do app.md e o código fornecido, preciso que você:
+
+
+Me diga quais alterações eu preciso fazer e em quais arquivos preciso atualizar.
+Me retorne sempre o código completo do arquivo a ser alterado.

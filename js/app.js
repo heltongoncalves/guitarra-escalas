@@ -4,7 +4,7 @@
  * ========================================================================
  */
 
-// 1. CARREGAMENTO IMEDIATO DO TEMA (Evita "piscar" a tela em branco antes de aplicar o modo escuro)
+// 1. CARREGAMENTO IMEDIATO DO TEMA (Evita "piscar" a tela em branco)
 (function loadEarlyTheme() {
     try {
         const saved = localStorage.getItem('guitar_tutor_app_state');
@@ -28,22 +28,20 @@ function saveAppState() {
         inverterCordas: document.getElementById('inverter-cordas')?.checked,
         desafio: document.getElementById('desafio')?.checked,
         autoBpm: document.getElementById('auto-bpm-toggle')?.checked,
-        lang: typeof currentLang !== 'undefined' ? currentLang : 'pt', // Salva o Idioma atual
-        skin: document.body.getAttribute('data-skin'),                 // Salva o Tema atual (Claro, Escuro, Vintage)
-        skinIcon: document.getElementById('current-skin-icon')?.innerText // Salva o Ícone do Solzinho/Lua
+        lang: typeof currentLang !== 'undefined' ? currentLang : 'pt',
+        skin: document.body.getAttribute('data-skin'),
+        skinIcon: document.getElementById('current-skin-icon')?.innerText
     };
     localStorage.setItem('guitar_tutor_app_state', JSON.stringify(state));
 }
 
-// FUNÇÃO PARA CARREGAR O ESTADO SALVO (Inputs e Selects)
+// FUNÇÃO PARA CARREGAR O ESTADO SALVO
 function loadAppState() {
     const saved = localStorage.getItem('guitar_tutor_app_state');
     if (!saved) return;
     
     try {
         const state = JSON.parse(saved);
-        
-        // Restaura o ícone do tema na barra superior
         if (state.skinIcon) {
             const iconEl = document.getElementById('current-skin-icon');
             if (iconEl) iconEl.innerText = state.skinIcon;
@@ -51,19 +49,25 @@ function loadAppState() {
 
         if (state.tom) {
             const el = document.getElementById('tom');
-            if (el) { el.value = state.tom; document.getElementById('tom-display').innerText = el.options[el.selectedIndex]?.text || state.tom; }
+            if (el && el.options.length > 0) { 
+                el.value = state.tom; 
+                document.getElementById('tom-display').innerText = el.options[el.selectedIndex]?.text || state.tom; 
+            }
         }
         if (state.escala) {
             const el = document.getElementById('escala');
-            if (el) { el.value = state.escala; document.getElementById('escala-display').innerText = el.options[el.selectedIndex]?.text || state.escala; }
+            if (el && el.options.length > 0) { 
+                el.value = state.escala; 
+                document.getElementById('escala-display').innerText = el.options[el.selectedIndex]?.text || state.escala; 
+            }
         }
         
-        if (typeof atualizarModos === 'function') atualizarModos(false); 
-        
+        if (typeof atualizarModos === 'function') atualizarModos(false);
+
         if (state.modo) {
             const el = document.getElementById('modo');
-            if (el) { 
-                el.value = state.modo; 
+            if (el && el.options.length > 0) { 
+                el.value = state.modo;
                 if (el.selectedIndex >= 0) {
                     document.getElementById('modo-display').innerText = el.options[el.selectedIndex].text;
                 } else {
@@ -75,11 +79,17 @@ function loadAppState() {
 
         if (state.exercicio) {
             const el = document.getElementById('exercicio');
-            if (el) { el.value = state.exercicio; document.getElementById('exercicio-display').innerText = el.options[el.selectedIndex]?.dataset.short || state.exercicio; }
+            if (el && el.options.length > 0) { 
+                el.value = state.exercicio; 
+                document.getElementById('exercicio-display').innerText = el.options[el.selectedIndex]?.dataset?.short || state.exercicio; 
+            }
         }
         if (state.filtroCordas) {
             const el = document.getElementById('filtro-cordas');
-            if (el) { el.value = state.filtroCordas; document.getElementById('cordas-display').innerText = el.options[el.selectedIndex]?.text || state.filtroCordas; }
+            if (el && el.options.length > 0) { 
+                el.value = state.filtroCordas; 
+                document.getElementById('cordas-display').innerText = el.options[el.selectedIndex]?.text || state.filtroCordas; 
+            }
         }
         if (state.bpm) {
             const el = document.getElementById('bpm');
@@ -112,11 +122,24 @@ function loadAppState() {
 function updateUI() {
     if (typeof stopPlayback === 'function') stopPlayback(); 
     let scaleData = typeof getScaleData === 'function' ? getScaleData() : null; 
-    if (!scaleData) return; 
+    
+    // PROTEÇÃO CONTRA TELA VAZIA: Se falhar ao ler os Selects, força restauração de valores
+    if (!scaleData) {
+        console.warn("Aviso: Dados da escala não encontrados. Tentando restaurar valores padrão...");
+        const tomEl = document.getElementById('tom');
+        const escalaEl = document.getElementById('escala');
+        if (tomEl && tomEl.options.length > 0) tomEl.selectedIndex = 0;
+        if (escalaEl && escalaEl.options.length > 0) escalaEl.selectedIndex = 0;
+        if (typeof atualizarModos === 'function') atualizarModos(false);
+        scaleData = typeof getScaleData === 'function' ? getScaleData() : null;
+        if (!scaleData) {
+            console.error("Falha crítica: O banco de dados de escalas não está acessível.");
+            return; 
+        }
+    }
 
     let exEl = document.getElementById('exercicio');
     let exercicioId = exEl ? exEl.value : '1';
-    
     let filtroCordasEl = document.getElementById('filtro-cordas');
     let filtroCordas = filtroCordasEl ? filtroCordasEl.value : 'all'; 
 
@@ -124,13 +147,12 @@ function updateUI() {
     let inverterCordas = document.getElementById('inverter-cordas')?.checked || false;
     
     if (typeof playbackState !== 'undefined') playbackState.sequences = {};
-
     let windows = typeof getPositionWindows === 'function' ? getPositionWindows(scaleData.rootIdx, scaleData.cagedOffset) : [];
     
     let mainFullSequence = [];
     let mainActiveIds = new Set();
     let allPositionsData = [];
-    let processedPositions = []; 
+    let processedPositions = [];
 
     if (typeof generateExerciseData === 'function') {
         let mainData = generateExerciseData('main', 0, 15, scaleData, exercicioId, filtroCordas);
@@ -151,7 +173,6 @@ function updateUI() {
                     let parts = id.split('-');
                     let f = parseInt(parts[parts.length-1]);
                     activeFrets.add(f);
-                    
                     if (f > 0 && f < minFret) minFret = f; 
                     if (f > maxFret) maxFret = f;
                 });
@@ -165,16 +186,16 @@ function updateUI() {
                 if (activeFrets.has(0) || start === 0) {
                     newStart = 0;
                 } else if (minFret !== 99) {
-                    newStart = minFret; 
+                    newStart = minFret;
                 }
             }
 
             if (newEnd - newStart < 2) newEnd = newStart + 2;
-
             let posData = generateExerciseData(diagId, newStart, newEnd, scaleData, exercicioId, filtroCordas);
             
             let finalActiveFrets = new Set();
             let finalActiveNotes = new Set();
+
             if (posData && posData.activeNoteIds) {
                 posData.activeNoteIds.forEach(id => {
                     let parts = id.split('-');
@@ -244,7 +265,6 @@ function updateUI() {
 }
 
 async function initApp() { 
-    // LÊ O IDIOMA SALVO (Antes de carregar a lista de idiomas)
     let savedLang = null;
     try {
         const saved = localStorage.getItem('guitar_tutor_app_state');
@@ -252,19 +272,18 @@ async function initApp() {
     } catch(e) {}
     
     let userLang = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
-    
+
     if (savedLang && typeof langMetadata !== 'undefined' && langMetadata[savedLang]) {
         if (typeof currentLang !== 'undefined') currentLang = savedLang;
     } else if (typeof i18n !== 'undefined' && i18n[userLang] && typeof langMetadata !== 'undefined' && langMetadata[userLang]) {
         if (typeof currentLang !== 'undefined') currentLang = userLang;
     }
 
-    // NOVO: Intercepta o botão de Tema (Skin) para salvar automaticamente sempre que clicar
     if (typeof window.setSkin === 'function' && !window.setSkin.isIntercepted) {
         const originalSetSkin = window.setSkin;
         window.setSkin = function(skin, icon) {
             originalSetSkin(skin, icon);
-            saveAppState(); // Salva logo depois de trocar!
+            saveAppState();
         };
         window.setSkin.isIntercepted = true;
     }
@@ -305,13 +324,15 @@ async function initApp() {
             btn.onclick = (e) => { 
                 e.preventDefault(); 
                 if(typeof setLang === 'function') setLang(code, langMetadata[code].name); 
-                saveAppState(); // NOVO: Salva quando troca a língua
+                saveAppState(); 
             };
             langListEl.appendChild(btn);
         });
+        
         let currentFlagEl = document.getElementById('current-flag');
         let currentLangNameEl = document.getElementById('current-lang-name');
         let langToUse = typeof currentLang !== 'undefined' ? currentLang : 'pt';
+        
         if (currentFlagEl && langMetadata[langToUse]) currentFlagEl.innerHTML = langMetadata[langToUse].svg;
         if (currentLangNameEl && langMetadata[langToUse]) currentLangNameEl.innerText = langMetadata[langToUse].name;
     }
@@ -323,4 +344,12 @@ async function initApp() {
     updateUI();
 }
 
-initApp();
+// ========================================================================
+// MOTOR DE BOOT SEGURO
+// ========================================================================
+// Aguarda o HTML completo (incluindo as views injetadas via Javascript) antes de iniciar
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        initApp();
+    }, 50); // Delay cirúrgico para garantir que o DOM estabilizou
+});

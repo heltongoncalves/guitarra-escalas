@@ -9,9 +9,11 @@
 let currentLang = 'pt';
 
 function t(key) {
-    if (i18n[currentLang] && i18n[currentLang][key]) return i18n[currentLang][key];
-    if (i18n['en'] && i18n['en'][key]) return i18n['en'][key];
-    if (i18n['pt'] && i18n['pt'][key]) return i18n['pt'][key];
+    if (typeof i18n !== 'undefined') {
+        if (i18n[currentLang] && i18n[currentLang][key]) return i18n[currentLang][key];
+        if (i18n['en'] && i18n['en'][key]) return i18n['en'][key];
+        if (i18n['pt'] && i18n['pt'][key]) return i18n['pt'][key];
+    }
     return key;
 }
 
@@ -23,17 +25,30 @@ function getShortExText(fullText) {
 }
 
 function setLang(code, langName) {
-    document.getElementById('current-flag').innerHTML = langMetadata[code].svg;
-    document.getElementById('current-lang-name').innerText = langName;
-    document.getElementById('lang-menu-dropdown').classList.add('hidden');
+    const flagEl = document.getElementById('current-flag');
+    const nameEl = document.getElementById('current-lang-name');
+    const dropdownEl = document.getElementById('lang-menu-dropdown');
+    
+    if (flagEl && typeof langMetadata !== 'undefined' && langMetadata[code]) {
+        flagEl.innerHTML = langMetadata[code].svg;
+    }
+    if (nameEl) nameEl.innerText = langName;
+    if (dropdownEl) dropdownEl.classList.add('hidden');
+    
     currentLang = code;
     applyLanguage();
 }
 
 function applyLanguage() {
-    const selCat = document.getElementById('escala').value || 'Pentatônica';
-    const selModo = document.getElementById('modo').value || 'Maior';
-    const selEx = document.getElementById('exercicio').value || '1';
+    // Busca os elementos de forma segura
+    const escalaEl = document.getElementById('escala');
+    const modoEl = document.getElementById('modo');
+    const exSelect = document.getElementById('exercicio');
+    
+    // Captura os valores atuais ou usa os padrões se os selects ainda não existirem
+    const selCat = escalaEl?.value || 'Pentatônica';
+    const selModo = modoEl?.value || 'Maior';
+    const selEx = exSelect?.value || '1';
 
     document.documentElement.lang = currentLang;
 
@@ -45,64 +60,97 @@ function applyLanguage() {
         el.innerHTML = t(key);
     });
 
-    const exSelect = document.getElementById('exercicio');
-    exSelect.innerHTML = '';
-    for (let i = 1; i <= 9; i++) {
-        let opt = document.createElement('option');
-        opt.value = i.toString();
-        opt.text = t(`ex_${i}`);
-        opt.dataset.short = getShortExText(t(`ex_${i}`));
-        exSelect.add(opt);
+    // Só atualiza os Exercícios se o Select existir no DOM
+    if (exSelect) {
+        exSelect.innerHTML = '';
+        for (let i = 1; i <= 9; i++) {
+            let opt = document.createElement('option');
+            opt.value = i.toString();
+            opt.text = t(`ex_${i}`);
+            opt.dataset.short = getShortExText(t(`ex_${i}`));
+            exSelect.add(opt);
+        }
+        exSelect.value = selEx;
+        const exDisplay = document.getElementById('exercicio-display');
+        if (exDisplay && exSelect.selectedIndex >= 0) {
+            exDisplay.innerText = exSelect.options[exSelect.selectedIndex].dataset.short;
+        }
     }
-    exSelect.value = selEx;
-    document.getElementById('exercicio-display').innerText = exSelect.options[exSelect.selectedIndex].dataset.short;
 
-    const catSelect = document.getElementById('escala');
-    catSelect.innerHTML = '';
-    for (const cat in bancoDeEscalas) {
-        catSelect.add(new Option(t(cat), cat)); 
+    // Só atualiza as Escalas se o Select existir no DOM
+    if (escalaEl && typeof bancoDeEscalas !== 'undefined') {
+        escalaEl.innerHTML = '';
+        for (const cat in bancoDeEscalas) {
+            escalaEl.add(new Option(t(cat), cat));
+        }
+        escalaEl.value = bancoDeEscalas[selCat] ? selCat : 'Pentatônica';
+        const escalaDisplay = document.getElementById('escala-display');
+        if (escalaDisplay && escalaEl.selectedIndex >= 0) {
+            escalaDisplay.innerText = escalaEl.options[escalaEl.selectedIndex].text;
+        }
     }
-    catSelect.value = bancoDeEscalas[selCat] ? selCat : 'Pentatônica';
-    document.getElementById('escala-display').innerText = catSelect.options[catSelect.selectedIndex].text;
 
     atualizarModos(false);
-    const modoSelect = document.getElementById('modo');
-    if ([...modoSelect.options].some(o => o.value === selModo)) {
-        modoSelect.value = selModo;
+    
+    // Só atualiza os Modos se o Select existir no DOM
+    if (modoEl) {
+        if ([...modoEl.options].some(o => o.value === selModo)) {
+            modoEl.value = selModo;
+        }
+        const modoDisplay = document.getElementById('modo-display');
+        if (modoDisplay && modoEl.selectedIndex >= 0) {
+            modoDisplay.innerText = modoEl.options[modoEl.selectedIndex].text;
+        }
     }
-    document.getElementById('modo-display').innerText = modoSelect.options[modoSelect.selectedIndex].text;
 
+    // Só atualiza as Cordas se o Select existir no DOM
     const cordasSelect = document.getElementById('filtro-cordas');
-    cordasSelect.options[0].text = t('str_all');
-    document.getElementById('cordas-display').innerText = cordasSelect.options[cordasSelect.selectedIndex].text;
+    if (cordasSelect && cordasSelect.options.length > 0) {
+        cordasSelect.options[0].text = t('str_all');
+        const cordasDisplay = document.getElementById('cordas-display');
+        if (cordasDisplay && cordasSelect.selectedIndex >= 0) {
+            cordasDisplay.innerText = cordasSelect.options[cordasSelect.selectedIndex].text;
+        }
+    }
 
+    // Só atualiza os Tons se o Select existir no DOM
     const tomSelect = document.getElementById('tom');
-    const selTom = tomSelect.value || 'C';
-    tomSelect.innerHTML = '';
-    const rootsArr = (i18n[currentLang] && i18n[currentLang].roots) ? i18n[currentLang].roots : i18n['en'].roots;
-    
-    notasCromaticas.forEach((nota, idx) => {
-        let opt = document.createElement('option');
-        opt.value = nota; 
-        opt.text = rootsArr[idx]; 
-        tomSelect.add(opt);
-    });
-    
-    tomSelect.value = selTom;
-    document.getElementById('tom-display').innerText = tomSelect.options[tomSelect.selectedIndex].text;
+    if (tomSelect && typeof notasCromaticas !== 'undefined') {
+        const selTom = tomSelect.value || 'C';
+        tomSelect.innerHTML = '';
+        const rootsArr = (typeof i18n !== 'undefined' && i18n[currentLang] && i18n[currentLang].roots) ? i18n[currentLang].roots : i18n['en'].roots;
+        
+        notasCromaticas.forEach((nota, idx) => {
+            let opt = document.createElement('option');
+            opt.value = nota; 
+            opt.text = rootsArr[idx]; 
+            tomSelect.add(opt);
+        });
+        tomSelect.value = selTom;
+        const tomDisplay = document.getElementById('tom-display');
+        if (tomDisplay && tomSelect.selectedIndex >= 0) {
+            tomDisplay.innerText = tomSelect.options[tomSelect.selectedIndex].text;
+        }
+    }
 
-    updateUI();
+    if (typeof updateUI === 'function') updateUI();
     
-    // Força a atualização do botão Backing Track se o módulo estiver carregado
     if (typeof updateBackingTrackButton === 'function') {
         updateBackingTrackButton();
     }
 }
 
 function atualizarModos(triggerUpdateUI = true) {
-    const cat = document.getElementById('escala').value;
-    const modos = bancoDeEscalas[cat];
     const selectModo = document.getElementById('modo');
+    const escalaEl = document.getElementById('escala');
+    
+    // Se faltar algum elemento ou o banco de dados da música, aborta silenciosamente
+    if (!selectModo || !escalaEl || typeof bancoDeEscalas === 'undefined') return;
+
+    const cat = escalaEl.value;
+    const modos = bancoDeEscalas[cat];
+    if (!modos) return;
+
     const oldModo = selectModo.value;
 
     selectModo.innerHTML = ''; 
@@ -114,7 +162,10 @@ function atualizarModos(triggerUpdateUI = true) {
         selectModo.value = oldModo;
     }
     
-    document.getElementById('modo-display').innerText = selectModo.options[selectModo.selectedIndex].text;
+    const modoDisplay = document.getElementById('modo-display');
+    if (modoDisplay && selectModo.selectedIndex >= 0) {
+        modoDisplay.innerText = selectModo.options[selectModo.selectedIndex].text;
+    }
 
-    if (triggerUpdateUI) updateUI();
+    if (triggerUpdateUI && typeof updateUI === 'function') updateUI();
 }
